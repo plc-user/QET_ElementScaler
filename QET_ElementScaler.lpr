@@ -69,7 +69,7 @@ begin
       fNewVal := (strtofloat(val) * gfFactor);
       result := (Format('%0.2f', [fNewVal]));
       if (elem = 'definition') then begin
-        result := Copy(result, 1 ,length(result)-3);
+        result := inttostr(round(fNewVal));
         exit;
         end;
       if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
