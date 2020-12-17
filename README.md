@@ -5,4 +5,4 @@
 compiles/runs with Lazarus 2.0.10 and FreePascal 3.2.0 on Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-1196)
 
 usage:
-QET_ElementScaler <file> <scaling-factor>
+QET_ElementScaler  file  scaling-factor
