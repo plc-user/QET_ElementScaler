@@ -61,6 +61,7 @@ begin
      ((elem = 'line') and ((name = 'x1') or (name = 'x2') or (name = 'y1') or (name = 'y2'))) or
      ((elem = 'dynamic_text') and ((name = 'x') or (name = 'y'))) or
      ((elem = 'text') and ((name = 'x') or (name = 'y'))) or
+     ((elem = 'input') and ((name = 'x') or (name = 'y'))) or
      ((elem = 'terminal') and ((name = 'x') or (name = 'y'))) or
      ((elem = 'arc') and ((name = 'height') or (name = 'width') or (name = 'x') or (name = 'y'))) or
      ((elem = 'circle') and ((name = 'x') or (name = 'y') or (name = 'diameter'))) or
