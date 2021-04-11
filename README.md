@@ -1,8 +1,11 @@
 # QET_ElementScaler
 
-"Quick-And-Dirty"-approach to scale QElectroTech-Graphics with a constant factor.
+Scale QElectroTech-Graphics with constant factor(s).
 
-compiles/runs with Lazarus 2.0.10 and FreePascal 3.2.0 on Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-1196)
+compiles/runs with Lazarus 2.0.10 and FreePascal 3.2.0 on Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-2029)
 
-usage:
-QET_ElementScaler  file  scaling-factor
+usage:<br>
+QET_ElementScaler  &lt;file&gt;  &lt;scaling-factor&gt;
+
+or:<br>
+QET_ElementScaler [-x FactorForX] [-y FactorForY] -f FILENAME
