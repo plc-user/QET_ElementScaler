@@ -6,7 +6,7 @@ compiles/runs with Lazarus 2.0.10 and FreePascal 3.2.0 on Debian/GNU Linux (unst
 
 usage:<br>
 QET_ElementScaler  &lt;file&gt;  &lt;scaling-factor&gt; <br>
-(as used in Batch-File &quot;scale.cmd&quot;)
+(as used in Batch-File &quot;scale.cmd&quot; and shell-script &quot;scale.sh&quot;)
 
 or:<br>
 QET_ElementScaler [-x FactorForX] [-y FactorForY] -f FILENAME
