@@ -3,8 +3,8 @@ program QET_ElementScaler;
 //
 // Scale QElectroTech-Graphics with a constant factor(s).
 //
-// compiles/runs with Lazarus 2.0.10 and FreePascal 3.2.0 on
-// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-2029)
+// compiles/runs with Lazarus 2.0.12 and FreePascal 3.2.0 on
+// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-3048)
 //
 // usage:
 // QET_ElementScaler <file> <scaling-factor>
@@ -19,12 +19,12 @@ program QET_ElementScaler;
 //
 // use it at your own risk!
 //
-// Last Change: 11.04.2021
-// possibility to set different factors for X- and Y-directions
+// Last Change: 25.08.2021
+// if there is a UUID in/for the element, we create a new one
 //
 // Created: 17.12.2020
 // Author: plc-user
-// https//github.com/plc-user
+// https://github.com/plc-user
 //
 // based on example-code from
 // https://wiki.freepascal.org/XML_Tutorial
@@ -55,6 +55,9 @@ type
 
 { TQETScaler }
 
+const
+  sVersion: string = '0.2beta3';
+
 var
   QETfile: TXMLDocument;    // holds the XML-Data from/to file
   gfFactor:  double = 1.0;  // Scaling-Factor for circles and Text-size
@@ -70,6 +73,7 @@ function FaktorAnwenden(elem, name, val: string): string;
 // removes trailing zeros
 var
   fNewVal: double = 0.0;
+  uuidNEW: TGuid;
   slFont: TStringList;
   iNewFontSize: longint;
 begin
@@ -96,6 +100,10 @@ begin
       if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
       if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
     end
+  else if ((elem = 'uuid') and (name = 'uuid')) then begin
+    if (CreateGUID(uuidNEW) = 0) then
+      result := LowerCase(GUIDToString(uuidNEW));
+    end
   else result := val;
 end;
 
@@ -106,6 +114,7 @@ function FaktorXAnwenden(elem, name, val: string): string;
 // removes trailing zeros
 var
   fNewVal: double = 0.0;
+  uuidNEW: TGuid;
 begin
   if ((elem = 'polygon') and (name[1] = 'x')) or
      ((elem = 'definition') and ((name = 'width') or (name = 'hotspot_x'))) or
@@ -129,6 +138,10 @@ begin
       if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
       if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
     end
+  else if ((elem = 'uuid') and (name = 'uuid')) then begin
+    if (CreateGUID(uuidNEW) = 0) then
+      result := LowerCase(GUIDToString(uuidNEW));
+    end
   else result := val;
 end;
 
@@ -139,6 +152,7 @@ function FaktorYAnwenden(elem, name, val: string): string;
 // removes trailing zeros
 var
   fNewVal: double = 0.0;
+  uuidNEW: TGuid;
 begin
   if ((elem = 'polygon') and (name[1] = 'y')) or
      ((elem = 'definition') and ((name = 'height') or (name = 'hotspot_y'))) or
@@ -161,6 +175,10 @@ begin
       if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
       if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
       if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
+    end
+  else if ((elem = 'uuid') and (name = 'uuid')) then begin
+    if (CreateGUID(uuidNEW) = 0) then
+      result := LowerCase(GUIDToString(uuidNEW));
     end
   else result := val;
 end;
@@ -236,16 +254,8 @@ begin
   cDecSep := DefaultFormatSettings.DecimalSeparator;
   DefaultFormatSettings.DecimalSeparator := '.';
 
-  // weniger als 2 Parameter gehen gar nicht!
-    if (ParamCount < 2) then begin
-      WriteHelp;
-      writeln(' - - - no file read / changed - - -');
-      Terminate;
-      Exit;
-    end;
-
   // Schnelltest der Parameter
-  ErrorMsg:=CheckOptions('hx:y:f:', 'help file:');
+  ErrorMsg:=CheckOptions('hx:y:f:v', 'help file: version');
   if ErrorMsg<>'' then begin
     ShowException(Exception.Create(ErrorMsg));
     writeln(' * * * STOP * * *');
@@ -253,6 +263,32 @@ begin
     Exit;
   end;
 
+  // Version ausgeben und beenden
+  if HasOption('v', 'version') then begin
+    writeln;
+    writeln(ExtractFileName(ExeName), ' version ', sVersion);
+    writeln;
+    Terminate;
+    Exit;
+  end;
+
+  // da braucht jemand Hilfe
+  if HasOption('h', 'help') then begin
+    WriteHelp;
+    writeln(' - - - no file read / changed - - -');
+    Terminate;
+    Exit;
+  end;
+
+  // weniger als 2 Parameter gehen sonst gar nicht!
+  if (ParamCount < 2) then begin
+    WriteHelp;
+    writeln(' - - - no file read / changed - - -');
+    Terminate;
+    Exit;
+  end;
+
+  // Faktor für X
   if hasOption('x') then
   begin
     try
@@ -265,6 +301,7 @@ begin
     end;
   end;
 
+  // Faktor für Y
   if hasOption('y') then
   begin
     try
@@ -277,6 +314,7 @@ begin
     end;
   end;
 
+  // die Datei zum Bearbeiten
   if hasOption('f', 'file') then
   begin
     try
@@ -287,14 +325,6 @@ begin
       Terminate;
       exit;
     end;
-  end;
-
-  // Help wanted!
-  if HasOption('h', 'help') then begin
-    WriteHelp;
-    writeln(' - - - no file read / changed - - -');
-    Terminate;
-    Exit;
   end;
 
 // den ursprünglichen Modus versuchen:
@@ -368,7 +398,7 @@ var
 begin
   sExeName := ExtractFileName(ExeName);
   writeln();
-  writeln(sExeName, ' needs some arguments!');
+  writeln(sExeName, ' version ', sVersion, ' needs some arguments!');
   writeln();
   writeln('usage for simple mode (both directions use the same factor):');
   writeln(sExeName, '  <file>  <scaling-factor>');
