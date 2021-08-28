@@ -4,7 +4,7 @@ program QET_ElementScaler;
 // Scale QElectroTech-Graphics with a constant factor(s).
 //
 // compiles/runs with Lazarus 2.0.12 and FreePascal 3.2.0 on
-// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-3048)
+// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-3081)
 //
 // usage:
 // QET_ElementScaler <file> <scaling-factor>
@@ -19,8 +19,8 @@ program QET_ElementScaler;
 //
 // use it at your own risk!
 //
-// Last Change: 25.08.2021
-// if there is a UUID in/for the element, we create a new one
+// Last Change: 28.08.2021
+// all UUIDs are replaced by new ones
 //
 // Created: 17.12.2020
 // Author: plc-user
@@ -56,7 +56,7 @@ type
 { TQETScaler }
 
 const
-  sVersion: string = '0.2beta3';
+  sVersion: string = '0.2beta4';
 
 var
   QETfile: TXMLDocument;    // holds the XML-Data from/to file
@@ -100,7 +100,7 @@ begin
       if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
       if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
     end
-  else if ((elem = 'uuid') and (name = 'uuid')) then begin
+  else if ((name = 'uuid')) then begin
     if (CreateGUID(uuidNEW) = 0) then
       result := LowerCase(GUIDToString(uuidNEW));
     end
@@ -138,7 +138,7 @@ begin
       if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
       if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
     end
-  else if ((elem = 'uuid') and (name = 'uuid')) then begin
+  else if ((name = 'uuid')) then begin
     if (CreateGUID(uuidNEW) = 0) then
       result := LowerCase(GUIDToString(uuidNEW));
     end
@@ -176,7 +176,7 @@ begin
       if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
       if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
     end
-  else if ((elem = 'uuid') and (name = 'uuid')) then begin
+  else if ((name = 'uuid')) then begin
     if (CreateGUID(uuidNEW) = 0) then
       result := LowerCase(GUIDToString(uuidNEW));
     end
