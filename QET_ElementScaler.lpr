@@ -19,8 +19,9 @@ program QET_ElementScaler;
 //
 // use it at your own risk!
 //
-// Last Change: 28.08.2021
-// all UUIDs are replaced by new ones
+// Last Change: 11.09.2021
+// - renew only element uuid, keep all others
+// - delete trailing zeros in separate function
 //
 // Created: 17.12.2020
 // Author: plc-user
@@ -56,16 +57,36 @@ type
 { TQETScaler }
 
 const
-  sVersion: string = '0.2beta4';
+  sVersion: string = '0.2beta5';
 
 var
   QETfile: TXMLDocument;    // holds the XML-Data from/to file
   gfFactor:  double = 1.0;  // Scaling-Factor for circles and Text-size
   gfFactorX: double = 1.0;  // Scaling-Factor X-direction
   gfFactorY: double = 1.0;  // Scaling-Factor Y-direction
-  cDecSep: char;            // Decimal-Separator
+  cDecSepOrg: char;         // voreingestellter Dezimal-Trenner
+  cDecSepNew: char = '.';   // neuer Dezimal-Trenner
 
 // Funktionen außerhalb der Class .............
+
+
+function DelTrailingZeros(s: string):string;
+begin
+  // nur Fließkomma-Zahlen...
+  if (Pos (cDecSepNew, s) = 0) then begin
+    result := s;
+    exit;
+  end;
+  // Nullen machen am Ende keinen Sinn
+  while (s[length(s)] = '0') do
+    delete(s, length(s), 1);
+  // Dezimaltrenner ist am Ende auch nutzlos
+  if (s[length(s)] = cDecSepNew) then
+    delete(s, length(s), 1);
+  // das war's schon
+  result := s;
+end;
+
 
 function FaktorAnwenden(elem, name, val: string): string;
 // multiplies the Value "s" with factor and
@@ -96,11 +117,9 @@ begin
         result := inttostr(round(fNewVal));
         exit;
         end;
-      if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
-      if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
-      if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
+      result := DelTrailingZeros(result);
     end
-  else if ((name = 'uuid')) then begin
+  else if ((elem = 'uuid') and (name = 'uuid')) then begin
     if (CreateGUID(uuidNEW) = 0) then
       result := LowerCase(GUIDToString(uuidNEW));
     end
@@ -134,11 +153,9 @@ begin
         result := inttostr(round(fNewVal));
         exit;
         end;
-      if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
-      if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
-      if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
+      result := DelTrailingZeros(result);
     end
-  else if ((name = 'uuid')) then begin
+  else if ((elem = 'uuid') and (name = 'uuid')) then begin
     if (CreateGUID(uuidNEW) = 0) then
       result := LowerCase(GUIDToString(uuidNEW));
     end
@@ -172,11 +189,9 @@ begin
         result := inttostr(round(fNewVal));
         exit;
         end;
-      if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
-      if (result[length(result)] = '0') then  result := Copy(result, 1 ,length(result)-1);
-      if (result[length(result)] = '.') then  result := Copy(result, 1 ,length(result)-1);
+      result := DelTrailingZeros(result);
     end
-  else if ((name = 'uuid')) then begin
+  else if ((elem = 'uuid') and (name = 'uuid')) then begin
     if (CreateGUID(uuidNEW) = 0) then
       result := LowerCase(GUIDToString(uuidNEW));
     end
@@ -251,8 +266,8 @@ var
   ErrorMsg: string;
 begin
   // Remember Setting for Decimal-Separator:
-  cDecSep := DefaultFormatSettings.DecimalSeparator;
-  DefaultFormatSettings.DecimalSeparator := '.';
+  cDecSepOrg := DefaultFormatSettings.DecimalSeparator;
+  DefaultFormatSettings.DecimalSeparator := cDecSepNew;
 
   // Schnelltest der Parameter
   ErrorMsg:=CheckOptions('hx:y:f:v', 'help file: version');
@@ -375,7 +390,7 @@ begin
   WriteXMLFile(QETfile, changeFileExt(sDateiName, '.SCALED.elmt'));
 
   // Einstellungen wieder auf Original:
-  DefaultFormatSettings.DecimalSeparator := cDecSep;
+  DefaultFormatSettings.DecimalSeparator := cDecSepOrg;
 
   // stop program loop
   Terminate;
@@ -424,4 +439,3 @@ begin
   Application.Run;
   Application.Free;
 end.
-
