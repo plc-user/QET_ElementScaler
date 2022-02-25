@@ -6,8 +6,8 @@ rem Wo liegt das Programm?
 rem Where does the Program lie?
 set "ProgPfad=C:\Tools\QET_ElementScaler"
 
-rem Wo liegen die Element-Dateien?
-rem Where do the element-files reside?
+rem Wo liegen die zu skalierenden Element-Dateien?
+rem Path to the directory of element-files to be scaled:
 set "DataPfad=Z:\win\Elemente"
 
 rem Welcher Faktor soll angewendet werden?
