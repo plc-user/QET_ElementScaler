@@ -8,10 +8,10 @@ program QET_ElementScaler;
 // Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-4888)
 //
 // usage:
-// QET_ElementScaler [-s] <file> <scaling-factor>
+// QET_ElementScaler [-i] [-o] <file> <scaling-factor>
 //
 // OR
-// QET_ElementScaler [-s] [-x FactorForX] [-y FactorForY] -f FILENAME
+// QET_ElementScaler [-i] [-o] [-x FactorForX] [-y FactorForY] -f FILENAME
 //
 //
 // Result is a XML-File with an additional header-line
@@ -23,8 +23,11 @@ program QET_ElementScaler;
 // On Linux you may use something like this:
 //   grep -v -i "xml version" "filename.elmt" > "filename_new.elmt"
 //
-// Last Change(s): 13.08.2022
-// - add option "-s" to write scaled data to stdout instead of a renamed file
+// Last Change(s): 14.08.2022
+// - add option "-i" and "--stdin" to read element-data from stdin instead
+//   of a file. With this option a filename is not necessary and will be
+//   ignored and the output is forced to stdout
+// - renamed option "-s" to "-o" and added "--stdout" for writing to stdout
 //
 // Created: 17.12.2020
 // Author: plc-user
@@ -43,7 +46,7 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Classes, SysUtils, CustApp,
+  Classes, SysUtils, IOStream, CustApp,
   DOM, XMLRead, XMLWrite;
 
 type
@@ -62,7 +65,7 @@ type
 { TQETScaler }
 
 const
-  sVersion: string = '0.2beta6';
+  sVersion: string = '0.3beta1';
 
 var
   QETfile: TXMLDocument;    // holds the XML-Data from/to file
@@ -270,20 +273,27 @@ var
   sDateiName: string = '';
   ErrorMsg: string;
   xExtMode: boolean = false;
-  ssScaledXML: TStringStream;
+  xUseStdIO: boolean = false;
+  ios: TIOStream; // Lesen von Daten aus stdin
+  ssInputXML:  TStringStream; // für Daten aus stdin
+  ssScaledXML: TStringStream; // für Daten nach stdout
 begin
   // Remember Setting for Decimal-Separator:
   cDecSepOrg := DefaultFormatSettings.DecimalSeparator;
   DefaultFormatSettings.DecimalSeparator := cDecSepNew;
 
   // Schnelltest der Parameter
-  ErrorMsg:=CheckOptions('hsx:y:f:v', 'help file: version');
+  ErrorMsg:=CheckOptions('hiox:y:f:v', 'help stdin stdout file: version');
   if ErrorMsg<>'' then begin
     ShowException(Exception.Create(ErrorMsg));
     writeln(' * * * STOP * * *');
     Terminate;
     Exit;
   end;
+
+  // ein paar Flags für die Programmsteuerung setzen
+  xUseStdIO := hasOption('i', 'stdin');  // wir holen die Daten von StdIn?
+  xExtMode  := hasOption('x') or hasOption('y');
 
   // Version ausgeben und beenden
   if HasOption('v', 'version') then begin
@@ -303,17 +313,17 @@ begin
   end;
 
   // weniger als 2 Parameter gehen sonst gar nicht!
-  if (ParamCount < 2) then begin
-    WriteHelp;
-    writeln(' - - - no file read / changed - - -');
-    Terminate;
-    Exit;
-  end;
+  if (ParamCount < 2)
+    then begin
+      WriteHelp;
+      writeln(' - - - no file read / changed - - -');
+      Terminate;
+      Exit;
+    end;
 
   // Faktor für X
   if hasOption('x') then
   begin
-    xExtMode := true;
     try
       gfFactorX := getOptionValue('x').ToDouble;
     except
@@ -327,7 +337,6 @@ begin
   // Faktor für Y
   if hasOption('y') then
   begin
-    xExtMode := true;
     try
       gfFactorY := getOptionValue('y').ToDouble;
     except
@@ -354,14 +363,17 @@ begin
 // den ursprünglichen Modus versuchen:
   if (xExtMode = false)
     then begin
-      // gibt es die Datei überhaupt?
-      sDateiName := ParamStr(ParamCount - 1);
-      if (fileExists(sDateiName) = false) then
-        begin
-          writeln('File not found: ', sDateiName);
-          writeln(' - - - no file read / changed - - -');
-          Terminate;
-          exit;
+      if (xUseStdIO = false)
+        then begin // nur, wenn Datei gelesen werden soll
+          // gibt es die Datei überhaupt?
+          sDateiName := ParamStr(ParamCount - 1);
+          if (fileExists(sDateiName) = false) then
+            begin
+              writeln('File not found: ', sDateiName);
+              writeln(' - - - no file read / changed - - -');
+              Terminate;
+              exit;
+            end;
         end;
       try  // Skalierungsfaktor als letzter Parameter
         gfFactor := ParamStr(ParamCount).ToDouble;
@@ -379,23 +391,50 @@ begin
 
 // hier geht das eigentliche Programm los!
 
-// bevor es losgeht, den Dateinamen prüfen:
-  if (ExtractFileExt(sDateiName.ToLower) <> '.elmt') then begin
+  // bevor es losgeht, den Dateinamen und Existenz prüfen:
+  if (xUseStdIO = false) and (ExtractFileExt(sDateiName.ToLower) <> '.elmt')
+    then begin
       writeln('invalid file-type: ', sDateiName);
       writeln(' * * * STOP * * *');
       Terminate;
       exit;
     end;
-  if not(FileExists(sDateiName)) then begin
-    writeln('File not found: ', sDateiName);
-    writeln(' * * * STOP * * *');
-    Terminate;
-    exit;
-  end;
-
+  if (xUseStdIO = false) and not(FileExists(sDateiName))
+    then begin
+      writeln('File not found: ', sDateiName);
+      writeln(' * * * STOP * * *');
+      Terminate;
+      exit;
+    end;
 
   // Read data to structure:
-  ReadXMLFile(QETfile, sDateiName);
+  if xUseStdIO // ohne Eingabedatei keine Ausgabedatei!
+    then begin
+      try  // ... to read from StdIn
+        ios := TIOStream.Create(iosInput);
+        ssInputXML := TStringStream.Create('');
+        ssInputXML.CopyFrom(ios, 0);
+      finally
+        ios.Free;
+      end;
+      if (ssInputXML.Size > 0)
+        then begin
+          ssInputXML.Position := 0;
+          ReadXMLFile(QETfile, ssInputXML);
+          ssInputXML.Free;
+          end
+        else begin
+          writeln('No Data from StdIn ');
+          writeln(' * * * STOP * * *');
+          Terminate;
+          exit;
+          end;
+      end
+    else begin  // read Data from file
+      ReadXMLFile(QETfile, sDateiName);
+      end;
+
+
 
   // process data-conversion:
   if (gfFactorX < gfFactorY)
@@ -404,7 +443,8 @@ begin
   ScaleGraphics();
 
   // write changed data to stdout or new file
-  if hasOption('s')
+  // force output to stdout, when input comes from stdin!
+  if hasOption('o', 'stdout') or (xUseStdIO = true)
     then
       begin // write new data to stdout
         try
@@ -448,19 +488,22 @@ begin
   writeln(sExeName, ' version ', sVersion, ' needs some arguments!');
   writeln();
   writeln('usage for simple mode (both directions use the same factor):');
-  writeln(sExeName, ' [-s] <file>  <scaling-factor>');
+  writeln(sExeName, ' [-i|--stdin] [-o|--stdout] <file>  <scaling-factor>');
   writeln();
-  writeln('with option "-s" the scaled data is written to stdout. ');
+  writeln('With option "-o" or "--stdout" the scaled data is written to stdout. ');
   writeln('Otherwise the new data is written to a renamed file.');
+  writeln();
+  writeln('With option "-i" or "--stdin" input-data is read from stdin, a given');
+  writeln('filename is ignored and the scaled element will be written to stdout.');
   writeln();
   writeln('In extended mode the scaling-factors for X and Y may differ and it is');
   writeln('allowed to specify only one direction for scaling. In each case the');
   writeln('Font-Sizes and Circle-Diameters are scaled by the smaller value.');
-  writeln('');
+  writeln();
   writeln('usage for extended mode:');
-  writeln(sExeName, ' [-s] [-x FactorForX] [-y FactorForY] -f FILENAME');
+  writeln(sExeName, ' [-i] [-o] [-x FactorForX] [-y FactorForY] -f FILENAME');
   writeln('or');
-  writeln(sExeName, ' [-s] [-x FactorForX] [-y FactorForY] --file=FILENAME');
+  writeln(sExeName, ' [-i] [-o] [-x FactorForX] [-y FactorForY] --file=FILENAME');
   writeln('');
   writeln('without parameters or with "-h" or "--help" this help is displayed');
   writeln('');
