@@ -1,27 +1,30 @@
 program QET_ElementScaler;
 
 //
-// Scale QElectroTech-Graphics with a constant factor(s).
+// QET_ElementScaler is a commandline-tool to scale
+// QElectroTech-Graphics with constant factor(s).
 //
-// compiles/runs with Lazarus 2.0.12 and FreePascal 3.2.0 on
-// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-3081)
+// compiles with Lazarus 2.2.2 and FreePascal 3.2.2 on
+// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-4888)
 //
 // usage:
-// QET_ElementScaler <file> <scaling-factor>
+// QET_ElementScaler [-s] <file> <scaling-factor>
 //
 // OR
-// QET_ElementScaler [-x FactorForX] [-y FactorForY] -f FILENAME
+// QET_ElementScaler [-s] [-x FactorForX] [-y FactorForY] -f FILENAME
 //
 //
 // Result is a XML-File with an additional header-line
 // <?xml version="1.0" encoding="utf-8"?>
-// but it does not seem to bother QET   ;-)
+// Use tools from your system to remove this line for
+// productive use of the scaled element in QET.
+// On ReactOS (or win) "more" is available:
+//   more +1 < "filename.elmt" > "filename_new.elmt"
+// On Linux you may use something like this:
+//   grep -v -i "xml version" "filename.elmt" > "filename_new.elmt"
 //
-// use it at your own risk!
-//
-// Last Change: 11.09.2021
-// - renew only element uuid, keep all others
-// - delete trailing zeros in separate function
+// Last Change(s): 13.08.2022
+// - add option "-s" to write scaled data to stdout instead of a renamed file
 //
 // Created: 17.12.2020
 // Author: plc-user
@@ -29,6 +32,8 @@ program QET_ElementScaler;
 //
 // based on example-code from
 // https://wiki.freepascal.org/XML_Tutorial
+//
+// Use this Software at your own risk!
 //
 
 
@@ -57,7 +62,7 @@ type
 { TQETScaler }
 
 const
-  sVersion: string = '0.2beta5';
+  sVersion: string = '0.2beta6';
 
 var
   QETfile: TXMLDocument;    // holds the XML-Data from/to file
@@ -88,7 +93,7 @@ begin
 end;
 
 
-function FaktorAnwenden(elem, name, val: string): string;
+function FaktorAnwenden(elem, name: unicodestring; val: string): string;
 // multiplies the Value "s" with factor and
 // returns a value with max. 2 decimals
 // removes trailing zeros
@@ -127,7 +132,7 @@ begin
 end;
 
 
-function FaktorXAnwenden(elem, name, val: string): string;
+function FaktorXAnwenden(elem, name: unicodestring; val: string): string;
 // multiplies the Value "s" with factor and
 // returns a value with max. 2 decimals
 // removes trailing zeros
@@ -163,7 +168,7 @@ begin
 end;
 
 
-function FaktorYAnwenden(elem, name, val: string): string;
+function FaktorYAnwenden(elem, name: unicodestring; val: string): string;
 // multiplies the Value "s" with factor and
 // returns a value with max. 2 decimals
 // removes trailing zeros
@@ -214,15 +219,15 @@ var
       begin
         // hier die Attribute durchgehen und alle Maß-Angaben ändern
         for i := 0 to (Node.Attributes.Length-1) do begin
-          Node.Attributes[i].NodeValue := FaktorAnwenden(Node.NodeName,
+          Node.Attributes[i].NodeValue := unicodestring(FaktorAnwenden(Node.NodeName,
                                                          Node.Attributes[i].NodeName,
-                                                         Node.Attributes[i].NodeValue);
-          Node.Attributes[i].NodeValue := FaktorXAnwenden(Node.NodeName,
+                                                         string(Node.Attributes[i].NodeValue)));
+          Node.Attributes[i].NodeValue := unicodestring(FaktorXAnwenden(Node.NodeName,
                                                          Node.Attributes[i].NodeName,
-                                                         Node.Attributes[i].NodeValue);
-          Node.Attributes[i].NodeValue := FaktorYAnwenden(Node.NodeName,
+                                                         string(Node.Attributes[i].NodeValue)));
+          Node.Attributes[i].NodeValue := unicodestring(FaktorYAnwenden(Node.NodeName,
                                                          Node.Attributes[i].NodeName,
-                                                         Node.Attributes[i].NodeValue);
+                                                         string(Node.Attributes[i].NodeValue)));
           end;
       end;
     // zum Kindknoten weitergehen
@@ -230,7 +235,7 @@ var
     // Alle Kindknoten bearbeiten
     while cNode <> nil do
     begin
-      ProcessNoDe(cNode);
+      ProcessNode(cNode);
       cNode := cNode.NextSibling;
     end;
   end;
@@ -239,15 +244,15 @@ begin
   iNode := QETfile.DocumentElement.ChildNodes.Item[0];
   if iNode.ParentNode.HasAttributes then begin
     for i := 0 to (iNode.ParentNode.Attributes.Length-1) do begin
-      iNode.ParentNode.Attributes[i].NodeValue := FaktorAnwenden(iNode.ParentNode.NodeName,
+      iNode.ParentNode.Attributes[i].NodeValue := unicodestring(FaktorAnwenden(iNode.ParentNode.NodeName,
                                                                iNode.ParentNode.Attributes[i].NodeName,
-                                                               iNode.ParentNode.Attributes[i].NodeValue);
-      iNode.ParentNode.Attributes[i].NodeValue := FaktorXAnwenden(iNode.ParentNode.NodeName,
+                                                               string(iNode.ParentNode.Attributes[i].NodeValue)));
+      iNode.ParentNode.Attributes[i].NodeValue := unicodestring(FaktorXAnwenden(iNode.ParentNode.NodeName,
                                                                iNode.ParentNode.Attributes[i].NodeName,
-                                                               iNode.ParentNode.Attributes[i].NodeValue);
-      iNode.ParentNode.Attributes[i].NodeValue := FaktorYAnwenden(iNode.ParentNode.NodeName,
+                                                               string(iNode.ParentNode.Attributes[i].NodeValue)));
+      iNode.ParentNode.Attributes[i].NodeValue := unicodestring(FaktorYAnwenden(iNode.ParentNode.NodeName,
                                                                iNode.ParentNode.Attributes[i].NodeName,
-                                                               iNode.ParentNode.Attributes[i].NodeValue);
+                                                               string(iNode.ParentNode.Attributes[i].NodeValue)));
       end;
     end;
   while iNode <> nil do
@@ -264,13 +269,15 @@ procedure TQETScaler.DoRun;
 var
   sDateiName: string = '';
   ErrorMsg: string;
+  xExtMode: boolean = false;
+  ssScaledXML: TStringStream;
 begin
   // Remember Setting for Decimal-Separator:
   cDecSepOrg := DefaultFormatSettings.DecimalSeparator;
   DefaultFormatSettings.DecimalSeparator := cDecSepNew;
 
   // Schnelltest der Parameter
-  ErrorMsg:=CheckOptions('hx:y:f:v', 'help file: version');
+  ErrorMsg:=CheckOptions('hsx:y:f:v', 'help file: version');
   if ErrorMsg<>'' then begin
     ShowException(Exception.Create(ErrorMsg));
     writeln(' * * * STOP * * *');
@@ -306,6 +313,7 @@ begin
   // Faktor für X
   if hasOption('x') then
   begin
+    xExtMode := true;
     try
       gfFactorX := getOptionValue('x').ToDouble;
     except
@@ -319,6 +327,7 @@ begin
   // Faktor für Y
   if hasOption('y') then
   begin
+    xExtMode := true;
     try
       gfFactorY := getOptionValue('y').ToDouble;
     except
@@ -343,11 +352,19 @@ begin
   end;
 
 // den ursprünglichen Modus versuchen:
-  if (ParamCount = 2)
+  if (xExtMode = false)
     then begin
-      sDateiName := ParamStr(1);
-      try
-        gfFactor := ParamStr(2).ToDouble;
+      // gibt es die Datei überhaupt?
+      sDateiName := ParamStr(ParamCount - 1);
+      if (fileExists(sDateiName) = false) then
+        begin
+          writeln('File not found: ', sDateiName);
+          writeln(' - - - no file read / changed - - -');
+          Terminate;
+          exit;
+        end;
+      try  // Skalierungsfaktor als letzter Parameter
+        gfFactor := ParamStr(ParamCount).ToDouble;
         gfFactorX := gfFactor;
         gfFactorY := gfFactor;
       except
@@ -386,8 +403,23 @@ begin
     else gfFactor := gfFactorY;
   ScaleGraphics();
 
-  // save changed data to new file
-  WriteXMLFile(QETfile, changeFileExt(sDateiName, '.SCALED.elmt'));
+  // write changed data to stdout or new file
+  if hasOption('s')
+    then
+      begin // write new data to stdout
+        try
+          ssScaledXML := TStringStream.create('');
+          WriteXMLFile(QETfile, ssScaledXML);
+          writeln(ssScaledXML.DataString);
+        finally
+          ssScaledXML.Free; // Speicher wieder freigeben
+        end;
+      end
+    else  // write new data to renamed file
+      begin
+        WriteXMLFile(QETfile, changeFileExt(sDateiName, '.SCALED.elmt'));
+      end;
+
 
   // Einstellungen wieder auf Original:
   DefaultFormatSettings.DecimalSeparator := cDecSepOrg;
@@ -416,16 +448,19 @@ begin
   writeln(sExeName, ' version ', sVersion, ' needs some arguments!');
   writeln();
   writeln('usage for simple mode (both directions use the same factor):');
-  writeln(sExeName, '  <file>  <scaling-factor>');
+  writeln(sExeName, ' [-s] <file>  <scaling-factor>');
+  writeln();
+  writeln('with option "-s" the scaled data is written to stdout. ');
+  writeln('Otherwise the new data is written to a renamed file.');
   writeln();
   writeln('In extended mode the scaling-factors for X and Y may differ and it is');
   writeln('allowed to specify only one direction for scaling. In each case the');
   writeln('Font-Sizes and Circle-Diameters are scaled by the smaller value.');
   writeln('');
   writeln('usage for extended mode:');
-  writeln(sExeName, ' [-x FactorForX] [-y FactorForY] -f FILENAME');
+  writeln(sExeName, ' [-s] [-x FactorForX] [-y FactorForY] -f FILENAME');
   writeln('or');
-  writeln(sExeName, ' [-x FactorForX] [-y FactorForY] --file=FILENAME');
+  writeln(sExeName, ' [-s] [-x FactorForX] [-y FactorForY] --file=FILENAME');
   writeln('');
   writeln('without parameters or with "-h" or "--help" this help is displayed');
   writeln('');
@@ -439,3 +474,4 @@ begin
   Application.Run;
   Application.Free;
 end.
+
