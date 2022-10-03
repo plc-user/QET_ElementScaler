@@ -1,35 +1,24 @@
 #!/bin/sh
 
-# scales QET - Element-files in the directory and all sub-dirs
-# by the factor given here:
+# scales QET - Element-files in the directory from where it was called and
+# all sub-dirs by the factor given here:
 
-Skalierung="0.5"
-SkalierProg="/usr/local/bin/QET_ElementScaler"
+Skalierung="1.0"
+SkalierProg="/home/ich/Projekte/c_c++/QET_ElementScaler/QET_ElementScaler"
 
-# um Leerzeichen in Dateinamen verarbeiten zu können:
-# Originalzustand merken:
+# to be able to process blanks in file names - remember original state:
 OFS=$IFS
-# Einstellen:
+# set new:
 IFS="
 "
 
 for i in  `find . -name "*.elmt"` ; do
   echo "processing $i"
-  # Grafik skalieren:
-  "$SkalierProg" "$i" "$Skalierung"
+  # With the construct in curly brackets the file extension
+  # is changed accordingly
+  "$SkalierProg" -o "$i" "$Skalierung" > "${i%.elmt}.SCALED.elmt"
   done
 
-for i in  `find . -name "*.SCALED.elmt"` ; do
-  echo "processing $i"
-  # "xml version" entfernen
-  grep -v -i "xml version" "$i" > /tmp/tempfile.elmt
-  # Dateiname wieder herstellen
-  cat /tmp/tempfile.elmt > "$i"
-  done
-
-# aufräumen:
-rm -r /tmp/tempfile.elmt
-
-# Leerzeichen in Dateinamen - wieder Originalzustand:
+# blanks in filenames - back to original:
 IFS=$OFS
-# FERTIG!
+# DONE!

@@ -1,10 +1,10 @@
 # QET_ElementScaler
 
 QET_ElementScaler is a commandline-tool to scale QElectroTech-Elements with constant factor(s) and save the changed data to a renamed file.
-With the optional parameter &quot;-o&quot; or &quot;--stdout&quot; the scaled element is written to stdout and no new file is created.
-The optional parameter &quot;-i&quot; or &quot;--stdin&quot; is used to read the input-data from stdin and the output is forced to stdout.<br>
+With the optional parameter &quot;-o&quot; or &quot;--stdout&quot; the changed data is written to stdout and no new file is created.
 
-It compiles with Lazarus 2.2.2 and FreePascal 3.2.2 on Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-4888).
+
+It compiles with GCC with C++17 activated on Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-5075).
 The ReactOS-Build can also be used with Win in a cmd-window.<br>
 
 QET_ElementScaler can process one file at a time.
@@ -13,15 +13,44 @@ If you want to edit all files in a directory, you need to call QET_ElementScaler
 You do not want to (or can't) compile the FreePascal program yourself? Download the executable file suitable for your operating system from the releases-page and use that.<br><br>
 Hint: <br>
 Get familiar with the command line before using this software.
-General support for using the command line for the various systems cannot be provided here.<br>
+General support for using the command line for the various systems cannot be provided here.
+
 
 
 usage:<br>
-QET_ElementScaler  [-i] [-o] &lt;file&gt;  &lt;scaling-factor&gt; <br>
-(as used in Batch-File &quot;scale.cmd&quot; and shell-script &quot;scale.sh&quot;)<br>
+QET_ElementScaler [options] &lt;file&gt;  &lt;scaling-factor&gt; <br>
+(as used in Batch-File &quot;scale.cmd&quot; and shell-script &quot;scale.sh&quot;) <br>
 
 or:<br>
-QET_ElementScaler [-i] [-o] [-x FactorForX] [-y FactorForY] -f FILENAME<br>
+QET_ElementScaler [options] [-x FactorForX] [-y FactorForY] -f FILENAME <br>
+
+ <br>
+
+ <br>
+  available options: <br>
+   -i | --stdin     input-data is read from stdin, a given filename is <br>
+                    ignored and scaled element will be written to stdout <br>
+   -o | --stdout    output will be written to stdout <br>
+   -x VALUE         or <br>
+   --factorx VALUE  factor for x-values (x, rx, width, ...) <br>
+   -y VALUE         or <br>
+   --factory VALUE  factor for y-values (y, ry, height, ...) <br>
+   -f FILENAME      or <br>
+   --file FILENAME  the file that will be used <br>
+   -h | --help      show this help <br>
+ <br>
+
+ <br>
+  there are also some &quot;long-opt&quot;-only options: <br>
+  &quot;--RemoveAllTerminals&quot; removes all terminals from the element <br>
+                         (useful for front-views or &quot;thumbnails&quot;) <br>
+  &quot;--FlipPolyHorizontal&quot; flips ALL Lines and polygons horizontally <br>
+                         (useful during creation of elements) <br>
+  &quot;--FlipPolyVertical&quot;   flips ALL Lines and polygons vertically <br>
+                         (useful during creation of elements) <br>
+  &quot;--OverwriteOriginal&quot;  the original file is replaced by scaled one <br>
+                         (CAUTION: Be careful with this option!) <br>
+ <br>
 
  <br>
 examples to use data from stdin: <br>
@@ -30,6 +59,12 @@ QET_ElementScaler -i  2.0  &lt;  ElementToScale.elmt  &gt;  ScaledElement.elmt <
 or use a pipe like this <br>
 cat  ElementToScale.elmt  |  QET_ElementScaler -i  2.0  |  OtherSoftwareBinary <br>
  <br>
-extended mode and long-options are also possible:<br>
-QET_ElementScaler --stdin -x 2 -y 3  &lt;  ElementToScale.elmt  &gt;  ScaledElement.elmt <br>
+extended mode is also possible:<br>
+QET_ElementScaler -i -x 2 -y 3  &lt;  ElementToScale.elmt  &gt;  ScaledElement.elmt <br>
+ <br>
+ <br>
+
+QET_ElementScaler uses Arseny Kapoulkine's &quot;pugixml&quot; (https://pugixml.org)
+to handle the content of the Element-File. <br>
+Thank you, Arseny! <br>
  <br>
