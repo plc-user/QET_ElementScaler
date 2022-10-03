@@ -26,31 +26,32 @@ QET_ElementScaler [options] [-x FactorForX] [-y FactorForY] -f FILENAME <br>
 
  <br>
 
- <br>
-  available options: <br>
-   -i | --stdin     input-data is read from stdin, a given filename is <br>
-                    ignored and scaled element will be written to stdout <br>
-   -o | --stdout    output will be written to stdout <br>
-   -x VALUE         or <br>
-   --factorx VALUE  factor for x-values (x, rx, width, ...) <br>
-   -y VALUE         or <br>
-   --factory VALUE  factor for y-values (y, ry, height, ...) <br>
-   -f FILENAME      or <br>
-   --file FILENAME  the file that will be used <br>
-   -h | --help      show this help <br>
- <br>
+  available options:
+```
+   -i | --stdin     input-data is read from stdin, a given filename is
+                    ignored and scaled element will be written to stdout
+   -o | --stdout    output will be written to stdout
+   -x VALUE         or 
+   --factorx VALUE  factor for x-values (x, rx, width, ...) 
+   -y VALUE         or 
+   --factory VALUE  factor for y-values (y, ry, height, ...) 
+   -f FILENAME      or 
+   --file FILENAME  the file that will be used 
+   -h | --help      show this help 
+```
 
- <br>
-  there are also some &quot;long-opt&quot;-only options: <br>
-  &quot;--RemoveAllTerminals&quot; removes all terminals from the element <br>
-                         (useful for front-views or &quot;thumbnails&quot;) <br>
-  &quot;--FlipPolyHorizontal&quot; flips ALL Lines and polygons horizontally <br>
-                         (useful during creation of elements) <br>
-  &quot;--FlipPolyVertical&quot;   flips ALL Lines and polygons vertically <br>
-                         (useful during creation of elements) <br>
-  &quot;--OverwriteOriginal&quot;  the original file is replaced by scaled one <br>
-                         (CAUTION: Be careful with this option!) <br>
- <br>
+  there are also some &quot;long-opt&quot;-only options: 
+```
+  &quot;--RemoveAllTerminals&quot; removes all terminals from the element 
+                         (useful for front-views or &quot;thumbnails&quot;) 
+  &quot;--FlipPolyHorizontal&quot; flips ALL Lines and polygons horizontally 
+                         (useful during creation of elements) 
+  &quot;--FlipPolyVertical&quot;   flips ALL Lines and polygons vertically 
+                         (useful during creation of elements) 
+  &quot;--OverwriteOriginal&quot;  the original file is replaced by scaled one 
+                         (CAUTION: Be careful with this option!) 
+```
+
 
  <br>
 examples to use data from stdin: <br>
