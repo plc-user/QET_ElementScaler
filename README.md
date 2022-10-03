@@ -40,15 +40,15 @@ QET_ElementScaler [options] [-x FactorForX] [-y FactorForY] -f FILENAME <br>
    -h | --help      show this help 
 ```
 
-  there are also some &quot;long-opt&quot;-only options: 
+  there are also some "long-opt"-only options: 
 ```
-  &quot;--RemoveAllTerminals&quot; removes all terminals from the element 
-                         (useful for front-views or &quot;thumbnails&quot;) 
-  &quot;--FlipPolyHorizontal&quot; flips ALL Lines and polygons horizontally 
+  "--RemoveAllTerminals" removes all terminals from the element 
+                         (useful for front-views or "thumbnails") 
+  "--FlipPolyHorizontal" flips ALL Lines and polygons horizontally 
                          (useful during creation of elements) 
-  &quot;--FlipPolyVertical&quot;   flips ALL Lines and polygons vertically 
+  "--FlipPolyVertical"   flips ALL Lines and polygons vertically 
                          (useful during creation of elements) 
-  &quot;--OverwriteOriginal&quot;  the original file is replaced by scaled one 
+  "--OverwriteOriginal"  the original file is replaced by scaled one 
                          (CAUTION: Be careful with this option!) 
 ```
 
