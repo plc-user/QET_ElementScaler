@@ -3,14 +3,14 @@
 // QElectroTech-Graphics with constant factor(s).
 //
 // compiles with GCC with (at least) C++17 enabled on
-// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-5075)
+// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-5153)
 //
 // to compile the code use these commands (Linux):
-// g++ -Wall -O2 std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
-// g++ -Wall -O2 std=c++17 -c main.cpp -o obj/main.o
+// g++ -Wall -O2 -std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
+// g++ -Wall -O2 -std=c++17 -c main.cpp -o obj/main.o
 // g++ -o  QET_ElementScaler obj/inc/pugixml/pugixml.o obj/main.o  -s
 //
-// these are the commands that work for me (TDM-GCC 10.3.0) on ReactOS 0.4.15 to compile
+// these are the commands that work for me (TDM-GCC 10.3.0) on ReactOS to compile
 // g++.exe -Wall -O2 -std=c++17 -c inc\pugixml\pugixml.cpp -o obj\inc\pugixml\pugixml.o
 // g++.exe -Wall -O2 -std=c++17 -c main.cpp -o obj\main.o
 // g++.exe -o QET_ElementScaler.exe obj\inc\pugixml\pugixml.o obj\main.o -s
@@ -26,7 +26,11 @@
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
 //
-// Last Change(s): 01.10.2022
+// Last Change(s): 09.10.2022
+// - terminals are always placed on an integer-position: no decimals!
+// - when removing all terminals, the "link_type" is set to "thumbnail"
+//
+// Change(s): 01.10.2022
 // - ported all functionalities to C++
 // - added possibility ro remove terminals
 // - added possibility to flip all Lines and Polygons
@@ -69,7 +73,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta1";
+const string sVersion = "0.4beta2";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;
@@ -158,10 +162,11 @@ string FormatValue(double &val, const size_t dec){
     for (i=0; i<dec; i++)
         dVal = (dVal / 10.0);
     stringstream ss;
+    ss.imbue(std::locale(std::cout.getloc(), new DecSep));
     ss << fixed << setprecision(2) << dVal;
     string s = ss.str();  // "s" is number always (!) with decimals
     // delete this range of characters in order from the end of string:
-    const char chars[] = {'0', '.'};
+    const char chars[] = {'0', cDecSep};
     // use range for loop to print array elements
     for (char c : chars)
         while (s[s.length()-1] == c) {
@@ -188,7 +193,7 @@ int parseCommandline(int argc, char *argv[]) {
                 if (string(long_options[option_index].name) == "RemoveAllTerminals"){
                     if (_debug_)
                         cerr << "Remove all terminals from Element!\n";
-                    xRemoveTerminals = true;
+                    xRemoveAllTerminals = true;
                 }
                 if (string(long_options[option_index].name) == "FlipPolyHorizontal"){
                     if (_debug_)
@@ -336,6 +341,10 @@ int EditDefinition(pugi::xml_node &node){
             posY *= scaleY;
             attr.set_value(FormatValue(posY, 0).c_str());
         }
+        if ((xRemoveAllTerminals==true) && (string(attr.name())=="link_type")){
+            if (_debug_) cerr << "change \"link_type\" to \"terminal\"" << endl;
+            attr.set_value("thumbnail");
+        }
         if (_debug_) cerr << " " << attr.name() << "=" << attr.value();
     }
     if (_debug_) cerr << endl;
@@ -400,11 +409,23 @@ int ScaleElement(pugi::xml_node &node){
 
     double posX = node.attribute("x").as_double();
     posX *= scaleX;
-    node.attribute("x") = FormatValue(posX, decimals).c_str();
+    if (static_cast<string>(node.name())=="terminal") {
+        // terminals without decimals:
+        node.attribute("x") = FormatValue(posX, 0).c_str();
+    } else {
+        // other elements may have decimals:
+        node.attribute("x") = FormatValue(posX, decimals).c_str();
+    }
 
     double posY = node.attribute("y").as_double();
     posY *= scaleY;
-    node.attribute("y") = FormatValue(posY, decimals).c_str();
+    if (static_cast<string>(node.name())=="terminal") {
+        // terminals without decimals:
+        node.attribute("y") = FormatValue(posY, 0).c_str();
+    } else {
+        // other elements may have decimals:
+        node.attribute("y") = FormatValue(posY, decimals).c_str();
+    }
 
     return 0;
 }
@@ -412,6 +433,7 @@ int ScaleElement(pugi::xml_node &node){
 int ScalePoints(pugi::xml_node &node){
     // for elements "line" and "polygon"
     if (_debug_) cerr << "Scale values of: " << node.name() << endl;
+    double length;
     double posX;
     double posY;
 
@@ -425,6 +447,10 @@ int ScalePoints(pugi::xml_node &node){
         if (attr.name()[0]=='y') {
             posY = attr.as_double() * scaleY;
             attr.set_value(FormatValue(posY, decimals).c_str());
+        }
+        if ((static_cast<string>(attr.name())=="length1") || (static_cast<string>(attr.name())=="length2")) {
+            length = attr.as_double();
+            attr.set_value(FormatValue(length, decimals).c_str());
         }
     }
     if (_debug_points_) cerr << endl;
@@ -496,16 +522,10 @@ int  PolyLineFlipVert(pugi::xml_node &node){
 /*****************************************************************************/
 
 
-
 /*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
 int main(int argc, char *argv[]) {
-
-    // for setting decimal-separator to "."
-    locale mylocale("");   // get global locale
-    cout.imbue(mylocale);  // imbue global locale
-
 
     // we need a "Pugi-Node":
     pugi::xml_node node;
@@ -604,7 +624,7 @@ int main(int argc, char *argv[]) {
 
 
     // Remove all Terminals from QET-Element:
-    if (xRemoveTerminals == true){
+    if (xRemoveAllTerminals == true){
         node = doc.child("definition").child("description");
         while(node.remove_child("terminal"));
     }

@@ -52,6 +52,7 @@
 
 using namespace std;
 
+const char cDecSep = '.';     // Decimal-Separator for values in output-file
 const size_t decimals = 2;    // number of decimals for floating-point values
 string sFileName = "NoFileNameSet.elmt";
 string sFileScaled = "NoFileNameSet_scaled.elmt";
@@ -59,15 +60,15 @@ double scaleX = 1.0;
 double scaleY = 1.0;
 
 // some bits for control:
-bool xStandardMode      = true;
-bool xPrintHelp         = false;
-bool xPrintToStdOut     = false;
-bool xReadFromStdIn     = false;
-bool xRemoveTerminals   = false;
-bool xFlipPolyHor       = false;
-bool xFlipPolyVert      = false;
-bool xOverwriteOriginal = false;
-bool xStopWithError     = false;
+bool xStandardMode       = true;
+bool xPrintHelp          = false;
+bool xPrintToStdOut      = false;
+bool xReadFromStdIn      = false;
+bool xRemoveAllTerminals = false;
+bool xFlipPolyHor        = false;
+bool xFlipPolyVert       = false;
+bool xOverwriteOriginal  = false;
+bool xStopWithError      = false;
 
 
 struct statistics{
@@ -90,6 +91,12 @@ static struct option long_options[]={
     {"OverwriteOriginal",no_argument,NULL,0},  // "long-opt" only!!!
     {0,0,0,0}
   };
+
+
+// for setting a (new) Decimal-Separator
+struct DecSep : std::numpunct<char> {
+    char do_decimal_point()   const { return cDecSep; }  // Dezimal-Trenner
+};
 
 
 // function prototypes:
