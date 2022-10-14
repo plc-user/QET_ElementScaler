@@ -2,18 +2,25 @@
 // QET_ElementScaler is a commandline-tool to scale
 // QElectroTech-Graphics with constant factor(s).
 //
-// compiles with GCC with (at least) C++17 enabled on
-// Debian/GNU Linux (unstable) and ReactOS (0.4.15-dev-5153)
+// compiles with (at least) C++17 enabled on
+// - Debian/GNU Linux (unstable)
+// - ReactOS (0.4.15-dev-5153)
+// - macOS Monterey 12.6 (darwin21.6.0)
 //
-// to compile the code use these commands (Linux):
-// g++ -Wall -O2 -std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
-// g++ -Wall -O2 -std=c++17 -c main.cpp -o obj/main.o
+// to compile the code with GCC on Linux use these commands:
+// g++ -Wall -O2 std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
+// g++ -Wall -O2 std=c++17 -c main.cpp -o obj/main.o
 // g++ -o  QET_ElementScaler obj/inc/pugixml/pugixml.o obj/main.o  -s
 //
-// these are the commands that work for me (TDM-GCC 10.3.0) on ReactOS to compile
+// these commands work (TDM-GCC 10.3.0) on ReactOS to compile:
 // g++.exe -Wall -O2 -std=c++17 -c inc\pugixml\pugixml.cpp -o obj\inc\pugixml\pugixml.o
 // g++.exe -Wall -O2 -std=c++17 -c main.cpp -o obj\main.o
 // g++.exe -o QET_ElementScaler.exe obj\inc\pugixml\pugixml.o obj\main.o -s
+//
+// compile for macOS (clang 14.0.0 / Monterey 12.6 / x86_64-apple-darwin21.6.0):
+// g++ -Wall -O2 std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
+// g++ -Wall -O2 std=c++17 -c main.cpp -o obj/main.o
+// g++ -o  QET_ElementScaler obj/inc/pugixml/pugixml.o obj/main.o
 //
 //
 // usage:
@@ -26,8 +33,11 @@
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
 //
-// Last Change(s): 09.10.2022
-// - terminals are always placed on an integer-position: no decimals!
+// Change(s) for 0.4beta3
+// - added values "start" and "angle" of "arc" for rounding to ... decimals
+//
+// Change(s) for 0.4beta2
+// - terminals always placed on an integer-position: no decimals!
 // - when removing all terminals, the "link_type" is set to "thumbnail"
 //
 // Change(s): 01.10.2022
@@ -73,7 +83,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta2";
+const string sVersion = "0.4beta3";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;
@@ -405,6 +415,18 @@ int ScaleElement(pugi::xml_node &node){
         double height = node.attribute("height").as_double();
         height *= scaleY;
         node.attribute("height") = FormatValue(height, decimals).c_str();
+    }
+
+    if (sizeof(node.attribute("angle").name()) != 0) {
+        double angle = node.attribute("angle").as_double();
+        // no scaling of angle-value, just rounding
+        node.attribute("angle") = FormatValue(angle, decimals).c_str();
+    }
+
+    if (sizeof(node.attribute("start").name()) != 0) {
+        double start = node.attribute("start").as_double();
+        // no scaling of start-value, just rounding
+        node.attribute("start") = FormatValue(start, decimals).c_str();
     }
 
     double posX = node.attribute("x").as_double();
