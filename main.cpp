@@ -8,8 +8,8 @@
 // - macOS Monterey 12.6 (darwin21.6.0)
 //
 // to compile the code with GCC on Linux use these commands:
-// g++ -Wall -O2 std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
-// g++ -Wall -O2 std=c++17 -c main.cpp -o obj/main.o
+// g++ -Wall -O2 -std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
+// g++ -Wall -O2 -std=c++17 -c main.cpp -o obj/main.o
 // g++ -o  QET_ElementScaler obj/inc/pugixml/pugixml.o obj/main.o  -s
 //
 // these commands work (TDM-GCC 10.3.0) on ReactOS to compile:
@@ -18,8 +18,8 @@
 // g++.exe -o QET_ElementScaler.exe obj\inc\pugixml\pugixml.o obj\main.o -s
 //
 // compile for macOS (clang 14.0.0 / Monterey 12.6 / x86_64-apple-darwin21.6.0):
-// g++ -Wall -O2 std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
-// g++ -Wall -O2 std=c++17 -c main.cpp -o obj/main.o
+// g++ -Wall -O2 -std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
+// g++ -Wall -O2 -std=c++17 -c main.cpp -o obj/main.o
 // g++ -o  QET_ElementScaler obj/inc/pugixml/pugixml.o obj/main.o
 //
 //
@@ -32,6 +32,9 @@
 //
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
+//
+// Change(s) for 0.4beta4
+// - updated PugiXML to version 1.13
 //
 // Change(s) for 0.4beta3
 // - added values "start" and "angle" of "arc" for rounding to ... decimals
@@ -83,7 +86,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta3";
+const string sVersion = "0.4beta4";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;

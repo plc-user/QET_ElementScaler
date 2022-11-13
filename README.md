@@ -4,7 +4,7 @@ QET_ElementScaler is a commandline-tool to scale QElectroTech-Elements with cons
 With the optional parameter &quot;-o&quot; or &quot;--stdout&quot; the changed data is written to stdout and no new file is created.
 
 
-It compiles with C++17 activated on Debian/GNU Linux (unstable), ReactOS (0.4.15-dev-5153) and macOS (darwin 21.6.0.0).
+It compiles with C++17 activated on Debian/GNU Linux (unstable), ReactOS (0.4.15-dev-5359) and macOS (darwin 21.6.0.0).
 The ReactOS-Build can also be used with Win in a cmd-window.<br>
 
 QET_ElementScaler can process one file at a time.
@@ -65,7 +65,6 @@ QET_ElementScaler -i -x 2 -y 3  &lt;  ElementToScale.elmt  &gt;  ScaledElement.e
  <br>
  <br>
 
-QET_ElementScaler uses Arseny Kapoulkine's &quot;pugixml&quot; (https://pugixml.org)
-to handle the content of the Element-File. <br>
-Thank you, Arseny! <br>
+QET_ElementScaler uses Arseny Kapoulkine's &quot;pugixml&quot; (https://github.com/zeux/pugixml)
+to handle the content of the Element-File. Thank you, Arseny! <br>
  <br>
