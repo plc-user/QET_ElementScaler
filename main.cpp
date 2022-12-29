@@ -33,6 +33,9 @@
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
 //
+// Change(s) for 0.4beta6
+// - prevent warning on macOS
+//
 // Change(s) for 0.4beta5
 // - The LongOpt-only Flip-Options are renamed to "FlipHorizontal" and "FlipVertical".
 //   They now flip the complete Element at Coordinate-Axes.
@@ -93,7 +96,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta5";
+const string sVersion = "0.4beta6";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;

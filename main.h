@@ -89,7 +89,7 @@ static struct option long_options[]={
     {"FlipHorizontal",no_argument,nullptr,1001}, // "long-opt" only!!!
     {"FlipVertical",no_argument,nullptr,1002},   // "long-opt" only!!!
     {"OverwriteOriginal",no_argument,nullptr,1003},  // "long-opt" only!!!
-    0
+    {0,0,0,0}
   };
 
 
