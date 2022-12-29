@@ -4,7 +4,7 @@
 //
 // compiles with (at least) C++17 enabled on
 // - Debian/GNU Linux (unstable)
-// - ReactOS (0.4.15-dev-5153)
+// - ReactOS (0.4.15-dev-5517)
 // - macOS Monterey 12.6 (darwin21.6.0)
 //
 // to compile the code with GCC on Linux use these commands:
@@ -33,6 +33,13 @@
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
 //
+// Change(s) for 0.4beta5
+// - The LongOpt-only Flip-Options are renamed to "FlipHorizontal" and "FlipVertical".
+//   They now flip the complete Element at Coordinate-Axes.
+//   ToDo: The Positions for "text" and "dynamic_text" have to be calculated
+//         with Text-Width taken into account.
+//   ToDo: recalculate "hotspot_x", "hotspot_y", "width" and "height" of definition-line
+//
 // Change(s) for 0.4beta4
 // - updated PugiXML to version 1.13
 //
@@ -49,7 +56,7 @@
 // - added possibility to flip all Lines and Polygons
 // - added possibility to replace file with scaled one
 //
-// Created from September to October 2022
+// Created from September to December 2022
 // Author: plc-user
 // https://github.com/plc-user
 //
@@ -86,7 +93,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta4";
+const string sVersion = "0.4beta5";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;
@@ -196,28 +203,39 @@ string FormatValue(double &val, const size_t dec){
 /*****************************************************************************/
 int parseCommandline(int argc, char *argv[]) {
     int c;
-    int option_index = 0;
+    int option_index = 12345;
     string sTmp = "";
     while ((c=getopt_long(argc,argv,"f:hiox:y:",long_options,&option_index))!=-1) {
+        if (_debug_) cerr << "long-opt-name: " << long_options[option_index].name << endl;
         switch(c) {
             case 0:
-                if (long_options[option_index].flag != 0)
+                if (long_options[option_index].flag != 0){
+                    if (_debug_)
+                        cerr << "(long_options[option_index].flag != 0)\n";
                     break;
+                }
+            case 1000:
                 if (string(long_options[option_index].name) == "RemoveAllTerminals"){
                     if (_debug_)
                         cerr << "Remove all terminals from Element!\n";
                     xRemoveAllTerminals = true;
                 }
-                if (string(long_options[option_index].name) == "FlipPolyHorizontal"){
+                break;
+            case 1001:
+                if (string(long_options[option_index].name) == "FlipHorizontal"){
                     if (_debug_)
-                        cerr << "Flip Lines and Polygons horizontally!\n";
-                    xFlipPolyHor = true;
+                        cerr << "Flip Element horizontally!\n";
+                    xFlipHor = true;
                 }
-                if (string(long_options[option_index].name) == "FlipPolyVertical"){
+                break;
+            case 1002:
+                if (string(long_options[option_index].name) == "FlipVertical"){
                     if (_debug_)
-                        cerr << "Flip Lines and Polygons vertically!\n";
-                    xFlipPolyVert = true;
+                        cerr << "Flip Element vertically!\n";
+                    xFlipVert = true;
                 }
+                break;
+            case 1003:
                 if (string(long_options[option_index].name) == "OverwriteOriginal"){
                     if (_debug_)
                         cerr << "Overwrite original file with scaled data!\n";
@@ -483,32 +501,23 @@ int ScalePoints(pugi::xml_node &node){
     return 0;
 }
 /*****************************************************************************/
+
+
+/*****************************************************************************/
 int PolyLineFlipHor(pugi::xml_node &node){
     // only for elements "line" and "polygon"
     if (_debug_) cerr << "Flip horizontal: " << node.name() << endl;
     double posX;
-    statistics statx;
-    // determine min-max-values:
+    // bei Punkten von "polygon" und "line" das Vorzeichen umkehren:
     for (pugi::xml_attribute attr: node.attributes())
     {
-        if (_debug_points_) cerr << " " << attr.name() << "=" << attr.value();
+        if (_debug_points_) cerr << " " << attr.as_double() << "=" << attr.value();
         if (attr.name()[0]=='x') {
-            posX = attr.as_double();
-            statx.minval = min(posX, statx.minval);
-            statx.maxval = max(posX, statx.maxval);
-        }
-    }
-    if (_debug_points_) cerr << endl;
-    // calculate new X-values and replace in polygon
-    for (pugi::xml_attribute attr: node.attributes())
-    {
-        if (_debug_points_) cerr << " " << attr.name() << "=" << attr.value();
-        if (attr.name()[0]=='x') {
-            posX = attr.as_double();
-            posX = (statx.minval + statx.maxval) - posX;
+            posX = attr.as_double() * (-1);
             attr.set_value(FormatValue(posX, decimals).c_str());
         }
     }
+
     if (_debug_points_) cerr << endl;
 
     return 0;
@@ -518,33 +527,161 @@ int  PolyLineFlipVert(pugi::xml_node &node){
     // only for elements "line" and "polygon"
     if (_debug_) cerr << "Flip vertical: " << node.name() << endl;
     double posY;
-    statistics staty;
-    // determine min-max-values:
+    // bei Punkten von "polygon" und "line" das Vorzeichen umkehren:
     for (pugi::xml_attribute attr: node.attributes())
     {
-        if (_debug_points_) cerr << " " << attr.name() << "=" << attr.value();
+        if (_debug_points_) cerr << " " << attr.as_double() << "=" << attr.value();
         if (attr.name()[0]=='y') {
-            posY = attr.as_double();
-            staty.minval = min(posY, staty.minval);
-            staty.maxval = max(posY, staty.maxval);
-        }
-    }
-    if (_debug_points_) cerr << endl;
-    // calculate new Y-values and replace in polygon
-    for (pugi::xml_attribute attr: node.attributes())
-    {
-        if (attr.name()[0]=='y') {
-            posY = attr.as_double();
-            posY = (staty.minval + staty.maxval) - posY;
+            posY = attr.as_double() * (-1);
             attr.set_value(FormatValue(posY, decimals).c_str());
         }
-        if (_debug_points_) cerr << " " << attr.name() << "=" << attr.value();
     }
+
     if (_debug_points_) cerr << endl;
 
     return 0;
 }
 /*****************************************************************************/
+
+
+/*****************************************************************************/
+int  RectEllipseFlipVert(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip vertical: " << node.name() << endl;
+    // calculate new Y-values and replace in element:
+    double posY = (-1) * node.attribute("y").as_double() - node.attribute("height").as_double();
+    node.attribute("y") = FormatValue(posY, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+int RectEllipseFlipHor(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip horizontal: " << node.name() << endl;
+    // calculate new X-values and replace in element:
+    double posX = (-1) * node.attribute("x").as_double() - node.attribute("width").as_double();
+    node.attribute("x") = FormatValue(posX, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+
+
+/*****************************************************************************/
+int ArcFlipVert(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip vertical: " << node.name() << endl;
+    // calculate new Y-values and replace in element:
+    double posY = (-1) * node.attribute("y").as_double() - node.attribute("height").as_double();
+    node.attribute("y") = FormatValue(posY, decimals).c_str();
+    double Start = (-1) * node.attribute("start").as_double();
+    node.attribute("start") = FormatValue(Start, decimals).c_str();
+    double Angle = (-1) * node.attribute("angle").as_double();
+    node.attribute("angle") = FormatValue(Angle, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+int ArcFlipHor(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip horizontal: " << node.name() << endl;
+    // calculate new X-values and replace in element:
+    double posX = (-1) * node.attribute("x").as_double() - node.attribute("width").as_double();
+    node.attribute("x") = FormatValue(posX, decimals).c_str();
+    double Start = 180 - node.attribute("start").as_double();
+    node.attribute("start") = FormatValue(Start, decimals).c_str();
+    double Angle = (-1) * node.attribute("angle").as_double();
+    node.attribute("angle") = FormatValue(Angle, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+
+
+/*****************************************************************************/
+int CircleFlipVert(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip vertical: " << node.name() << endl;
+    // calculate new Y-value and replace in element:
+    double posY = (-1) * node.attribute("y").as_double() - node.attribute("diameter").as_double();
+    node.attribute("y") = FormatValue(posY, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+int CircleFlipHor(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip horizontal: " << node.name() << endl;
+    // calculate new X-value and replace in element:
+    double posX = (-1) * node.attribute("x").as_double() - node.attribute("diameter").as_double();
+    node.attribute("x") = FormatValue(posX, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+
+
+/*****************************************************************************/
+int TerminalFlipVert(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip vertical: " << node.name() << endl;
+    // calculate new Y-value and replace in element:
+    double posY = (-1) * node.attribute("y").as_double();
+    node.attribute("y") = FormatValue(posY, decimals).c_str();
+    // set new orientation for terminal:
+    std::string sOrient = std::string(node.attribute("orientation").value());
+    if (sOrient == "n") { node.attribute("orientation").set_value("s"); }
+    if (sOrient == "s") { node.attribute("orientation").set_value("n"); }
+    return 0;
+}
+/*****************************************************************************/
+int TerminalFlipHor(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip horizontal: " << node.name() << endl;
+    // calculate new X-value and replace in element:
+    double posX = (-1) * node.attribute("x").as_double();
+    node.attribute("x") = FormatValue(posX, decimals).c_str();
+    // set new orientation for terminal:
+    std::string sOrient = std::string(node.attribute("orientation").value());
+    if (sOrient == "w") { node.attribute("orientation").set_value("e"); }
+    if (sOrient == "e") { node.attribute("orientation").set_value("w"); }
+    return 0;
+}
+/*****************************************************************************/
+
+
+/*****************************************************************************/
+int TextFlipVert(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip vertical: " << node.name() << endl;
+    std::string sFont = std::string(node.attribute("font").as_string());
+    double FontSize;
+    if (sFont == "") {
+          FontSize = node.attribute("size").as_double();
+          }
+      else {
+          FontSize = ScaleFontSize(sFont, 1.0);
+          }
+    // calculate new Y-value and replace in element:
+    double posY = (-1) * node.attribute("y").as_double() + FontSize;
+    node.attribute("y") = FormatValue(posY, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+int TextFlipHor(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip horizontal: " << node.name() << endl;
+    // calculate new X-value and replace in element:
+    double posX = (-1) * node.attribute("x").as_double();
+    node.attribute("x") = FormatValue(posX, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+
+
+/*****************************************************************************/
+int InputFlipVert(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip vertical: " << node.name() << endl;
+    // calculate new Y-value and replace in element:
+    double posY = (-1) * node.attribute("y").as_double() - node.attribute("size").as_double();
+    node.attribute("y") = FormatValue(posY, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+int InputFlipHor(pugi::xml_node &node){
+    if (_debug_) cerr << "Flip horizontal: " << node.name() << endl;
+    // calculate new X-value and replace in element:
+    double posX = (-1) * node.attribute("x").as_double();
+    node.attribute("x") = FormatValue(posX, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+
+
 
 
 /*****************************************************************************/
@@ -659,21 +796,43 @@ int main(int argc, char *argv[]) {
     node = doc.child("definition").child("description").first_child();
     for (; node; node = node.next_sibling())
     {
-        if (((string(node.name())) == "circle")        ||
-            ((string(node.name())) == "ellipse")       ||
-            ((string(node.name())) == "arc")           ||
-            ((string(node.name())) == "rect")          ||
-            ((string(node.name())) == "input")         ||
-            ((string(node.name())) == "terminal")      ||
-            ((string(node.name())) == "text")          ||
-            ((string(node.name())) == "dynamic_text"))    {
-            ScaleElement(node);
-        }
         if (((string(node.name())) == "line")     ||
             ((string(node.name())) == "polygon"))    {
             ScalePoints(node);
-            if (xFlipPolyHor==true) { PolyLineFlipHor(node); }
-            if (xFlipPolyVert==true) { PolyLineFlipVert(node); }
+            if (xFlipHor==true) { PolyLineFlipHor(node); }
+            if (xFlipVert==true) { PolyLineFlipVert(node); }
+        }
+        if (((string(node.name())) == "ellipse")  ||
+            ((string(node.name())) == "rect"))           {
+            ScaleElement(node);
+            if (xFlipHor==true) { RectEllipseFlipHor(node); }
+            if (xFlipVert==true) { RectEllipseFlipVert(node); }
+        }
+        if ((string(node.name())) == "circle") {
+            ScaleElement(node);
+            if (xFlipHor==true) { CircleFlipHor(node); }
+            if (xFlipVert==true) { CircleFlipVert(node); }
+        }
+        if ((string(node.name())) == "arc") {
+            ScaleElement(node);
+            if (xFlipHor==true) { ArcFlipHor(node); }
+            if (xFlipVert==true) { ArcFlipVert(node); }
+        }
+        if ((string(node.name())) == "terminal") {
+            ScaleElement(node);
+            if (xFlipHor==true) { TerminalFlipHor(node); }
+            if (xFlipVert==true) { TerminalFlipVert(node); }
+        }
+        if (((string(node.name())) == "dynamic_text") ||
+            ((string(node.name())) == "text")) {
+            ScaleElement(node);
+            if (xFlipHor==true) { TextFlipHor(node); }
+            if (xFlipVert==true) { TextFlipVert(node); }
+        }
+        if ((string(node.name())) == "input") {
+            ScaleElement(node);
+            if (xFlipHor==true) { InputFlipHor(node); }
+            if (xFlipVert==true) { InputFlipVert(node); }
         }
     }
 

@@ -4,7 +4,7 @@ QET_ElementScaler is a commandline-tool to scale QElectroTech-Elements with cons
 With the optional parameter &quot;-o&quot; or &quot;--stdout&quot; the changed data is written to stdout and no new file is created.
 
 
-It compiles with C++17 activated on Debian/GNU Linux (unstable), ReactOS (0.4.15-dev-5359) and macOS (darwin 21.6.0.0).
+It compiles with C++17 activated on Debian/GNU Linux (unstable), ReactOS (0.4.15-dev-5517) and macOS (darwin 21.6.0.0).
 The ReactOS-Build can also be used with Win in a cmd-window.<br>
 
 QET_ElementScaler can process one file at a time.
@@ -44,9 +44,9 @@ QET_ElementScaler [options] [-x FactorForX] [-y FactorForY] -f FILENAME <br>
 ```
   "--RemoveAllTerminals" removes all terminals from the element 
                          (useful for front-views or "thumbnails") 
-  "--FlipPolyHorizontal" flips ALL Lines and polygons horizontally 
+  "--FlipHorizontal"     flips all graphical elements horizontally
                          (useful during creation of elements) 
-  "--FlipPolyVertical"   flips ALL Lines and polygons vertically 
+  "--FlipVertical"       flips all graphical elements vertically
                          (useful during creation of elements) 
   "--OverwriteOriginal"  the original file is replaced by scaled one 
                          (CAUTION: Be careful with this option!) 

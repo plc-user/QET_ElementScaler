@@ -6,7 +6,7 @@
 //
 // more information: see "main.cpp"
 //
-// Created from September to October 2022
+// Created from September to December 2022
 // Author: plc-user
 // https://github.com/plc-user
 //
@@ -65,8 +65,8 @@ bool xPrintHelp          = false;
 bool xPrintToStdOut      = false;
 bool xReadFromStdIn      = false;
 bool xRemoveAllTerminals = false;
-bool xFlipPolyHor        = false;
-bool xFlipPolyVert       = false;
+bool xFlipHor            = false;
+bool xFlipVert           = false;
 bool xOverwriteOriginal  = false;
 bool xStopWithError      = false;
 
@@ -79,17 +79,17 @@ struct statistics{
 
 // the possible Commandlineparameters:
 static struct option long_options[]={
-    {"file",required_argument,NULL,'f'},
-    {"help",no_argument,NULL,'h'},
-    {"stdin",no_argument,NULL,'i'},
-    {"stdout",no_argument,NULL,'o'},
-    {"factorx",required_argument,NULL,'x'},
-    {"factory",required_argument,NULL,'y'},
-    {"RemoveAllTerminals",no_argument,NULL,0}, // "long-opt" only!!!
-    {"FlipPolyHorizontal",no_argument,NULL,0}, // "long-opt" only!!!
-    {"FlipPolyVertical",no_argument,NULL,0},   // "long-opt" only!!!
-    {"OverwriteOriginal",no_argument,NULL,0},  // "long-opt" only!!!
-    {0,0,0,0}
+    {"file",required_argument,nullptr,'f'},
+    {"help",no_argument,nullptr,'h'},
+    {"stdin",no_argument,nullptr,'i'},
+    {"stdout",no_argument,nullptr,'o'},
+    {"factorx",required_argument,nullptr,'x'},
+    {"factory",required_argument,nullptr,'y'},
+    {"RemoveAllTerminals",no_argument,nullptr,1000}, // "long-opt" only!!!
+    {"FlipHorizontal",no_argument,nullptr,1001}, // "long-opt" only!!!
+    {"FlipVertical",no_argument,nullptr,1002},   // "long-opt" only!!!
+    {"OverwriteOriginal",no_argument,nullptr,1003},  // "long-opt" only!!!
+    0
   };
 
 
@@ -108,8 +108,22 @@ int ScaleFontSize(string &sFont, double dFactor);
 int EditDefinition(pugi::xml_node &node);
 int ScaleElement(pugi::xml_node &node);
 int ScalePoints(pugi::xml_node &node);
+// Mirror basic shapes on the coordinate axes
 int PolyLineFlipHor(pugi::xml_node &node);
 int PolyLineFlipVert(pugi::xml_node &node);
+int RectEllipseFlipVert(pugi::xml_node &node);
+int RectEllipseFlipHor(pugi::xml_node &node);
+int CircleFlipVert(pugi::xml_node &node);
+int CircleFlipHor(pugi::xml_node &node);
+int TerminalFlipVert(pugi::xml_node &node);
+int TerminalFlipHor(pugi::xml_node &node);
+int TextFlipVert(pugi::xml_node &node);
+int TextFlipHor(pugi::xml_node &node);
+int ArcFlipVert(pugi::xml_node &node);
+int ArcFlipHor(pugi::xml_node &node);
+int InputFlipVert(pugi::xml_node &node);
+int InputFlipHor(pugi::xml_node &node);
+
 
 unsigned int random_char();
 string generate_hex(const unsigned int len);
@@ -156,9 +170,9 @@ void PrintHelp(const string &s, const string &v){
     << "there are also some \"long-opt\"-only options:" << endl
     << "\"--RemoveAllTerminals\" removes all terminals from the element" << endl
     << "                       (useful for front-views or \"thumbnails\")" << endl
-    << "\"--FlipPolyHorizontal\" flips ALL Lines and polygons horizontally" << endl
+    << "\"--FlipHorizontal\"     flips all graphical elements horizontally" << endl
     << "                       (useful during creation of elements)" << endl
-    << "\"--FlipPolyVertical\"   flips ALL Lines and polygons vertically" << endl
+    << "\"--FlipVertical\"       flips all graphical elements vertically" << endl
     << "                       (useful during creation of elements)" << endl
     << "\"--OverwriteOriginal\"  the original file is replaced by scaled one" << endl
     << "                       (CAUTION: Be careful with this option!)" << endl
