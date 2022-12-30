@@ -71,9 +71,11 @@ bool xOverwriteOriginal  = false;
 bool xStopWithError      = false;
 
 
-struct statistics{
-    double minval =  9.99e99;
-    double maxval = -9.99e99;
+struct XYMinMaxVals{
+    double xmin = 0.0;
+    double ymin = 0.0;
+    double xmax = 0.0;
+    double ymax = 0.0;
 };
 
 
@@ -105,7 +107,7 @@ string FormatValue(double &val, const size_t decimals);
 int parseCommandline(int argc, char *argv[]);
 void PrintHelp(const string &s, const string &v);
 int ScaleFontSize(string &sFont, double dFactor);
-int EditDefinition(pugi::xml_node &node);
+int ReCalcDefinition(pugi::xml_node &node, XYMinMaxVals MiMaVals);
 int ScaleElement(pugi::xml_node &node);
 int ScalePoints(pugi::xml_node &node);
 // Mirror basic shapes on the coordinate axes
@@ -129,7 +131,6 @@ unsigned int random_char();
 string generate_hex(const unsigned int len);
 string CreateUUID(void);
 string CreateUUID(bool UpCase);
-
 
 
 //------------------------------------------------------------------------------

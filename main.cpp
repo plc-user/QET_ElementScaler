@@ -33,6 +33,9 @@
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
 //
+// Change(s) for 0.4beta7
+// - recalculate "hotspot_x", "hotspot_y", "width" and "height" of definition-line
+//
 // Change(s) for 0.4beta6
 // - prevent warning on macOS
 //
@@ -41,7 +44,6 @@
 //   They now flip the complete Element at Coordinate-Axes.
 //   ToDo: The Positions for "text" and "dynamic_text" have to be calculated
 //         with Text-Width taken into account.
-//   ToDo: recalculate "hotspot_x", "hotspot_y", "width" and "height" of definition-line
 //
 // Change(s) for 0.4beta4
 // - updated PugiXML to version 1.13
@@ -96,7 +98,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta6";
+const string sVersion = "0.4beta7";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;
@@ -200,7 +202,7 @@ string FormatValue(double &val, const size_t dec){
 
     return s;
 }
-/****************************************************************************/
+/*****************************************************************************/
 
 
 /*****************************************************************************/
@@ -358,30 +360,44 @@ int ScaleFontSize(string &sFont, double dFactor){
 
 
 /*****************************************************************************/
-int EditDefinition(pugi::xml_node &node){
-    double posX;
-    double posY;
-    if (_debug_) cerr << "Scale values of: " << node.name() << endl;
+int ReCalcDefinition(pugi::xml_node &node, XYMinMaxVals MiMaVals){
+
+    int width  = round(MiMaVals.xmax - MiMaVals.xmin);
+    int height = round(MiMaVals.ymax - MiMaVals.ymin);
+
+    // calculation taken from QET-sources:
+    int upwidth = ((width/10)*10)+10;
+    if ((width%10) > 6) upwidth+=10;
+
+    int upheight = ((height/10)*10)+10;
+    if ((height%10) > 6) upheight+=10;
+
+    int xmargin = upwidth - width;
+    int ymargin = upheight - height;
+
+    int hotspot_x = -(round(MiMaVals.xmin - (xmargin/2)));
+    int hotspot_y = -(round(MiMaVals.ymin - (ymargin/2)));
+
+    // write new values to Definition-Line:
     for (pugi::xml_attribute attr: node.attributes())
     {
-        if (_debug_) cerr << " " << attr.name() << "=" << attr.value();
-        if ((string(attr.name())=="width") || (string(attr.name())=="hotspot_x")) {
-            posX = stod(attr.value());
-            posX *= scaleX;
-            attr.set_value(FormatValue(posX, 0).c_str());
-        }
-        if ((string(attr.name())=="height") || (string(attr.name())=="hotspot_y")) {
-            posY = stod(attr.value());
-            posY *= scaleY;
-            attr.set_value(FormatValue(posY, 0).c_str());
-        }
         if ((xRemoveAllTerminals==true) && (string(attr.name())=="link_type")){
             if (_debug_) cerr << "change \"link_type\" to \"terminal\"" << endl;
             attr.set_value("thumbnail");
         }
-        if (_debug_) cerr << " " << attr.name() << "=" << attr.value();
+        if (string(attr.name())=="hotspot_x") {
+            attr.set_value(to_string(hotspot_x).c_str());
+        }
+        if (string(attr.name())=="hotspot_y") {
+            attr.set_value(to_string(hotspot_y).c_str());
+        }
+        if (string(attr.name())=="width") {
+            attr.set_value(to_string(upwidth).c_str());
+        }
+        if (string(attr.name())=="height") {
+            attr.set_value(to_string(upheight).c_str());
+        }
     }
-    if (_debug_) cerr << endl;
 
     return 0;
 }
@@ -685,6 +701,39 @@ int InputFlipHor(pugi::xml_node &node){
 /*****************************************************************************/
 
 
+/*****************************************************************************/
+XYMinMaxVals DetermineMinMax(pugi::xml_node &node, XYMinMaxVals MiMaIn){
+    XYMinMaxVals ValMinMax = MiMaIn;
+    // no need to make a difference, what node it is: non-existing attributes return "0.0"
+    ValMinMax.xmin = min( node.attribute("x").as_double(), ValMinMax.xmin);
+    ValMinMax.xmax = max( node.attribute("x").as_double(), ValMinMax.xmax);
+    ValMinMax.xmax = max((node.attribute("x").as_double() + node.attribute("width").as_double()), ValMinMax.xmax);
+    ValMinMax.xmax = max((node.attribute("x").as_double() + node.attribute("diameter").as_double()), ValMinMax.xmax);
+    ValMinMax.ymin = min( node.attribute("y").as_double(), ValMinMax.ymin);
+    ValMinMax.ymax = max( node.attribute("y").as_double(), ValMinMax.ymax);
+    ValMinMax.ymax = max((node.attribute("y").as_double() + node.attribute("height").as_double()), ValMinMax.ymax);
+    ValMinMax.ymax = max((node.attribute("y").as_double() + node.attribute("diameter").as_double()), ValMinMax.ymax);
+
+    // separate handling for lines and polygons:
+    if (((string(node.name())) == "line")           ||
+        ((string(node.name())) == "polygon"))         {
+        for (pugi::xml_attribute attr: node.attributes())
+        {
+            if (attr.name()[0]=='x') {
+                ValMinMax.xmin = min(attr.as_double(), ValMinMax.xmin);
+                ValMinMax.xmax = max(attr.as_double(), ValMinMax.xmax);
+            }
+            if (attr.name()[0]=='y') {
+                ValMinMax.ymin = min(attr.as_double(), ValMinMax.ymin);
+                ValMinMax.ymax = max(attr.as_double(), ValMinMax.ymax);
+            }
+        }
+    }
+    return ValMinMax;
+}
+/*****************************************************************************/
+
+
 
 
 /*****************************************************************************/
@@ -770,11 +819,6 @@ int main(int argc, char *argv[]) {
     }
 
 
-    // the values of "definition"-line;
-    node = doc.child("definition");
-    EditDefinition(node);
-
-
     // we re-new the elements UUID:
     node = doc.child("definition").child("uuid");
     for (pugi::xml_attribute attr: node.attributes())
@@ -797,6 +841,8 @@ int main(int argc, char *argv[]) {
 
     // edit the graphical elements of the QET-Element:
     node = doc.child("definition").child("description").first_child();
+
+    XYMinMaxVals ElmtMinMax; // to determine element's min-max-Values (X and Y)
     for (; node; node = node.next_sibling())
     {
         if (((string(node.name())) == "line")     ||
@@ -804,41 +850,51 @@ int main(int argc, char *argv[]) {
             ScalePoints(node);
             if (xFlipHor==true) { PolyLineFlipHor(node); }
             if (xFlipVert==true) { PolyLineFlipVert(node); }
+            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
         }
         if (((string(node.name())) == "ellipse")  ||
             ((string(node.name())) == "rect"))           {
             ScaleElement(node);
             if (xFlipHor==true) { RectEllipseFlipHor(node); }
             if (xFlipVert==true) { RectEllipseFlipVert(node); }
+            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
         }
         if ((string(node.name())) == "circle") {
             ScaleElement(node);
             if (xFlipHor==true) { CircleFlipHor(node); }
             if (xFlipVert==true) { CircleFlipVert(node); }
+            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
         }
         if ((string(node.name())) == "arc") {
             ScaleElement(node);
             if (xFlipHor==true) { ArcFlipHor(node); }
             if (xFlipVert==true) { ArcFlipVert(node); }
+            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
         }
         if ((string(node.name())) == "terminal") {
             ScaleElement(node);
             if (xFlipHor==true) { TerminalFlipHor(node); }
             if (xFlipVert==true) { TerminalFlipVert(node); }
+            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
         }
         if (((string(node.name())) == "dynamic_text") ||
             ((string(node.name())) == "text")) {
             ScaleElement(node);
             if (xFlipHor==true) { TextFlipHor(node); }
             if (xFlipVert==true) { TextFlipVert(node); }
+            // Min-Max-Calculation not for text-nodes
         }
         if ((string(node.name())) == "input") {
             ScaleElement(node);
             if (xFlipHor==true) { InputFlipHor(node); }
             if (xFlipVert==true) { InputFlipVert(node); }
+            // Min-Max-Calculation not for text-nodes
         }
     }
 
+    // calculate new values for Definition-Line:
+    node = doc.child("definition");
+    ReCalcDefinition(node, ElmtMinMax);
 
 
     if (xPrintToStdOut==true){
