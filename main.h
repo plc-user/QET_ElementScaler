@@ -6,13 +6,13 @@
 //
 // more information: see "main.cpp"
 //
-// Created from September to December 2022
+// Created from September 2022 to January 2023
 // Author: plc-user
 // https://github.com/plc-user
 //
 
 /*
- * Copyright (c) 2022 plc-user
+ * Copyright (c) 2022-2023 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -40,15 +40,202 @@
 #define _QETscaler_MAIN_H
 
 #include <iostream>     // I/O
-#include <fstream>      // write stringstream to file
-#include <cmath>        // for "round"
 #include <getopt.h>     // for Commandline-Parameters
-#include <locale>
 #include <regex>        // for "double"-Check
 #include <filesystem>   // for exe-filename
-#include <sstream>      // für Typ-Konvertierung
-#include <string>       // für das Ergebnis als std::string
-#include <random>       // für Zufallszahlen der uuid
+#include <string>       // for std::string - handling
+#include <sstream>      // for Type-Convertion
+#include <random>       // for random values of uuid
+
+
+//
+//--- definition of class "RectMinMax" -----------------------------------------
+//
+class RectMinMax {
+   private:
+      double xMin = 0.0;
+      double xMax = 0.0;
+      double yMin = 0.0;
+      double yMax = 0.0;
+   public:
+      RectMinMax();                  // default-constructor
+      RectMinMax(double, double);    // constructor with value
+      RectMinMax(const RectMinMax&); // copy-constructor
+      void addx(double);             // add a new x-value
+      void addy(double);             // add a new y-value
+      void add(double, double);      // add new values
+      void clear(void);              // clear min/max and set to 0
+      void clear(double, double);    // clear min/max and set new values
+      void clear(const RectMinMax&); // clear with value
+      double xmin(void);             // returns minimum x-value
+      double xmax(void);             // returns maximum x-value
+      double ymin(void);             // returns minimum y-value
+      double ymax(void);             // returns maximum y-value
+      double width(void);            // returns (xmax - xmin)
+      double height(void);           // returns (ymax - ymin)
+      double diagonal(void);         // returns length of diagonal
+      double angle(void);            // returns angle of diagonal
+      friend std::ostream& operator << (std::ostream&, const RectMinMax&); // Standardoutput-operator
+};
+//
+//--- implementation of class "RectMinMax" -------------------------------------
+//
+RectMinMax::RectMinMax(){
+    xMin = 0.0;
+    xMax = 0.0;
+    yMin = 0.0;
+    yMax = 0.0;
+}
+RectMinMax::RectMinMax(double x, double y){
+    xMin = x;
+    xMax = x;
+    yMin = y;
+    yMax = y;
+}
+RectMinMax::RectMinMax(const RectMinMax& r){
+    xMin = r.xMin;
+    xMax = r.xMax;
+    yMin = r.yMin;
+    yMax = r.yMax;
+}
+void RectMinMax::addx(double x){
+    if (x < xMin) { xMin = x; }
+    if (x > xMax) { xMax = x; }
+}
+void RectMinMax::addy(double y){
+    if (y < yMin) { yMin = y; }
+    if (y > yMax) { yMax = y; }
+}
+void RectMinMax::add(double x, double y){
+    if (x < xMin) { xMin = x; }
+    if (x > xMax) { xMax = x; }
+    if (y < yMin) { yMin = y; }
+    if (y > yMax) { yMax = y; }
+}
+// reset all values to ...
+void RectMinMax::clear(void){
+    xMin = 0.0;
+    xMax = 0.0;
+    yMin = 0.0;
+    yMax = 0.0;
+}
+void RectMinMax::clear(double x, double y){
+    xMin = x;
+    xMax = x;
+    yMin = y;
+    yMax = y;
+}
+void RectMinMax::clear(const RectMinMax& r){
+    xMin = r.xMin;
+    xMax = r.xMax;
+    yMin = r.yMin;
+    yMax = r.yMax;
+}
+// return values seperately
+double RectMinMax::xmin(void){
+    return xMin;
+}
+double RectMinMax::xmax(void){
+    return xMax;
+}
+double RectMinMax::ymin(void){
+    return yMin;
+}
+double RectMinMax::ymax(void){
+    return yMax;
+}
+double RectMinMax::width(void){
+    return (xMax - xMin);
+}
+double RectMinMax::height(void){
+    return (yMax - yMin);
+}
+double RectMinMax::diagonal(void){
+    double w = (xMax - xMin);
+    double h = (yMax - yMin);
+    return std::sqrt((w * w)+(h * h));
+}
+double RectMinMax::angle(void){
+    double dx = (xMax - xMin);
+    double dy = (yMax - yMin);
+    const double pi = 3.14159265359;
+    return (atan2(dy, dx) * 180 / pi);
+}
+// for outputting the whole bunch:
+inline std::ostream& operator << (std::ostream& strm, const RectMinMax& r)
+{
+	strm << "x:(" << r.xMin << " ... " << r.xMax << ")"
+         << " | "
+         << "y:(" << r.yMin << " ... " << r.yMax << ")";
+	return strm;
+}
+//
+//--- END - implementation of class "RectMinMax" -------------------------------
+//
+
+
+//
+// --- function-prototypes for UUID-calculation --------------------------------
+//
+unsigned int random_char(void);
+std::string generate_hex(const unsigned int);
+std::string CreateUUID(void);
+std::string CreateUUID(bool);
+//
+// ############################################################
+// ###              we build a (random?) UUID               ###
+// ############################################################
+//
+unsigned int random_char(void) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 255);
+    return dis(gen);
+}
+//
+std::string generate_hex(const unsigned int len) {
+    std::stringstream ss;
+    for (unsigned int i = 0; i < len; i++) {
+        const auto rc = random_char();
+        std::stringstream hexstream;
+        hexstream << std::hex << rc;
+        auto hexa = hexstream.str();
+        ss << (hexa.length() < 2 ? '0' + hexa : hexa);
+    }
+    return ss.str();
+}
+//
+std::string CreateUUID(void) {
+    std::string uuid = "";
+    uuid  =       generate_hex(4);
+    uuid += '-' + generate_hex(2);
+    uuid += '-' + generate_hex(2);
+    uuid += '-' + generate_hex(2);
+    uuid += '-' + generate_hex(6);
+    return uuid;
+}
+//
+std::string CreateUUID(bool UpCase){
+    std::string uuid = CreateUUID();
+    for (size_t i=0; i<uuid.length(); i++)
+        if (UpCase == true)
+            uuid[i] = toupper(uuid[i]);
+        else
+            uuid[i] = tolower(uuid[i]);
+    return uuid;
+}
+//
+// ############################################################
+// ### END          we build a (random?) UUID               ###
+// ############################################################
+//
+
+
+//
+// "... and now to something completely different!"
+// variables and functions for the actual tasks:
+//
+
 
 using namespace std;
 
@@ -71,12 +258,7 @@ bool xOverwriteOriginal  = false;
 bool xStopWithError      = false;
 
 
-struct XYMinMaxVals{
-    double xmin = 0.0;
-    double ymin = 0.0;
-    double xmax = 0.0;
-    double ymax = 0.0;
-};
+RectMinMax XYMinMax;  // to store the min-max-values of the element
 
 
 // the possible Commandlineparameters:
@@ -97,7 +279,7 @@ static struct option long_options[]={
 
 // for setting a (new) Decimal-Separator
 struct DecSep : std::numpunct<char> {
-    char do_decimal_point()   const { return cDecSep; }  // Dezimal-Trenner
+    char do_decimal_point()   const { return cDecSep; }  // Decimal-Separator
 };
 
 
@@ -106,8 +288,9 @@ string CheckForDoubleString(string &sArg);
 string FormatValue(double &val, const size_t decimals);
 int parseCommandline(int argc, char *argv[]);
 void PrintHelp(const string &s, const string &v);
+void NormalizeArcVals(double &start, double &angle);
 int ScaleFontSize(string &sFont, double dFactor);
-int ReCalcDefinition(pugi::xml_node &node, XYMinMaxVals MiMaVals);
+int ReCalcDefinition(pugi::xml_node &node);
 int ScaleElement(pugi::xml_node &node);
 int ScalePoints(pugi::xml_node &node);
 // Mirror basic shapes on the coordinate axes
@@ -125,19 +308,14 @@ int ArcFlipVert(pugi::xml_node &node);
 int ArcFlipHor(pugi::xml_node &node);
 int InputFlipVert(pugi::xml_node &node);
 int InputFlipHor(pugi::xml_node &node);
-
-
-unsigned int random_char();
-string generate_hex(const unsigned int len);
-string CreateUUID(void);
-string CreateUUID(bool UpCase);
+void DetermineMinMax(pugi::xml_node &node);
 
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
 
-/*****************************************************************************/
+/******************************************************************************/
 void PrintHelp(const string &s, const string &v){
     stringstream ss;
     ss << filesystem::path(s).filename();
@@ -188,55 +366,33 @@ void PrintHelp(const string &s, const string &v){
     << "As always with free software: Use it at your own risk! " << smilie << endl
     << endl;
 }
-/*****************************************************************************/
+/******************************************************************************/
 
 
-
-// ############################################################
-// ###          wir bauen eine (zufällige?) UUID            ###
-// ############################################################
-//
-unsigned int random_char() {
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dis(0, 255);
-    return dis(gen);
-}
-//
-string generate_hex(const unsigned int len) {
-    stringstream ss;
-    for (unsigned int i = 0; i < len; i++) {
-        const auto rc = random_char();
-        stringstream hexstream;
-        hexstream << hex << rc;
-        auto hex = hexstream.str();
-        ss << (hex.length() < 2 ? '0' + hex : hex);
+/******************************************************************************/
+void NormalizeArcVals(double &start, double &angle){
+    int istart = round(std::fmod(start, 360.0));
+    int iangle = round(std::fmod(angle, 360.0));
+    if (istart < 0) {
+        // for example:
+        // old values: start = -20; angle = 330;
+        // new values: start = 340; angle = 330;
+        istart = (360 + istart) % 360;
+        iangle = iangle;
     }
-    return ss.str();
+    if (iangle < 0) {
+        // for example:
+        // old values: start = 350; angle = -330;
+        // new values: start =  20; angle =  330;
+        istart  = (istart + iangle) % 360;
+        iangle *= (-1);
+    }
+    start = istart;
+    angle = iangle;
 }
-//
-string CreateUUID(void) {
-    string sRet = "";
-    sRet  =       generate_hex(4);
-    sRet += '-' + generate_hex(2);
-    sRet += '-' + generate_hex(2);
-    sRet += '-' + generate_hex(2);
-    sRet += '-' + generate_hex(6);
-    return sRet;
-}
-//
-string CreateUUID(bool UpCase){
-    string uuid = CreateUUID();
-    for (size_t i=0; i<uuid.length(); i++)
-        if (UpCase == true)
-            uuid[i] = toupper(uuid[i]);
-        else
-            uuid[i] = tolower(uuid[i]);
-    return uuid;
-}
-// ############################################################
-// ### ENDE       wir bauen eine (zufällige?) UUID          ###
-// ############################################################
+/******************************************************************************/
+
+
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 

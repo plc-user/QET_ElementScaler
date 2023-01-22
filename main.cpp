@@ -12,6 +12,11 @@
 // g++ -Wall -O2 -std=c++17 -c main.cpp -o obj/main.o
 // g++ -o  QET_ElementScaler obj/inc/pugixml/pugixml.o obj/main.o  -s
 //
+// clang works as well:
+// clang++ -Weverything -O2 -std=c++17 -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
+// clang++ -Weverything -O2 -std=c++17 -c main.cpp -o obj/main.o
+// clang++ -o  QET_ElementScaler obj/inc/pugixml/pugixml.o obj/main.o  -s
+//
 // these commands work (TDM-GCC 10.3.0) on ReactOS to compile:
 // g++.exe -Wall -O2 -std=c++17 -c inc\pugixml\pugixml.cpp -o obj\inc\pugixml\pugixml.o
 // g++.exe -Wall -O2 -std=c++17 -c main.cpp -o obj\main.o
@@ -32,6 +37,11 @@
 //
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
+//
+// Change(s) for 0.4beta8
+// - graphical element "arc": normalize "start" and "angle" to positive values
+// - internal: replaced struct for element's min-max-values by own class
+// - internal: renamed variables, translated comments, sorted headers
 //
 // Change(s) for 0.4beta7
 // - recalculate "hotspot_x", "hotspot_y", "width" and "height" of definition-line
@@ -61,7 +71,7 @@
 // - added possibility to flip all Lines and Polygons
 // - added possibility to replace file with scaled one
 //
-// Created from September to December 2022
+// Created from September 2022 to January 2023
 // Author: plc-user
 // https://github.com/plc-user
 //
@@ -70,7 +80,7 @@
 //
 
 /*
- * Copyright (c) 2022 plc-user
+ * Copyright (c) 2022-2023 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -98,7 +108,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta7";
+const string sVersion = "0.4beta8";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;
@@ -143,7 +153,7 @@ string CheckForDoubleString(string &sArg){
 
 /****************************************************************************/
 string FormatValue(double &val, const size_t dec){
-    size_t i = 0; // Laufindex
+    size_t i = 0; // index for loops
     double epsilon = 0.1; // too small values will be set to "0"
     for (i=0; i<dec; i++)
         epsilon = epsilon / 10.0;
@@ -162,23 +172,23 @@ string FormatValue(double &val, const size_t dec){
         return "0";
     // additional rounding, if value is VERY close to the next integer:
     if (dec>1) {
-        int Teiler = 1;
-        for (i=0; i<dec; i++) Teiler *= 10;
-        int Rest = iVal % Teiler;
+        int Divider = 1;
+        for (i=0; i<dec; i++) Divider *= 10;
+        int Rest = iVal % Divider;
         if (((Rest > 0) && (Rest <  5)) || ((Rest < 0) && (Rest > -5))) {
-            if (_debug_) cerr << "Teiler: " << Teiler << " - Rest: " << Rest
-                              << " - subtrahiere " << Rest << endl;
+            if (_debug_) cerr << "Divider: " << Divider << " - Rest: " << Rest
+                              << " - subtract " << Rest << endl;
             iVal -= Rest;
         }
-        if ((Rest > 0) && (Rest > (Teiler - 5))) {
-            if (_debug_) cerr << "Teiler: " << Teiler << " - Rest: " << Rest
-                              << " - addiere " << (Teiler - Rest) << endl;
-            iVal += (Teiler - Rest);
+        if ((Rest > 0) && (Rest > (Divider - 5))) {
+            if (_debug_) cerr << "Divider: " << Divider << " - Rest: " << Rest
+                              << " - add " << (Divider - Rest) << endl;
+            iVal += (Divider - Rest);
             }
-        if ((Rest < 0) && (Rest < (-1)*(Teiler - 5))) {
-            if (_debug_) cerr << "Teiler: " << Teiler << " - Rest: " << Rest
-                              << " - subtrahiere " << (Teiler + Rest) << endl;
-            iVal -= (Teiler + Rest);
+        if ((Rest < 0) && (Rest < (-1)*(Divider - 5))) {
+            if (_debug_) cerr << "Divider: " << Divider << " - Rest: " << Rest
+                              << " - subtract " << (Divider + Rest) << endl;
+            iVal -= (Divider + Rest);
             }
     }
 
@@ -326,9 +336,9 @@ int parseCommandline(int argc, char *argv[]) {
 
 /*****************************************************************************/
 int ScaleFontSize(string &sFont, double dFactor){
-    // sFont an "," aufteilen in Teil-Strings
-    // das zweite Datum ist die Schriftgröße -> mit scaleX multiplizieren,
-    // dann zuerst runden und größer "0" lassen, danach zurückschreiben
+    // split sFont at ","
+    // the second date is the font-size -> multiply with scaleX,
+    // then first round and keep greater than "0", after that write back
     stringstream ss (sFont);
     int i = 0;
     int iSize = 0;
@@ -355,15 +365,15 @@ int ScaleFontSize(string &sFont, double dFactor){
 
 
 /****************************************************************************/
-/***             nun die XML-spezifischen Funktionen                      ***/
+/***                now the XML-specific functions                        ***/
 /****************************************************************************/
 
 
 /*****************************************************************************/
-int ReCalcDefinition(pugi::xml_node &node, XYMinMaxVals MiMaVals){
+int ReCalcDefinition(pugi::xml_node &node){
 
-    int width  = round(MiMaVals.xmax - MiMaVals.xmin);
-    int height = round(MiMaVals.ymax - MiMaVals.ymin);
+    int width  = round(XYMinMax.width());
+    int height = round(XYMinMax.height());
 
     // calculation taken from QET-sources:
     int upwidth = ((width/10)*10)+10;
@@ -375,8 +385,8 @@ int ReCalcDefinition(pugi::xml_node &node, XYMinMaxVals MiMaVals){
     int xmargin = upwidth - width;
     int ymargin = upheight - height;
 
-    int hotspot_x = -(round(MiMaVals.xmin - (xmargin/2)));
-    int hotspot_y = -(round(MiMaVals.ymin - (ymargin/2)));
+    int hotspot_x = -(round(XYMinMax.xmin() - (xmargin/2)));
+    int hotspot_y = -(round(XYMinMax.ymin() - (ymargin/2)));
 
     // write new values to Definition-Line:
     for (pugi::xml_attribute attr: node.attributes())
@@ -457,18 +467,6 @@ int ScaleElement(pugi::xml_node &node){
         node.attribute("height") = FormatValue(height, decimals).c_str();
     }
 
-    if (sizeof(node.attribute("angle").name()) != 0) {
-        double angle = node.attribute("angle").as_double();
-        // no scaling of angle-value, just rounding
-        node.attribute("angle") = FormatValue(angle, decimals).c_str();
-    }
-
-    if (sizeof(node.attribute("start").name()) != 0) {
-        double start = node.attribute("start").as_double();
-        // no scaling of start-value, just rounding
-        node.attribute("start") = FormatValue(start, decimals).c_str();
-    }
-
     double posX = node.attribute("x").as_double();
     posX *= scaleX;
     if (static_cast<string>(node.name())=="terminal") {
@@ -527,7 +525,7 @@ int PolyLineFlipHor(pugi::xml_node &node){
     // only for elements "line" and "polygon"
     if (_debug_) cerr << "Flip horizontal: " << node.name() << endl;
     double posX;
-    // bei Punkten von "polygon" und "line" das Vorzeichen umkehren:
+    // for points of "polygon" and "line" invert the sign:
     for (pugi::xml_attribute attr: node.attributes())
     {
         if (_debug_points_) cerr << " " << attr.as_double() << "=" << attr.value();
@@ -546,7 +544,7 @@ int  PolyLineFlipVert(pugi::xml_node &node){
     // only for elements "line" and "polygon"
     if (_debug_) cerr << "Flip vertical: " << node.name() << endl;
     double posY;
-    // bei Punkten von "polygon" und "line" das Vorzeichen umkehren:
+    // for points of "polygon" and "line" invert the sign:
     for (pugi::xml_attribute attr: node.attributes())
     {
         if (_debug_points_) cerr << " " << attr.as_double() << "=" << attr.value();
@@ -589,8 +587,8 @@ int ArcFlipVert(pugi::xml_node &node){
     double posY = (-1) * node.attribute("y").as_double() - node.attribute("height").as_double();
     node.attribute("y") = FormatValue(posY, decimals).c_str();
     double Start = (-1) * node.attribute("start").as_double();
-    node.attribute("start") = FormatValue(Start, decimals).c_str();
     double Angle = (-1) * node.attribute("angle").as_double();
+    node.attribute("start") = FormatValue(Start, decimals).c_str();
     node.attribute("angle") = FormatValue(Angle, decimals).c_str();
     return 0;
 }
@@ -601,8 +599,18 @@ int ArcFlipHor(pugi::xml_node &node){
     double posX = (-1) * node.attribute("x").as_double() - node.attribute("width").as_double();
     node.attribute("x") = FormatValue(posX, decimals).c_str();
     double Start = 180 - node.attribute("start").as_double();
-    node.attribute("start") = FormatValue(Start, decimals).c_str();
     double Angle = (-1) * node.attribute("angle").as_double();
+    node.attribute("start") = FormatValue(Start, decimals).c_str();
+    node.attribute("angle") = FormatValue(Angle, decimals).c_str();
+    return 0;
+}
+/*****************************************************************************/
+int NormalizeArc(pugi::xml_node &node){
+    if (_debug_) cerr << "normalize angles of: " << node.name() << endl;
+    double Start = node.attribute("start").as_double();
+    double Angle = node.attribute("angle").as_double();
+    NormalizeArcVals(Start, Angle);
+    node.attribute("start") = FormatValue(Start, decimals).c_str();
     node.attribute("angle") = FormatValue(Angle, decimals).c_str();
     return 0;
 }
@@ -702,34 +710,28 @@ int InputFlipHor(pugi::xml_node &node){
 
 
 /*****************************************************************************/
-XYMinMaxVals DetermineMinMax(pugi::xml_node &node, XYMinMaxVals MiMaIn){
-    XYMinMaxVals ValMinMax = MiMaIn;
+void DetermineMinMax(pugi::xml_node &node){
     // no need to make a difference, what node it is: non-existing attributes return "0.0"
-    ValMinMax.xmin = min( node.attribute("x").as_double(), ValMinMax.xmin);
-    ValMinMax.xmax = max( node.attribute("x").as_double(), ValMinMax.xmax);
-    ValMinMax.xmax = max((node.attribute("x").as_double() + node.attribute("width").as_double()), ValMinMax.xmax);
-    ValMinMax.xmax = max((node.attribute("x").as_double() + node.attribute("diameter").as_double()), ValMinMax.xmax);
-    ValMinMax.ymin = min( node.attribute("y").as_double(), ValMinMax.ymin);
-    ValMinMax.ymax = max( node.attribute("y").as_double(), ValMinMax.ymax);
-    ValMinMax.ymax = max((node.attribute("y").as_double() + node.attribute("height").as_double()), ValMinMax.ymax);
-    ValMinMax.ymax = max((node.attribute("y").as_double() + node.attribute("diameter").as_double()), ValMinMax.ymax);
-
+    XYMinMax.addx(node.attribute("x").as_double());
+    XYMinMax.addx(node.attribute("x").as_double() + node.attribute("width").as_double());
+    XYMinMax.addx(node.attribute("x").as_double() + node.attribute("diameter").as_double());
+    XYMinMax.addy(node.attribute("y").as_double());
+    XYMinMax.addy(node.attribute("y").as_double() + node.attribute("height").as_double());
+    XYMinMax.addy(node.attribute("y").as_double() + node.attribute("diameter").as_double());
     // separate handling for lines and polygons:
-    if (((string(node.name())) == "line")           ||
-        ((string(node.name())) == "polygon"))         {
+    if (((string(node.name())) == "line")       ||
+        ((string(node.name())) == "polygon"))     {
         for (pugi::xml_attribute attr: node.attributes())
         {
             if (attr.name()[0]=='x') {
-                ValMinMax.xmin = min(attr.as_double(), ValMinMax.xmin);
-                ValMinMax.xmax = max(attr.as_double(), ValMinMax.xmax);
+                XYMinMax.addx(attr.as_double());
             }
             if (attr.name()[0]=='y') {
-                ValMinMax.ymin = min(attr.as_double(), ValMinMax.ymin);
-                ValMinMax.ymax = max(attr.as_double(), ValMinMax.ymax);
+                XYMinMax.addy(attr.as_double());
             }
         }
     }
-    return ValMinMax;
+    return;
 }
 /*****************************************************************************/
 
@@ -800,7 +802,7 @@ int main(int argc, char *argv[]) {
 
 
     /*************************************************************************/
-    /***          nun werden endlich die XML-Elemente bearbeitet           ***/
+    /***             now finally the XML elements are edited               ***/
     /*************************************************************************/
 
 
@@ -842,7 +844,6 @@ int main(int argc, char *argv[]) {
     // edit the graphical elements of the QET-Element:
     node = doc.child("definition").child("description").first_child();
 
-    XYMinMaxVals ElmtMinMax; // to determine element's min-max-Values (X and Y)
     for (; node; node = node.next_sibling())
     {
         if (((string(node.name())) == "line")     ||
@@ -850,32 +851,33 @@ int main(int argc, char *argv[]) {
             ScalePoints(node);
             if (xFlipHor==true) { PolyLineFlipHor(node); }
             if (xFlipVert==true) { PolyLineFlipVert(node); }
-            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
+            DetermineMinMax(node);
         }
         if (((string(node.name())) == "ellipse")  ||
             ((string(node.name())) == "rect"))           {
             ScaleElement(node);
             if (xFlipHor==true) { RectEllipseFlipHor(node); }
             if (xFlipVert==true) { RectEllipseFlipVert(node); }
-            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
+            DetermineMinMax(node);
         }
         if ((string(node.name())) == "circle") {
             ScaleElement(node);
             if (xFlipHor==true) { CircleFlipHor(node); }
             if (xFlipVert==true) { CircleFlipVert(node); }
-            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
+            DetermineMinMax(node);
         }
         if ((string(node.name())) == "arc") {
             ScaleElement(node);
             if (xFlipHor==true) { ArcFlipHor(node); }
             if (xFlipVert==true) { ArcFlipVert(node); }
-            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
+            NormalizeArc(node);
+            DetermineMinMax(node);
         }
         if ((string(node.name())) == "terminal") {
             ScaleElement(node);
             if (xFlipHor==true) { TerminalFlipHor(node); }
             if (xFlipVert==true) { TerminalFlipVert(node); }
-            ElmtMinMax = DetermineMinMax(node, ElmtMinMax);
+            DetermineMinMax(node);
         }
         if (((string(node.name())) == "dynamic_text") ||
             ((string(node.name())) == "text")) {
@@ -892,9 +894,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (_debug_ ){
+        cerr << "XYMinMax: " << XYMinMax << endl
+             << "Diagonal: " << XYMinMax.diagonal() << " Angle: " << XYMinMax.angle() << "°" << endl;
+    }
+
     // calculate new values for Definition-Line:
     node = doc.child("definition");
-    ReCalcDefinition(node, ElmtMinMax);
+    ReCalcDefinition(node);
 
 
     if (xPrintToStdOut==true){
