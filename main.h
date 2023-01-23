@@ -308,6 +308,7 @@ int ArcFlipVert(pugi::xml_node &node);
 int ArcFlipHor(pugi::xml_node &node);
 int InputFlipVert(pugi::xml_node &node);
 int InputFlipHor(pugi::xml_node &node);
+void DetermineArcMinMax(pugi::xml_node &node);
 void DetermineMinMax(pugi::xml_node &node);
 
 

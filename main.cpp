@@ -38,6 +38,9 @@
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
 //
+// Change(s) for 0.4beta9
+// - added mathmatically correct calculation for Min-Max-Values of ARC
+//
 // Change(s) for 0.4beta8
 // - graphical element "arc": normalize "start" and "angle" to positive values
 // - internal: replaced struct for element's min-max-values by own class
@@ -108,7 +111,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta8";
+const string sVersion = "0.4beta9";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;
@@ -710,6 +713,29 @@ int InputFlipHor(pugi::xml_node &node){
 
 
 /*****************************************************************************/
+void DetermineArcMinMax(pugi::xml_node &node){
+    // read values from XML:
+    double PosX   = node.attribute("x").as_double();
+    double PosY   = node.attribute("y").as_double();
+    double Height = node.attribute("height").as_double();
+    double Width  = node.attribute("width").as_double();
+    int StartDeg  = round(node.attribute("start").as_double());
+    int AngleDeg  = round(node.attribute("angle").as_double());
+    const double pi = 3.14159265359;
+    // calculate points on ellipse-circumference:
+    // x = a ⋅ cos(t)
+    // y = b ⋅ sin(t)
+    // with t = 0 .. 2*pi = ([0 .. 360]/360)*2*pi
+    for (int i = StartDeg; i <= (StartDeg + AngleDeg); i++){
+        double x = PosX + (Width/2) * (1 + cos((i%360)/360.0*2*pi));
+        double y = PosY + (Height/2) * (1 - sin((i%360)/360.0*2*pi));
+        XYMinMax.add(x, y);
+    }
+    return;
+}
+/*****************************************************************************/
+
+/*****************************************************************************/
 void DetermineMinMax(pugi::xml_node &node){
     // no need to make a difference, what node it is: non-existing attributes return "0.0"
     XYMinMax.addx(node.attribute("x").as_double());
@@ -871,7 +897,7 @@ int main(int argc, char *argv[]) {
             if (xFlipHor==true) { ArcFlipHor(node); }
             if (xFlipVert==true) { ArcFlipVert(node); }
             NormalizeArc(node);
-            DetermineMinMax(node);
+            DetermineArcMinMax(node);
         }
         if ((string(node.name())) == "terminal") {
             ScaleElement(node);
