@@ -38,8 +38,12 @@
 // Result is a new file "FILENAME.SCALED.elmt" or output on stdout
 // in both cases without the XML declaration-line
 //
+//
+// Change(s) for 0.4beta10
+// - fix: normalized angles for ARCs weren't always positive
+//
 // Change(s) for 0.4beta9
-// - added mathmatically correct calculation for Min-Max-Values of ARC
+// - added mathematically correct calculation for Min-Max-Values of ARC
 //
 // Change(s) for 0.4beta8
 // - graphical element "arc": normalize "start" and "angle" to positive values
@@ -111,7 +115,7 @@
 #include "inc/pugixml/pugixml.hpp"
 #include "main.h"
 
-const string sVersion = "0.4beta9";
+const string sVersion = "0.4beta10";
 
 const int _debug_ = 0;
 const int _debug_points_ = 0;
@@ -733,8 +737,6 @@ void DetermineArcMinMax(pugi::xml_node &node){
     }
     return;
 }
-/*****************************************************************************/
-
 /*****************************************************************************/
 void DetermineMinMax(pugi::xml_node &node){
     // no need to make a difference, what node it is: non-existing attributes return "0.0"

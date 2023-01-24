@@ -372,20 +372,20 @@ void PrintHelp(const string &s, const string &v){
 
 /******************************************************************************/
 void NormalizeArcVals(double &start, double &angle){
-    int istart = round(std::fmod(start, 360.0));
-    int iangle = round(std::fmod(angle, 360.0));
+    int istart = (int)(round(start)) % 360;
+    int iangle = (int)(round(angle)) % 360;
     if (istart < 0) {
         // for example:
         // old values: start = -20; angle = 330;
         // new values: start = 340; angle = 330;
-        istart = (360 + istart) % 360;
+        istart = (istart + 360) % 360;
         iangle = iangle;
     }
     if (iangle < 0) {
         // for example:
         // old values: start = 350; angle = -330;
         // new values: start =  20; angle =  330;
-        istart  = (istart + iangle) % 360;
+        istart  = (istart + iangle + 360) % 360;
         iangle *= (-1);
     }
     start = istart;
