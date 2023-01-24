@@ -68,3 +68,4 @@ QET_ElementScaler -i -x 2 -y 3  &lt;  ElementToScale.elmt  &gt;  ScaledElement.e
 QET_ElementScaler uses Arseny Kapoulkine's &quot;pugixml&quot; (https://github.com/zeux/pugixml)
 to handle the content of the Element-File. Thank you, Arseny! <br>
  <br>
+Many thanks, of course, to the developers and contributors of QElectroTech - a free software to create electric diagrams. (https://qelectrotech.org) <br>
