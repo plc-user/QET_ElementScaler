@@ -23,6 +23,10 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++17" />
 		</Compiler>
+		<Unit filename="inc/elements.cpp" />
+		<Unit filename="inc/elements.h" />
+		<Unit filename="inc/helpers.cpp" />
+		<Unit filename="inc/helpers.h" />
 		<Unit filename="inc/pugixml/pugiconfig.hpp" />
 		<Unit filename="inc/pugixml/pugixml.cpp" />
 		<Unit filename="inc/pugixml/pugixml.hpp" />
