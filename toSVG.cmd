@@ -32,7 +32,7 @@ rem Recursively finds all matching files:
 @for /r "%DataPfad%" %%i in ("*.elmt") do (
 rem @for /r "%cd%" %%i in ("*.elmt") do (
     rem edit found files:
-    "%ProgPfad%\QET_ElementScaler.exe" -F %Skalierung% "%%i"
+    "%ProgPfad%\QET_ElementScaler.exe" --toSVG "%%i"
     )
 
 @echo + + + Fertig! + + +

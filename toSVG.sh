@@ -16,7 +16,7 @@ for i in  `find . -name "*.elmt"` ; do
   echo "processing $i"
   # With the construct in curly brackets the file extension
   # is changed accordingly
-  "$SkalierProg" -o -F "$Skalierung" "$i" > "${i%.elmt}.SCALED.elmt"
+  "$SkalierProg" --toSVG -o "$i" > "${i%.elmt}.svg"
   done
 
 # blanks in filenames - back to original:
