@@ -40,7 +40,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta1";
+const std::string sVersion = "v0.5.0beta2";
 
 // the element-file to process:
 std::string ElementFile       = "";
@@ -446,15 +446,16 @@ std::string ToSVG(pugi::xml_node node) {
     // hier die Definition von "terminal", falls im Element vorhanden:
     if (node.child("description").child("terminal")) {
         s += "  <defs>\n";
-        s += "    <g id=\"terminal\">\n";
-        s += "      <line x1=\"0\" y1=\"0\"   x2=\"0\" y2=\"4.5\" stroke-width=\"1.5\" fill=\"none\" stroke=\"#0000FF\" />\n";
-        s += "      <line x1=\"0\" y1=\"1.5\" x2=\"0\" y2=\"4.5\" stroke-width=\"1.5\" fill=\"none\" stroke=\"#FF0000\" />\n";
+        s += "    <g id=\"terminal\" stroke-width=\"1.5\" stroke-linecap=\"square\">\n";
+        s += "      <line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"4\" stroke=\"#0000FF\" />\n";
+        s += "      <line x1=\"0\" y1=\"1.5\" x2=\"0\" y2=\"4\" stroke=\"#FF0000\" />\n";
         s += "    </g>\n";
         s += "  </defs>\n";
     }
     // dann weiter mit der Gruppierung der Elemente inklusive Verschiebung mit Daten aus Definition-Line:
+    // da drin auch die allgemeingültige Anweisung für "stroke-linecap=(butt|round|square)" bei QET: square
     s += "  <g transform=\"translate(" + std::to_string(DefLine.Gethotspot_x());
-    s += "," + std::to_string(DefLine.Gethotspot_y()) + ")\">\n";
+    s += "," + std::to_string(DefLine.Gethotspot_y()) + ")\" stroke-linecap=\"square\">\n";
     // Hier nun die Schleife für die grafischen Elemente
     // edit the graphical elements of the QET-Element:
     node = node.child("description").first_child();
