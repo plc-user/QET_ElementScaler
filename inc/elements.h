@@ -121,6 +121,10 @@ class BaseStyle {
       // enthält Daten zu Linien-Stil, etc:
       std::string antialias = "false";
       std::string style = "line-style:normal;line-weight:normal;filling:none;color:black";
+      std::string lineStyle = "normal"; // "normal", "dotted", "dashed", "dash-dotted"
+      std::string lineWeight = "normal"; // "none", "thin", "normal", "height", "eleve"
+      std::string lineFilling = "none"; // Füllfarbe
+      std::string lineColor = "black"; // Zeichenfarbe
    public:
       BaseStyle() {
                    // std::cerr << " default-constructor BaseStyle\n";

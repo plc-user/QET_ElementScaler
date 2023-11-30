@@ -109,54 +109,67 @@ std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
     std::string s = "";
     //
     for (const auto& str : vsStyleParts) {
-        std::string sValue = str;
-        //std::cerr << sValue << std::endl;
-        if (sValue.rfind("line-style:", 0) == 0) { // pos=0 limits the search to the prefix
-            sValue.erase(0, std::string("line-style:").length());
-            // "line-style:normal" --> ""
-            // "line-style:dotted" --> stroke-dasharray="3,3"
-            // "line-style:dashed" --> stroke-dasharray="10,5"
-            // "line-style:dashdotted" --> stroke-dasharray="15,3,3,3"
-            if      (sValue == "dotted")
-                s += "stroke-dasharray=\"3,3\" ";
-            else if (sValue == "dashed")
-                s += "stroke-dasharray=\"10,5\" ";
-            else if (sValue == "dashdotted")
-                s += "stroke-dasharray=\"15,3,3,3\" ";
+        std::string val = str;
+        // wir bestimmen die einzelnen Linien-Parameter:
+        if (val.rfind("line-style:", 0) == 0) { // pos=0 limits the search to the prefix
+            val.erase(0, std::string("line-style:").length());
+            lineStyle = val;
         }
-        if (sValue.rfind("line-weight:", 0) == 0) { // pos=0 limits the search to the prefix
-            sValue.erase(0, std::string("line-weight:").length());
-            // "line-weight:none" --> stroke-width:0
-            // "line-weight:thin" --> stroke-width:0.25
-            // "line-weight:normal" --> stroke-width:1.5
-            // "line-weight:height" --> stroke-width:6
-            // "line-weight:eleve" --> stroke-width:15
-            if      (sValue == "none")
-                s += "stroke-width=\"0\" ";
-            else if (sValue == "thin")
-                s += "stroke-width=\"0.25\" ";
-            else if (sValue == "normal")
-                s += "stroke-width=\"1.5\" ";
-            else if (sValue == "height")
-                s += "stroke-width=\"6\" ";
-            else if (sValue == "normal")
-                s += "stroke-width=\"15\" ";
-            else
-                s += "stroke-width=\"1.5\" ";
+        if (val.rfind("line-weight:", 0) == 0) { // pos=0 limits the search to the prefix
+            val.erase(0, std::string("line-weight:").length());
+            lineWeight = val;
         }
-        if (sValue.rfind("filling:", 0) == 0) { // pos=0 limits the search to the prefix
-            //std::cerr << sValue << std::endl;
-            sValue.erase(0, std::string("filling:").length());
-            // "filling:none" --> fill:none
-            s += "fill=\"" + ColorToValue(sValue) + "\" ";
+        if (val.rfind("color:", 0) == 0) { // pos=0 limits the search to the prefix
+            val.erase(0, std::string("color:").length());
+            lineColor = val;
         }
-        if (sValue.rfind("color:", 0) == 0) { // pos=0 limits the search to the prefix
-            //std::cerr << sValue << std::endl;
-            sValue.erase(0, std::string("color:").length());
-            // "color:black" --> stroke="black"
-            s += "stroke=\"" + ColorToValue(sValue) + "\" ";
+        if (val.rfind("filling:", 0) == 0) { // pos=0 limits the search to the prefix
+            val.erase(0, std::string("filling:").length());
+            lineFilling = val;
         }
     }
+
+    // und nun den SVG-String bauen:
+    double dStrokeWidth = std::nan("1");
+    if      (lineWeight == "none")
+        dStrokeWidth = -1.0;
+    else if (lineWeight == "thin")
+        dStrokeWidth = 0.25;
+    else if (lineWeight == "normal")
+        dStrokeWidth = 1.5;
+    else if (lineWeight == "hight")
+        dStrokeWidth = 3.0;
+    else if (lineWeight == "eleve")
+        dStrokeWidth = 6.0;
+    else
+        dStrokeWidth = 1.5;
+
+    // "line-style:normal" --> ""
+    // "line-style:dotted" --> stroke-dasharray="1,3" oder stroke-dasharray="1% 1%"
+    // "line-style:dashed" --> stroke-dasharray="4,3"
+    // "line-style:dashdotted" --> stroke-dasharray="8,2,1,2"
+    // aber abhängig von der Strichbreite!
+    if      (lineStyle == "dotted")
+        s += "stroke-dasharray=\"" + FormatValue((1.0 * dStrokeWidth), 2) + "," +
+                                     FormatValue((3.0 * dStrokeWidth), 2) + "\" ";
+    else if (lineStyle == "dashed")
+        s += "stroke-dasharray=\"" + FormatValue((4.0 * dStrokeWidth), 2) + "," +
+                                     FormatValue((3.0 * dStrokeWidth), 2) + "\" ";
+    else if (lineStyle == "dashdotted")
+        s += "stroke-dasharray=\"" + FormatValue((8.0 * dStrokeWidth), 2) + "," +
+                                     FormatValue((2.0 * dStrokeWidth), 2) + "," +
+                                     FormatValue((1.0 * dStrokeWidth), 2) + "," +
+                                     FormatValue((2.0 * dStrokeWidth), 2) + "\" ";
+
+    // Linienbreite liegt bereits als Zahlwert vor (s.o.):
+    s += "stroke-width=\"" + FormatValue((dStrokeWidth), 2) + "\" ";
+
+    // "filling:none" --> fill:none
+    s += "fill=\"" + ColorToValue(lineFilling) + "\" ";
+
+    // "color:black" --> stroke="black"
+    s += "stroke=\"" + ColorToValue(lineColor) + "\" ";
+
     // letztes Semikolon löschen:
     s.erase(s.length()-1, 1);
     s += " ";
