@@ -134,15 +134,15 @@ std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
     if      (lineWeight == "none")
         dStrokeWidth = -1.0;
     else if (lineWeight == "thin")
-        dStrokeWidth = 0.25;
+        dStrokeWidth = 0.2;
     else if (lineWeight == "normal")
-        dStrokeWidth = 1.5;
+        dStrokeWidth = 1.0;
     else if (lineWeight == "hight")
-        dStrokeWidth = 3.0;
+        dStrokeWidth = 2.0;
     else if (lineWeight == "eleve")
-        dStrokeWidth = 6.0;
+        dStrokeWidth = 5.0;
     else
-        dStrokeWidth = 1.5;
+        dStrokeWidth = 1.0;
 
     // "line-style:normal" --> ""
     // "line-style:dotted" --> stroke-dasharray="1,3" oder stroke-dasharray="1% 1%"
@@ -154,7 +154,7 @@ std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
                                      FormatValue((3.0 * dStrokeWidth), 2) + "\" ";
     else if (lineStyle == "dashed")
         s += "stroke-dasharray=\"" + FormatValue((4.0 * dStrokeWidth), 2) + "," +
-                                     FormatValue((3.0 * dStrokeWidth), 2) + "\" ";
+                                     FormatValue((2.0 * dStrokeWidth), 2) + "\" ";
     else if (lineStyle == "dashdotted")
         s += "stroke-dasharray=\"" + FormatValue((8.0 * dStrokeWidth), 2) + "," +
                                      FormatValue((2.0 * dStrokeWidth), 2) + "," +

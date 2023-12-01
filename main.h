@@ -446,9 +446,9 @@ std::string ToSVG(pugi::xml_node node) {
     // hier die Definition von "terminal", falls im Element vorhanden:
     if (node.child("description").child("terminal")) {
         s += "  <defs>\n";
-        s += "    <g id=\"terminal\" stroke-width=\"1.5\" stroke-linecap=\"square\">\n";
+        s += "    <g id=\"terminal\" stroke-width=\"1.0\" stroke-linecap=\"square\">\n";
         s += "      <line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"4\" stroke=\"#0000FF\" />\n";
-        s += "      <line x1=\"0\" y1=\"1.5\" x2=\"0\" y2=\"4\" stroke=\"#FF0000\" />\n";
+        s += "      <line x1=\"0\" y1=\"1.0\" x2=\"0\" y2=\"4\" stroke=\"#FF0000\" />\n";
         s += "    </g>\n";
         s += "  </defs>\n";
     }
