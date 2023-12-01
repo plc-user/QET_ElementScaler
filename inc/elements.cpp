@@ -1334,7 +1334,7 @@ std::string ColorToValue (const std::string Color){
     {"HTMLGreenMediumSeaGreen", "#3CB371"},
     {"HTMLGreenSeaGreen", "#2E8B57"},
     {"HTMLGreenForestGreen", "#228B22"},
-    {"HTMLGreenGreen", "#00FF00"},
+    {"HTMLGreenGreen", "#008000"},
     {"HTMLGreenDarkGreen", "#006400"},
     {"HTMLCyanAqua", "#00FFFF"},
     {"HTMLCyanCyan", "#00FFFF"},
