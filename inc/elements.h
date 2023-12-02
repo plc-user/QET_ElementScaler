@@ -133,6 +133,20 @@ class BaseStyle {
                   }
       std::string GetAntialias() { return antialias; }
       std::string GetStyle() { return style; }
+      double GetLineWidth() {
+              if      (lineWeight == "none")
+                  return 0.0;
+              else if (lineWeight == "thin")
+                  return 0.2;
+              else if (lineWeight == "normal")
+                  return 1.0;
+              else if (lineWeight == "hight")
+                  return 2.0;
+              else if (lineWeight == "eleve")
+                  return 5.0;
+              else
+                  return 1.0;
+      }
       void SetAntialias(const std::string val) { antialias = val; }
       void SetStyle(const std::string val) { style = val; }
       std::string StyleAsSVGstring(const uint8_t);

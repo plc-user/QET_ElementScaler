@@ -130,19 +130,7 @@ std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
     }
 
     // und nun den SVG-String bauen:
-    double dStrokeWidth = std::nan("1");
-    if      (lineWeight == "none")
-        dStrokeWidth = -1.0;
-    else if (lineWeight == "thin")
-        dStrokeWidth = 0.2;
-    else if (lineWeight == "normal")
-        dStrokeWidth = 1.0;
-    else if (lineWeight == "hight")
-        dStrokeWidth = 2.0;
-    else if (lineWeight == "eleve")
-        dStrokeWidth = 5.0;
-    else
-        dStrokeWidth = 1.0;
+    double dStrokeWidth = GetLineWidth();
 
     // "line-style:normal" --> ""
     // "line-style:dotted" --> stroke-dasharray="1,3" oder stroke-dasharray="1% 1%"
