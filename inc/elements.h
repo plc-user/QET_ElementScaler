@@ -424,6 +424,10 @@ class ElmtLine : public ElmtPolygon {
                        }
       bool ReadFromPugiNode(pugi::xml_node);
       bool WriteToPugiNode(pugi::xml_node, size_t);
+      double GetLength(void) {
+          return (sqrt( pow((std::get<2>(polygon[1])-(std::get<2>(polygon[0]))), 2) +
+                        pow((std::get<1>(polygon[1])-(std::get<1>(polygon[0]))), 2)) );
+          }
       int GetAngle(void) {
           const double pi = 3.14159265359;
           return (int)(round(atan2((std::get<2>(polygon[1])-(std::get<2>(polygon[0]))),
