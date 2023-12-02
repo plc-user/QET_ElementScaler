@@ -1266,7 +1266,7 @@ std::string ColorToValue (const std::string Color){
     {"cyan", "#00FFFF"},
     {"magenta", "#FF00FF"},
     {"lightgray", "#D3D3D3"},
-    {"orange", "#FFA500"},
+    {"orange", "#FF8000"},
     {"purple", "#A020F0"},
     {"HTMLPinkPink", "#FFC0CB"},
     {"HTMLPinkLightPink", "#FFB6C1"},
