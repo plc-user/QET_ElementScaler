@@ -44,6 +44,8 @@ std::string FormatValue(const double, const uint8_t);
 
 std::string ColorToValue (const std::string);
 
+std::string FontToFontFamily (const std::string);
+
 double getFontSize(const std::string);
 
 class RectMinMax;

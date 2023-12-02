@@ -284,8 +284,8 @@ std::string ElmtDynText::AsSVGstring(const uint8_t decimals)
         }
     }
     s += "\" ";
-    // ToDo: hier könnte die Anpassung auf generische Schriftfamilien hin!!!
-    s += "font-family=\"" + vsFont[0] + "\" "; // Schriftart aus Element
+    // wir nutzen hier generische Schriftfamilien!!!
+    s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
     s += "font-size=\"" + FormatValue(size, decimals) + "pt\" ";
     s += "fill=\"" + color + "\">";
     s += text + "</text>";
@@ -384,8 +384,8 @@ std::string ElmtText::AsSVGstring(const uint8_t decimals)
     s += FormatValue(x, decimals) + ", " + FormatValue(y, decimals) + ")";
     if (rotation != 0.0) { s += " rotate(" + FormatValue(rotation, 0) + ")"; }
     s += "\" ";
-    // ToDo: hier könnte die Anpassung auf generische Schriftfamilien hin!!!
-    s += "font-family=\"" + vsFont[0] + "\" ";
+    // wir nutzen hier generische Schriftfamilien!!!
+    s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
     s += "font-size=\"" + FormatValue(size, decimals) + "pt\" ";
     s += "fill=\"" + color + "\">";
     s += text + "</text>";
@@ -1416,6 +1416,35 @@ std::string ColorToValue (const std::string Color){
     return Value;
   else
     return "#696969";
+}
+/****************************************************************************/
+/****************************************************************************/
+/****************************************************************************/
+
+
+
+/****************************************************************************/
+/****************************************************************************/
+/****************************************************************************/
+std::string FontToFontFamily (const std::string s){
+    std::string sFontFamily;
+    if      ( (!(s.find("Sans") == std::string::npos)) ||
+              (!(s.find("Arial") == std::string::npos)) ||
+              (!(s.find("MS Shell Dlg") == std::string::npos)) )  {
+        sFontFamily = "Sans Serif,Arial";
+        }
+    else if ( (!(s.find("Mono") == std::string::npos)) ||
+              (!(s.find("Courier") == std::string::npos)))  {
+        sFontFamily = "Monospace,Courier New";
+        }
+    else if ( (!(s.find("Serif") == std::string::npos)) ||
+              (!(s.find("Times") == std::string::npos)))  {
+        sFontFamily = "Serif,Times";
+        }
+    else {
+        sFontFamily = "Sans Serif,Arial";
+        }
+    return sFontFamily;
 }
 /****************************************************************************/
 /****************************************************************************/
