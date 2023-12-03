@@ -762,8 +762,10 @@ std::string ElmtPolygon::AsXMLstring(const uint8_t decimals)
     std::string s = "<polygon ";
     //
     for (uint64_t i=0; i<polygon.size(); i++) {
-        s += "x" + std::to_string(std::get<0>(polygon[i])) + "=\"" + FormatValue(std::get<1>(polygon[i]), decimals) + "\" ";
-        s += "y" + std::to_string(std::get<0>(polygon[i])) + "=\"" + FormatValue(std::get<2>(polygon[i]), decimals) + "\" ";
+        s += "x" + std::to_string(std::get<0>(polygon[i])) + "=\""
+                 + FormatValue(std::get<1>(polygon[i]), decimals) + "\" ";
+        s += "y" + std::to_string(std::get<0>(polygon[i])) + "=\""
+                 + FormatValue(std::get<2>(polygon[i]), decimals) + "\" ";
     }
     //
     s += "style=\"" + style + "\" ";
