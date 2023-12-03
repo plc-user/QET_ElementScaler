@@ -1325,7 +1325,7 @@ double RectMinMax::angle(void){
 /****************************************************************************/
 /****************************************************************************/
 // Farbnamen von QET in RGB-Werte umwandeln
-std::string ColorToValue (const std::string Color){
+std::string ColorToValue (const std::string & Color){
   // hier die Liste der bekannten Farben:
   std::map<std::string, std::string> ColorMap = {
     {"white", "#FFFFFF"},
@@ -1501,7 +1501,7 @@ std::string ColorToValue (const std::string Color){
 /****************************************************************************/
 /****************************************************************************/
 /****************************************************************************/
-std::string FontToFontFamily (const std::string s){
+std::string FontToFontFamily (const std::string & s){
     std::string sFontFamily;
     if      ( (!(s.find("Sans") == std::string::npos)) ||
               (!(s.find("Arial") == std::string::npos)) ||

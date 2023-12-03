@@ -42,11 +42,11 @@
 //
 std::string FormatValue(const double, const uint8_t);
 
-std::string ColorToValue (const std::string);
+std::string ColorToValue (const std::string&);
 
-std::string FontToFontFamily (const std::string);
+std::string FontToFontFamily (const std::string&);
 
-double getFontSize(const std::string);
+double getFontSize(const std::string&);
 
 class RectMinMax;
 
@@ -137,7 +137,7 @@ class BaseStyle {
               if      (lineWeight == "none")
                   return 0.0;
               else if (lineWeight == "thin")
-                  return 0.2;
+                  return 0.25;
               else if (lineWeight == "normal")
                   return 1.0;
               else if (lineWeight == "hight")
