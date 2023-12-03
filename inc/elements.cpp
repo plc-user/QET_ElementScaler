@@ -1548,3 +1548,37 @@ std::string FontToFontFamily (const std::string & s){
 /****************************************************************************/
 /****************************************************************************/
 /****************************************************************************/
+
+
+
+/****************************************************************************/
+/****************************************************************************/
+/****************************************************************************/
+bool MultiLineText(std::string text, std::vector<std::string> & vsText){
+    if ( (!(text.find("\n") == std::string::npos)) ||
+         (!(text.find("\r") == std::string::npos)) )  {
+        // alle "\r" durch "\n" ersetzen --> einheitliche Trennzeichen:
+        for (auto it = text.cbegin() ; it != text.cend(); ++it) {
+            if (text[*it] == '\r') {  text[*it] = '\n'; }
+        }
+        // der Text wird aufgeteilt und im Vector abgelegt:
+        size_t pos;
+        std::string delimiter = "\n";
+        while ((pos = text.find(delimiter)) != std::string::npos) {
+            vsText.push_back(text.substr(0, pos));
+            text.erase(0, pos + delimiter.length());
+        }
+        // der letzte teil muss auch mit:
+        vsText.push_back(text);
+        // Ja, der übergebene Text enthält Umbrüche!
+        return true;
+    }
+    else {
+        // ohne Umbrüche kann der komplette Text in den Vector:
+        vsText.push_back(text);
+        return false;
+    }
+}
+/****************************************************************************/
+/****************************************************************************/
+/****************************************************************************/
