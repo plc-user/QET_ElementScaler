@@ -1558,8 +1558,15 @@ bool MultiLineText(std::string text, std::vector<std::string> & vsText){
     if ( (!(text.find("\n") == std::string::npos)) ||
          (!(text.find("\r") == std::string::npos)) )  {
         // alle "\r" durch "\n" ersetzen --> einheitliche Trennzeichen:
-        for (auto it = text.cbegin() ; it != text.cend(); ++it) {
-            if (text[*it] == '\r') {  text[*it] = '\n'; }
+        std::string as[] = {"\r", "&#10;", "&#13;", "&#xa;", "&#xd;"};
+        for (std::string s : as) {
+            while (text.find(s) != std::string::npos ) {
+                text.replace(text.find(s), s.length(), "\n");
+            }
+        }
+        // doppelte Umbrüche wollen wir nicht!
+        while (text.find("\n\n") != std::string::npos ) {
+            text.replace(text.find("\n\n"), 2, "\n");
         }
         // der Text wird aufgeteilt und im Vector abgelegt:
         size_t pos;
