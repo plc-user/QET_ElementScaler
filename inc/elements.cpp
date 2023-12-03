@@ -139,12 +139,12 @@ std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
     // aber abhängig von der Strichbreite!
     if      (lineStyle == "dotted")
         s += "stroke-dasharray=\"" + FormatValue((1.0 * dStrokeWidth), 2) + "," +
-                                     FormatValue((3.0 * dStrokeWidth), 2) + "\" ";
+                                     FormatValue((2.0 * dStrokeWidth), 2) + "\" ";
     else if (lineStyle == "dashed")
         s += "stroke-dasharray=\"" + FormatValue((4.0 * dStrokeWidth), 2) + "," +
                                      FormatValue((2.0 * dStrokeWidth), 2) + "\" ";
     else if (lineStyle == "dashdotted")
-        s += "stroke-dasharray=\"" + FormatValue((8.0 * dStrokeWidth), 2) + "," +
+        s += "stroke-dasharray=\"" + FormatValue((4.0 * dStrokeWidth), 2) + "," +
                                      FormatValue((2.0 * dStrokeWidth), 2) + "," +
                                      FormatValue((1.0 * dStrokeWidth), 2) + "," +
                                      FormatValue((2.0 * dStrokeWidth), 2) + "\" ";
