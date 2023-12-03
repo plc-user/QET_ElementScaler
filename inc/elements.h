@@ -426,8 +426,8 @@ class ElmtPolygon : public BaseElement,
 //
 class ElmtLine : public ElmtPolygon {
    protected:
-      double length1 = 1.5;
-      double length2 = 1.5;
+      double length1 = 0.0;
+      double length2 = 0.0;
       std::string end1 = "none";
       std::string end2 = "none";
    private:

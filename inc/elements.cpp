@@ -981,35 +981,120 @@ std::string ElmtLine::AsXMLstring(const uint8_t decimals)
 // ---
 std::string ElmtLine::AsSVGstring(const uint8_t decimals)
 {
-/* Linie mit Pfeil-Enden:
-   Enden müssen in "defs"-Sektion definiert werden und können dann
-   z.B. über eine "use"-Anweisung verwendet werden. (vgl "terminal")
-   Problem: in QET können die Enden parametriert werden und müssen
-   sowieso passend rotiert werden ... im Moment: zu aufwändig!
-  <defs>
-    <marker id="startarrow" markerWidth="10" markerHeight="7"
-    refX="10" refY="3.5" orient="auto">
-      <polygon points="10 0, 10 7, 0 3.5" fill="red" />
-    </marker>
-    <marker id="endarrow" markerWidth="10" markerHeight="7"
-    refX="0" refY="3.5" orient="auto" markerUnits="strokeWidth">
-        <polygon points="0 0, 10 3.5, 0 7" fill="red" />
-    </marker>
-  </defs>
-  <line x1="100" y1="50" x2="250" y2="50" stroke="#000" stroke-width="8"
-  marker-end="url(#endarrow)" marker-start="url(#startarrow)" />
-
- */
     if (polygon.size() == 0) return "<line />";
-    std::string s = "<line ";
-    //
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        s += "x" + std::to_string(std::get<0>(polygon[i])) + "=\"" + FormatValue(std::get<1>(polygon[i]), decimals) + "\" ";
-        s += "y" + std::to_string(std::get<0>(polygon[i])) + "=\"" + FormatValue(std::get<2>(polygon[i]), decimals) + "\" ";
-    }
-    //
+
+    // Hier müssen die Enden mit verwurstet werden: Alles in eine Gruppierung
+    std::string s = "<g ";
+    // hier kommen die Linienattribute mit rein
     s += StyleAsSVGstring(2);
-    return s + "/>";
+    // Anfang auf x1|y1 verschieben:
+    s += "transform=\"translate(" + FormatValue(std::get<1>(polygon[0]), decimals) + ","
+                                  + FormatValue(std::get<2>(polygon[0]), decimals) + ")";
+    // und falls die Linie eine Schräge ist, auch rotieren:
+    if ( (GetAngle() > 0.1) || (GetAngle() < -0.1))
+        s += " rotate(" + FormatValue(GetAngle(), decimals) + ")";
+    // Gruppierungs-Anfang beenden:
+    s += "\" >\n";
+    // wir bestimmen Anfang und Ende der realen Linie in Abhängigkeit der Enden:
+    double llength = GetLength();
+    double lwidth  = GetLineWidth();
+    double x1      = 0.0;
+    double x2      = llength;
+    if      (end1 == "none") {
+            x1 +=  0.0;
+    }
+    else if (end1 == "simple") {
+            x1 += (lwidth / 2.0);
+            // einfachen Pfeil (polyline) zeichnen
+            s += "      <polyline points=\"" + FormatValue(length1, decimals) + ","
+                                             + FormatValue(length1, decimals)
+                                             + " 0,0 "
+                                             + FormatValue(length1, decimals) + ","
+                                             + "-" + FormatValue(length1, decimals)
+                                             + "\" />\n";
+    }
+    else if (end1 == "triangle") {
+            x1 += length1 + (lwidth / 2.0);
+            // dreieckigen Pfeil (polygon) zeichnen
+            s += "      <polygon points=\"" + FormatValue(length1, decimals) + ","
+                                            + FormatValue(length1, decimals)
+                                            + " 0,0 "
+                                            + FormatValue(length1, decimals) + ","
+                                            + "-" + FormatValue(length1, decimals)
+                                            + "\" />\n";
+    }
+    else if (end1 == "circle") {
+            x1 = (length1 * 2) + (lwidth / 2.0);
+            // Kringel zeichnen
+            s += "      <ellipse cx=\"" + FormatValue(length1, decimals) + "\" cy=\"0\""
+                                      + " rx=\"" + FormatValue(length1, decimals) + "\""
+                                      + " ry=\"" + FormatValue(length1, decimals) + "\""
+                                      + " />\n";
+    }
+    else if (end1 == "diamond") {
+            x1 = (length1 * 2) + (lwidth / 2.0);
+            // Karo zeichnen
+            s += "      <polygon points=\"0,0 "
+                                      + FormatValue( length1, decimals) + ","
+                                      + FormatValue(length1, decimals) + " "
+                                      + FormatValue((2 * length1), decimals) + ",0 "
+                                      + FormatValue( length1, decimals) + ","
+                                      + "-" + FormatValue(length1, decimals)
+                                      + "\" />\n";
+    }
+
+    // ... und nun das Ende der realen Linie bestimmen und die Enden zeichnen:
+    if      (end2 == "none") {
+            x2 -=  0.0;
+    }
+    else if (end2 == "simple") {
+            x2 -= (lwidth / 2.0);
+            // einfachen Pfeil (polyline) zeichnen
+            s += "      <polyline points=\"" + FormatValue((llength-length2), decimals) + ","
+                                             + FormatValue(length2, decimals) + " "
+                                             + FormatValue(llength, decimals) + ",0 "
+                                             + FormatValue((llength-length2), decimals) + ","
+                                             + "-" + FormatValue(length2, decimals)
+                                             + "\" />\n";
+    }
+    else if (end2 == "triangle") {
+            x2 -= (length2 + (lwidth / 2.0));
+            // dreieckigen Pfeil (polygon) zeichnen
+            s += "      <polygon points=\"" + FormatValue(llength, decimals) + ",0 "
+                                            + FormatValue((llength-length2), decimals) + ","
+                                            + FormatValue(length2, decimals) + " "
+                                            + FormatValue((llength-length2), decimals) + ","
+                                            + "-" + FormatValue(length2, decimals)
+                                            + "\" />\n";
+    }
+    else if (end2 == "circle") {
+            x2 -= ((length2 * 2) + (lwidth / 2.0));
+            // Kringel zeichnen
+            s += "      <ellipse cx=\"" + FormatValue((llength - length2), decimals) + "\" cy=\"0\""
+                                        + " rx=\"" + FormatValue(length2, decimals) + "\""
+                                        + " ry=\"" + FormatValue(length2, decimals) + "\""
+                                        + " />\n";
+    }
+    else if (end2 == "diamond") {
+            x2 -= ((length2 * 2) + (lwidth / 2.0));
+            // Karo zeichnen
+            s += "      <polygon points=\""
+                                      + FormatValue( llength, decimals) + ",0 "
+                                      + FormatValue((llength - length2), decimals) + ","
+                                      + FormatValue(length2, decimals) + " "
+                                      + FormatValue((llength - 2 * length2), decimals) + ",0 "
+                                      + FormatValue((llength - length2), decimals) + ","
+                                      + "-" + FormatValue(length2, decimals)
+                                      + "\" />\n";
+    }
+
+    // nun noch die eigentliche Linie dazu:
+    s += "      <line x1=\"" + FormatValue(x1, decimals) + "\" y1=\"0\" x2=\""
+                             + FormatValue(x2, decimals) + "\" y2=\"0\" />\n";
+    // Gruppierung ist hier beendet:
+    s += "      </g>";
+    // und die Funktion auch!
+    return s;
 }
 //
 //--- END - implementation of class "ElmtLine" -------------------------------------
