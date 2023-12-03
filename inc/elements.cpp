@@ -367,17 +367,40 @@ std::string ElmtText::AsXMLstring(const uint8_t decimals)
 // ---
 std::string ElmtText::AsSVGstring(const uint8_t decimals)
 {
-    std::string s = "<text transform=\"translate(" ;
-    //
-    s += FormatValue(x, decimals) + ", " + FormatValue(y, decimals) + ")";
-    if (rotation != 0.0) { s += " rotate(" + FormatValue(rotation, 0) + ")"; }
-    s += "\" ";
-    // wir nutzen hier generische Schriftfamilien!!!
-    s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
-    s += "font-size=\"" + FormatValue(size, decimals) + "pt\" ";
-    s += "fill=\"" + color + "\">";
-    s += text + "</text>";
-    return s;
+    // mehrzeiliger Text wird in einem "Vector of String" abgelegt
+    // als Trennzeichen für die Teil-Strings: "\n" und "\r"
+    if ( (!(text.find("\n") == std::string::npos)) ||
+         (!(text.find("\r") == std::string::npos)) )  {
+        std::vector<std::string> vsText;
+        MultiLineText(text, vsText);
+        // wir brauchen einen String für den Rückgabewert:
+        std::string s = "";
+        s += "<text y=\"" + FormatValue(y, decimals) + "\" transform=\"rotate(";
+        s += FormatValue(rotation, decimals) + " " + FormatValue(x, decimals) + " " + FormatValue(y, decimals) + ")\" ";
+        s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
+        s += "font-size=\"" + FormatValue(size, decimals) + "pt\" ";
+        s += "fill=\"" + color + "\">\n";
+        for (size_t i=0; i<vsText.size(); i++) {
+            s += "      <tspan x=\"" + FormatValue(x, decimals) + "\" dy=\"" + FormatValue(((i>0)*1.5), decimals) + "em\">";
+            s += vsText[i] + "</tspan>\n";
+        }
+        s += "      </text>";
+        return s;
+    }
+    else {
+        // einzeiligen Text behandeln wir separat:
+        std::string s = "<text transform=\"translate(" ;
+        //
+        s += FormatValue(x, decimals) + ", " + FormatValue(y, decimals) + ")";
+        if (rotation != 0.0) { s += " rotate(" + FormatValue(rotation, decimals) + ")"; }
+        s += "\" ";
+        // wir nutzen hier generische Schriftfamilien!!!
+        s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
+        s += "font-size=\"" + FormatValue(size, decimals) + "pt\" ";
+        s += "fill=\"" + color + "\">";
+        s += text + "</text>";
+        return s;
+    }
 }
 // ---
 void ElmtText::SplitFontString(void)

@@ -46,6 +46,8 @@ std::string ColorToValue (const std::string&);
 
 std::string FontToFontFamily (const std::string&);
 
+bool MultiLineText(std::string, std::vector<std::string> & );
+
 double getFontSize(const std::string&);
 
 class RectMinMax;
