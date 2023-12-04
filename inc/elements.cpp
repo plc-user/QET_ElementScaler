@@ -353,19 +353,6 @@ bool ElmtText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     return true;
 }
 // ---
-std::string ElmtText::AsXMLstring(const uint8_t decimals)
-{
-    std::string s = "<text ";
-    //
-    s += "x=\"" + FormatValue(x, decimals) + "\" ";
-    s += "y=\"" + FormatValue(y, decimals) + "\" ";
-    s += "text=\"" + text + "\" ";
-    s += "font=\"" + font + "\" ";
-    s += "rotation=\"" + FormatValue(rotation, 0) + "\" ";
-    s += "color=\"" + color + "\" ";
-    return s + "/>";
-}
-// ---
 std::string ElmtText::AsSVGstring(const uint8_t decimals)
 {
     // mehrzeiliger Text wird in einem "Vector of String" abgelegt
@@ -527,22 +514,6 @@ bool ElmtArc::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     node.attribute("antialias").set_value(antialias.c_str());
     node.attribute("style").set_value(style.c_str());
     return true;
-}
-// ---
-std::string ElmtArc::AsXMLstring(const uint8_t decimals)
-{
-    std::string s = "<arc ";
-    //
-    s += "x=\"" + FormatValue(x, decimals) + "\" ";
-    s += "y=\"" + FormatValue(y, decimals) + "\" ";
-    s += "width=\"" + FormatValue(width, decimals) + "\" ";
-    s += "height=\"" + FormatValue(height, decimals) + "\" ";
-    s += "start=\"" + FormatValue(start, decimals) + "\" ";
-    s += "angle=\"" + FormatValue(angle, decimals) + "\" ";
-    //
-    s += "style=\"" + style + "\" ";
-    s += "antialias=\"" + antialias + "\" ";
-    return s + "/>";
 }
 // ---
 std::string ElmtArc::AsSVGstring(const uint8_t decimals)
@@ -780,23 +751,6 @@ void ElmtPolygon::Scale(const double factX, const double factY)
     }
 }
 // ---
-std::string ElmtPolygon::AsXMLstring(const uint8_t decimals)
-{
-    if (polygon.size() == 0) return "<polygon />";
-    std::string s = "<polygon ";
-    //
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        s += "x" + std::to_string(std::get<0>(polygon[i])) + "=\""
-                 + FormatValue(std::get<1>(polygon[i]), decimals) + "\" ";
-        s += "y" + std::to_string(std::get<0>(polygon[i])) + "=\""
-                 + FormatValue(std::get<2>(polygon[i]), decimals) + "\" ";
-    }
-    //
-    s += "style=\"" + style + "\" ";
-    s += "antialias=\"" + antialias + "\" ";
-    return s + "/>";
-}
-// ---
 std::string ElmtPolygon::AsSVGstring(const uint8_t decimals)
 {
     if (polygon.size() == 0) return "<polygon />";
@@ -857,20 +811,6 @@ bool ElmtEllipse::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     return true;
 }
 // ---
-std::string ElmtEllipse::AsXMLstring(const uint8_t decimals)
-{
-    std::string s = "<ellipse ";
-    //
-    s += "x=\"" + FormatValue(x, decimals) + "\" ";
-    s += "y=\"" + FormatValue(y, decimals) + "\" ";
-    s += "width=\"" + FormatValue(width, decimals) + "\" ";
-    s += "height=\"" + FormatValue(height, decimals) + "\" ";
-    //
-    s += "style=\"" + style + "\" ";
-    s += "antialias=\"" + antialias + "\" ";
-    return s + "/>";
-}
-// ---
 std::string ElmtEllipse::AsSVGstring(const uint8_t decimals)
 {
     std::string s = "<ellipse ";
@@ -920,22 +860,6 @@ bool ElmtRect::WriteToPugiNode(const pugi::xml_node node, const size_t decimals)
     return true;
 }
 // ---
-std::string ElmtRect::AsXMLstring(const uint8_t decimals)
-{
-    std::string s = "<rect ";
-    //
-    s += "x=\"" + FormatValue(x, decimals) + "\" ";
-    s += "y=\"" + FormatValue(y, decimals) + "\" ";
-    s += "width=\"" + FormatValue(width, decimals) + "\" ";
-    s += "height=\"" + FormatValue(height, decimals) + "\" ";
-    s += "rx=\"" + FormatValue(rx, decimals) + "\" ";
-    s += "ry=\"" + FormatValue(ry, decimals) + "\" ";
-    //
-    s += "style=\"" + style + "\" ";
-    s += "antialias=\"" + antialias + "\" ";
-    return s + "/>";
-}
-// ---
 std::string ElmtRect::AsSVGstring(const uint8_t decimals)
 {
     std::string s = "<rect ";
@@ -982,25 +906,6 @@ bool ElmtLine::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     node.attribute("y1").set_value(FormatValue(std::get<2>(polygon[0]), decimals).c_str());
     node.attribute("y2").set_value(FormatValue(std::get<2>(polygon[1]), decimals).c_str());
     return true;
-}
-// ---
-std::string ElmtLine::AsXMLstring(const uint8_t decimals)
-{
-    if (polygon.size() == 0) return "<line />";
-    std::string s = "<line ";
-    //
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        s += "x" + std::to_string(std::get<0>(polygon[i])) + "=\"" + FormatValue(std::get<1>(polygon[i]), decimals) + "\" ";
-        s += "y" + std::to_string(std::get<0>(polygon[i])) + "=\"" + FormatValue(std::get<2>(polygon[i]), decimals) + "\" ";
-    }
-    //
-    s += "end1=\"" + end1 + "\" ";
-    s += "length1=\"" + FormatValue(length1, decimals) + "\" ";
-    s += "end2=\"" + end2 + "\" ";
-    s += "length2=\"" + FormatValue(length2, decimals) + "\" ";
-    s += "style=\"" + style + "\" ";
-    s += "antialias=\"" + antialias + "\" ";
-    return s + "/>";
 }
 // ---
 std::string ElmtLine::AsSVGstring(const uint8_t decimals)
@@ -1166,20 +1071,6 @@ bool ElmtTerminal::WriteToPugiNode(pugi::xml_node node)
     if (uuid.length() == 0) { CreateNewUUID(); }
     if (type.length() == 0) { type = "Generic"; }
     return true;
-}
-// ---
-std::string ElmtTerminal::AsXMLstring(const uint8_t decimals)
-{
-    std::string s = "<terminal ";
-    //
-    s += "x=\"" + FormatValue(x, 0) + "\" ";
-    s += "y=\"" + FormatValue(y, 0) + "\" ";
-    s += "orientation=\"" + orientation + "\" ";
-    s += "type=\"" + type + "\" ";
-    s += "name=\"" + name + "\" ";
-    s += "uuid=\"" + uuid + "\" ";
-    //
-    return s + "/>";
 }
 // ---
 std::string ElmtTerminal::AsSVGstring(const uint8_t decimals)

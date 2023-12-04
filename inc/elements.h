@@ -273,7 +273,6 @@ class ElmtDynText : public BaseElement,
                        size *= std::min(factX, factY);
                        CreateFontString();
                        }
-      std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
 };
 //
@@ -343,7 +342,6 @@ class ElmtText : public BaseElement,
                        size *= std::min(factX, factY);
                        CreateFontString();
                        }
-      std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
 };
 //
@@ -407,7 +405,6 @@ class ElmtPolygon : public BaseElement,
                          for(const auto &i : polygon)
                              std::cout<<std::get<0>(i)<<" - "<<std::get<1>(i)<<" - "<<std::get<2>(i)<<"\n";
                          }
-      std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
       void Flip(void);   // vertikal
       void Mirror(void); // horizontal
@@ -461,7 +458,6 @@ class ElmtLine : public ElmtPolygon {
                          length1 *= std::min(factX, factY);
                          length2 *= std::min(factX, factY);
                        }
-      std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
 };
 //
@@ -495,7 +491,6 @@ class ElmtEllipse : public BaseElement,
                        x     *= factX;      y *= factY;
                        width *= factX; height *= factY;
                        }
-      std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
 };
 //
@@ -535,7 +530,6 @@ class ElmtRect : public BaseElement,
                        rx    *= factX;     ry *= factY;
                        width *= factX; height *= factY;
                        }
-      std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
 };
 //
@@ -589,7 +583,6 @@ class ElmtArc : public BaseElement,
                        width *= factX; height *= factY;
                        DetermineMinMax();
                        }
-      std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
 };
 //
@@ -627,7 +620,6 @@ class ElmtTerminal : public BaseElement,
       void SetType(const std::string val)        { type = val; }
       void SetName(const std::string val)        { name = val; }
       void SetUUID(const std::string val)        { uuid = val; }
-      std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
       void Flip(void) { y *= (-1.0);
                         if (orientation == "n") orientation = "s";
