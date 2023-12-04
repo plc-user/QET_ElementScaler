@@ -30,6 +30,7 @@
 #include <iomanip>      // for IO-Operations
 #include <string>       // for string-handling
 #include <map>          // for Color-Map
+#include <sstream>      // for String-Streams
 
 
 //
@@ -49,8 +50,8 @@ bool DefinitionLine::ReadFromPugiNode(pugi::xml_node node)
 // ---
 void DefinitionLine::ReCalc(RectMinMax XYMinMax) {
 // size and hotspots have to be re-calculated after scaling!
-    int w = round(XYMinMax.width());
-    int h = round(XYMinMax.height());
+    int w = (int)round(XYMinMax.width());
+    int h = (int)round(XYMinMax.height());
 
     // calculation taken from QET-sources:
     int upwidth = ((w/10)*10)+10;
@@ -63,8 +64,8 @@ void DefinitionLine::ReCalc(RectMinMax XYMinMax) {
     // copy values to internal variables
     width = upwidth;
     height = upheight;
-    hotspot_x = -(round(XYMinMax.xmin() - (xmargin/2)));
-    hotspot_y = -(round(XYMinMax.ymin() - (ymargin/2)));
+    hotspot_x = -((int)round(XYMinMax.xmin() - (xmargin/2)));
+    hotspot_y = -((int)round(XYMinMax.ymin() - (ymargin/2)));
 }
 // ---
 bool DefinitionLine::WriteToPugiNode(pugi::xml_node node)
@@ -505,7 +506,7 @@ void ElmtArc::DetermineMinMax(){
     // y = b ⋅ sin(t)
     // with t = 0 .. 2*pi = ([0 .. 360]/360)*2*pi
     const double pi = 3.141592653589793116; // also in <cmath> as M_PI
-    for (int i = round(start); i <= round((start + angle)); i++){
+    for (int i = (int)round(start); i <= (int)round((start + angle)); i++){
         double xx = x + (width / 2.0) * (1 + cos(i / 360.0 * 2.0 * pi));
         double yy = y + (height / 2.0) * (1 - sin(i / 360.0 * 2.0 * pi));
         MinX = std::min(MinX, xx);

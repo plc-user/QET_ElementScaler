@@ -28,6 +28,7 @@
 
 #include <iostream>     // for IO-Operations
 #include <fstream>      // for file-Operations
+#include <sstream>      // for String-Streams
 #include <cstdint>      // int8_t, ...
 #include <string>       // we handle strings here
 #include <getopt.h>     // for Commandline-Parameters
@@ -43,31 +44,31 @@
 const std::string sVersion = "v0.5.0beta5";
 
 // the element-file to process:
-std::string ElementFile       = "";
-std::string SVGFile           = "SampleFile.svg";
-std::string ElementFileScaled = "SampleFile.SCALED.elmt";
+static std::string ElementFile       = "";
+static std::string SVGFile           = "SampleFile.svg";
+static std::string ElementFileScaled = "SampleFile.SCALED.elmt";
 
 // we need a "Pugi-Node":
-pugi::xml_node node;
+static pugi::xml_node node;
 
 // some Bits for control
-bool xPrintHelp          = false;
-bool xReadFromStdIn      = false;
-bool xPrintToStdOut      = false;
-bool xCreateSVG          = false;
-bool xCreateELMT         = true;
-bool xStopWithError      = false;
-bool xScaleElement       = true;
-bool xRemoveAllTerminals = false;
-bool xOverwriteOriginal  = false;
-bool xFlipHor            = false;
-bool xFlipVert           = false;
+static bool xPrintHelp          = false;
+static bool xReadFromStdIn      = false;
+static bool xPrintToStdOut      = false;
+static bool xCreateSVG          = false;
+static bool xCreateELMT         = true;
+static bool xStopWithError      = false;
+static bool xScaleElement       = true;
+static bool xRemoveAllTerminals = false;
+static bool xOverwriteOriginal  = false;
+static bool xFlipHor            = false;
+static bool xFlipVert           = false;
 
 // max. Number of decimals:
-const size_t decimals = 2;    // number of decimals for floating-point values
+static const size_t decimals = 2;    // number of decimals for floating-point values
 
-double scaleX = 1.0;
-double scaleY = 1.0;
+static double scaleX = 1.0;
+static double scaleY = 1.0;
 
 //
 // --- function-prototypes -----------------------------------------------------
@@ -75,6 +76,7 @@ double scaleY = 1.0;
 int parseCommandline(int argc, char *argv[]);
 void PrintHelp(const std::string &s, const std::string &v);
 std::string CheckForDoubleString(std::string &sArg);
+void ProcessElement(pugi::xml_node);
 
 
 

@@ -40,8 +40,6 @@
 //
 // --- function-prototypes for ... ---------------------------------------------
 //
-std::string FormatValue(const double, const uint8_t);
-
 std::string ColorToValue (const std::string&);
 
 std::string FontToFontFamily (const std::string&);
@@ -268,7 +266,7 @@ class ElmtDynText : public BaseElement,
       bool WriteToPugiNode(pugi::xml_node, size_t);
       void SplitFontString(void);
       void CreateFontString(void);
-      int GetSize(void) { return round(size); }
+      int GetSize(void) { return (int)round(size); }
       std::string GetText(void) { return text; }
       void Flip(void)   { y = (-1) * y; }
       void Mirror(void) { x = (-1) * x; }
@@ -338,7 +336,7 @@ class ElmtText : public BaseElement,
       bool WriteToPugiNode(pugi::xml_node, size_t);
       void SplitFontString(void);
       void CreateFontString(void);
-      int GetSize(void) { return round(size); }
+      int GetSize(void) { return (int)round(size); }
       std::string GetText(void) { return text; }
       void Flip(void)   { y = (-1) * y; }
       void Mirror(void) { x = (-1) * x; }
@@ -386,31 +384,31 @@ class ElmtPolygon : public BaseElement,
           for (const auto &i : polygon)
               MaxX = std::max(MaxX, std::get<1>(i));
           return MaxX;
-          };
+          }
       double GetMinX() {
           double MinX = 1e99;
           for (const auto &i : polygon)
               MinX = std::min(MinX, std::get<1>(i));
           return MinX;
-          };
+          }
       double GetMaxY() {
           double MaxY = -1e99;
           for (const auto &i : polygon)
               MaxY = std::max(MaxY, std::get<2>(i));
           return MaxY;
-          };
+          }
       double GetMinY() {
           double MinY = 1e99;
           for (const auto &i : polygon)
               MinY = std::min(MinY, std::get<2>(i));
           return MinY;
-          };
+          }
       void Clear(){ polygon.clear(); closed = true; }
       bool CheckIndex(void);
       virtual void Write(void) {
                          for(const auto &i : polygon)
                              std::cout<<std::get<0>(i)<<" - "<<std::get<1>(i)<<" - "<<std::get<2>(i)<<"\n";
-                         };
+                         }
       std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
       void Flip(void);   // vertikal
@@ -457,14 +455,14 @@ class ElmtLine : public ElmtPolygon {
                          if (polygon.size() > 0) {
                            std::cout << length1 << " | " << length2 << "\n" << end1 << " | " << end2 << "\n";
                          }
-                       };
+                       }
       //void Flip(void);   // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
       //void Mirror(void); // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
       void Scale(const double factX=1.0, const double factY=1.0) {
                          ElmtPolygon::Scale(factX, factY);
                          length1 *= std::min(factX, factY);
                          length2 *= std::min(factX, factY);
-                       };
+                       }
       std::string AsXMLstring(const uint8_t);
       std::string AsSVGstring(const uint8_t);
 };

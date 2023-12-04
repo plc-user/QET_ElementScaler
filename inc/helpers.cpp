@@ -28,6 +28,7 @@
 #include <random>       // for random values of uuid
 #include <cmath>        // for sqrt, atan2, isnan(), ...
 #include <iomanip>      // for IO-Operations
+#include <sstream>      // for String-Streams
 
 
 const char cDecSep = '.';     // Decimal-Separator for values in output-file
@@ -43,7 +44,7 @@ struct DecSep : std::numpunct<char> {
 /****************************************************************************/
 /****************************************************************************/
 /****************************************************************************/
-std::string FormatValue(const double value, const uint8_t dec){
+std::string FormatValue(const double value, const size_t dec){
     size_t i = 0; // index for loops
     double val = value;
     double epsilon = 0.1; // too small values will be set to "0"
@@ -140,14 +141,14 @@ void RemoveLeadingZeros(std::string& s)
 // ###              we build a (random?) UUID               ###
 // ############################################################
 //
-unsigned int random_char() {
+static unsigned int random_char() {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 255);
     return dis(gen);
 }
 //
-std::string generate_hex(const unsigned int len) {
+static std::string generate_hex(const unsigned int len) {
     std::string s = "";
     for (unsigned int i = 0; i < len; i++) {
         const uint8_t rc = random_char();

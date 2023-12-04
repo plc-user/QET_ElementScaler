@@ -35,7 +35,7 @@
 //
 // --- function-prototype for formatted double-to-string -----------------------
 //
-std::string FormatValue(const double, const uint8_t);
+std::string FormatValue(const double, const size_t);
 
 //
 // --- function-prototype for UUID-calculation ---------------------------------
