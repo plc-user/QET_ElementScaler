@@ -23,8 +23,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _HELPERS_H
-#define _HELPERS_H
+#ifndef HELPERS_H
+#define HELPERS_H
 
 #include <iostream>     // for IO-Operations
 #include <cstdint>      // int8_t, ...
@@ -68,28 +68,32 @@ const std::string toHex(const T inVal, const bool upCase=false, const bool withP
     uint64_t val = 0;
     // hier die Unterscheidung je nach Eingabe-Datentyp:
     if      (std::is_same<T, float>::value)  {
-                  const uint32_t *fval =  (uint32_t*) &inVal;
+                  const uint32_t *fval = (uint32_t*)(&inVal);
                   val = *fval;
                   }
     else if (std::is_same<T, double>::value) {
-                  const uint64_t *fval = (uint64_t*) &inVal;
+                  const uint64_t *fval = (uint64_t*)(&inVal);
                   val = *fval;
                   }
     else
         switch (sizeof(inVal)){
-            case 1: val = (uint64_t)((uint8_t)  inVal); break;
-            case 2: val = (uint64_t)((uint16_t) inVal); break;
-            case 4: val = (uint64_t)((uint32_t) inVal); break;
-            case 8: val =           ((uint64_t) inVal); break;
+            case 1: val = (uint64_t)((uint8_t)  inVal);
+                    break;
+            case 2: val = (uint64_t)((uint16_t) inVal);
+                    break;
+            case 4: val = (uint64_t)((uint32_t) inVal);
+                    break;
+            case 8: val =           ((uint64_t) inVal);
+                    break;
             default: return "";
         }
     // ab hier wird der Wert in HEX ausgegeben:
     std::string s = "";
     for (int8_t i=(2*sizeof(inVal)-1); i>=0; i--) {
         if (upCase == true)
-            { s += TAB[(val >> (4*i)) & (uint16_t)0x0f]; }
+            { s += TAB[(val >> (4*i)) & static_cast<uint16_t>(0x0f)]; }
         else
-            { s += tab[(val >> (4*i)) & (uint16_t)0x0f]; }
+            { s += tab[(val >> (4*i)) & static_cast<uint16_t>(0x0f)]; }
         }
     return (withPrefix ? "0x" : "") + s;
 }

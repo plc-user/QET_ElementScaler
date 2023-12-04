@@ -23,8 +23,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _MAIN_H
-#define _MAIN_H
+#ifndef MAIN_H
+#define MAIN_H
 
 #include <iostream>     // for IO-Operations
 #include <fstream>      // for file-Operations

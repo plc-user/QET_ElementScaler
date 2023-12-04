@@ -747,7 +747,7 @@ void ElmtPolygon::AddPoint(double x, double y)
     uint64_t idx = 1;
     if (polygon.size() > 0) { idx = std::get<0>(polygon[polygon.size()-1]) + 1; }
     polygon.push_back(std::make_tuple(idx, x, y));
-    if (_DEBUG_) std::cerr //<< "Anzahl Punkte: " << polygon.size() << "\n"
+    if (_DEBUG_) std::cerr // << "Anzahl Punkte: " << polygon.size() << "\n"
               << "letzte Werte: \n i: " << std::get<0>(polygon[polygon.size()-1]) << "\n"
               << " X = " << std::get<1>(polygon[polygon.size()-1]) << "\n"
               << " Y = " << std::get<2>(polygon[polygon.size()-1]) << "\n";
@@ -1217,42 +1217,6 @@ std::string ElmtTerminal::AsSVGstring(const uint8_t decimals)
 //--- END - implementation of class "ElmtTerminal" -----------------------------
 //
 
-
-
-
-
-
-/****************************************************************************/
-/****************************************************************************/
-/****************************************************************************/
-double getFontSize(const std::string str)
-{
-  std::string s = str;
-  std::string v = "";  // Teilstring vor der Größenangabe
-  std::string n = "";  // Teilstring nach der Größenangabe
-
-//  std::cerr << "Font-String: -->" << s << "<-- \n";
-  std::size_t found = s.find(",");
-  // delete up to first ","
-  if (found != std::string::npos) {
-    v = s.substr(0, found+1);
-//    std::cerr << "Teilstring v: -->" << v << "<-- \n";
-    s.erase(s.begin(), s.begin()+found+1);
-//    std::cerr << "Font-String: -->" << s << "<-- \n";
-    found = s.find(",");
-    // delete everything behind ","
-    if (found != std::string::npos) {
-      n = s.substr(found, s.length()-found);
-//      std::cerr << "Teilstring n: -->" << n << "<-- \n";
-      s.erase(s.begin()+found, s.end()-found+1);
-    }
-  } else { return 8.999;}
-//  std::cerr << "Font-Size: -->" << s << "<-- \n";
-  return std::stod(s);
-}
-/****************************************************************************/
-/****************************************************************************/
-/****************************************************************************/
 
 
 //
