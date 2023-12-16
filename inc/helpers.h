@@ -50,6 +50,10 @@ std::string CreateUUID(bool UpCase=false);
 // der String bearbeitet (Übergabe als Referenz)
 void RemoveLeadingZeros(std::string& s);
 
+//
+// --- function-prototype for converting text to text with HTML-entities -------
+//
+std::string TextToEntity(std::string& s);
 
 //
 // Funktionen, die vorher auch schon da waren

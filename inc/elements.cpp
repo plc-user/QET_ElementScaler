@@ -183,7 +183,7 @@ bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
     rotate    = node.attribute("rotate").as_bool(); // scheint eine Rotation um 0° zu sein!
     if (node.attribute("rotation"))
         rotation  = node.attribute("rotation").as_double();
-    size      = node.attribute("size").as_double();
+    size      = node.attribute("font_size").as_double();
     text_width= node.attribute("text_width").as_double();
     if (node.attribute("text"))
         text      = node.attribute("text").as_string();
@@ -248,36 +248,41 @@ bool ElmtDynText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
 // ---
 std::string ElmtDynText::AsSVGstring(const uint8_t decimals)
 {
-    std::string s = "<text transform=\"translate(" ;
-    //
-    // für altes Element "input":
+    // Positionen x, y, rotationspunkt, für die beiden Varianten berechnen
+    double posx;
+    double posy;
+    double rotx;
+    double roty;
+    std::string s = "";
     if (xIsOldInput == true) {
-        s += FormatValue(((x + (size/8.0)+4.05)), decimals) + ", ";
-        s += FormatValue(y+0.5*size, decimals) + ")";
-        if (rotation != 0.0) {
-            s += " rotate(" + FormatValue(rotation, 0);
-            s += " " + FormatValue(- (((size/8.0)+4.05)) , 1);
-            s += " " + FormatValue(- (0.5*size), 1);
-            s += ")";
-        }
+        posx = x + (size / 8.0) + 4.05;
+        posy = y + (0.5 * size);
+        rotx = - ((size / 8.0) + 4.05);
+        roty = - (0.5 * size);
+    } else {
+        posx = ((x + (size/8.0)+4.05) - 0.5);
+        posy = y + (7.0/5.0*size + 26.0/5.0) - 0.5;
+        rotx = (-1) * (((size/8.0)+4.05) - 0.5);
+        roty = (-1) * ((7.0/5.0*size + 26.0/5.0) - 0.5);
     }
-    else {
-        // für "dynamic_text":
-        s += FormatValue(((x + (size/8.0)+4.05) - 0.5), 1) + ", ";
-        s += FormatValue(y + (7.0/5.0*size + 26.0/5.0) - 0.5, 1) + ")";
-        if (rotation != 0.0) {
-            s += " rotate(" + FormatValue(rotation, 0);
-            s += " " + FormatValue(- (((size/8.0)+4.05) - 0.5) , 1);
-            s += " " + FormatValue(- ((7.0/5.0*size + 26.0/5.0) - 0.5), 1);
-            s += ")";
-        }
+
+    // bei einzeiligem Text bleibt alles wie's war:
+    s += "<text transform=\"translate(" ;
+    // für "input" und "dynamic_text" gleich, weil oben berechnet
+    s += FormatValue(posx, 1) + ", ";
+    s += FormatValue(posy, 1) + ")";
+    if ((rotation < 0.05) || (rotation > 0.05)) {
+        s += " rotate(" + FormatValue(rotation, 1);
+        s += " " + FormatValue(rotx, 1);
+        s += " " + FormatValue(roty, 1);
+        s += ")";
     }
     s += "\" ";
     // wir nutzen hier generische Schriftfamilien!!!
     s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
     s += "font-size=\"" + FormatValue(size, decimals) + "pt\" ";
     s += "fill=\"" + color + "\">";
-    s += text + "</text>";
+    s += TextToEntity(text) + "</text>";
     return s;
 }
 // ---
@@ -366,7 +371,7 @@ std::string ElmtText::AsSVGstring(const uint8_t decimals)
         s += "<text y=\"" + FormatValue(y, decimals) + "\" transform=\"rotate(";
         s += FormatValue(rotation, decimals) + " " + FormatValue(x, decimals) + " " + FormatValue(y, decimals) + ")\" ";
         s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
-        s += "font-size=\"" + FormatValue(size, decimals) + "pt\" ";
+        s += "font-size=\"" + FormatValue(size, 0) + "pt\" ";
         s += "fill=\"" + color + "\">\n";
         for (size_t i=0; i<vsText.size(); i++) {
             s += "      <tspan x=\"" + FormatValue(x, decimals) + "\" dy=\"" + FormatValue(((i>0)*1.5), decimals) + "em\">";
@@ -386,7 +391,7 @@ std::string ElmtText::AsSVGstring(const uint8_t decimals)
         s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
         s += "font-size=\"" + FormatValue(size, decimals) + "pt\" ";
         s += "fill=\"" + color + "\">";
-        s += text + "</text>";
+        s += TextToEntity(text) + "</text>";
         return s;
     }
 }
