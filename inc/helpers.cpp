@@ -145,11 +145,16 @@ std::string TextToEntity(std::string& s){
     std::string result = "";
     for (size_t i = 0; i<s.length(); i++)
     {
-        char c = s[i];
-        if ( (c=='&') || (c=='>') || (c=='<') || (c=='"') || (c=='\'') ) {
-            result += "&#x" + toHex<char>(c, false, false) + ";";
-        } else {
-            result += s[i];
+        switch ((char)s[i]){
+            case '&' :
+            case '>' :
+            case '<' :
+            case '"' :
+            case '\'':
+                result += "&#x" + toHex<char>((char)s[i]) + ";";
+                break;
+            default:
+                result += s[i];
         }
     }
     return result;
