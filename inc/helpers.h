@@ -103,4 +103,4 @@ const std::string toHex(const T inVal, const bool upCase=false, const bool withP
 }
 
 
-#endif  //#ifndef _HELPERS_H
+#endif  //#ifndef HELPERS_H

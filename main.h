@@ -561,4 +561,4 @@ std::string CheckForDoubleString(std::string &sArg){
 
 
 
-#endif  //#ifndef _MAIN_H
+#endif  //#ifndef MAIN_H

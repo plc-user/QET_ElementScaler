@@ -43,7 +43,11 @@
 // - added ability to export SVG-data
 // - adjusted order of commandline-parameters: see --help
 //
-
+// +----------------------------------------------------------+
+// | This software uses pugixml library (https://pugixml.org) |
+// | pugixml is Copyright (C) 2006-2023 Arseny Kapoulkine.    |
+// +----------------------------------------------------------+
+//
 
 // own headers:
 #include "inc/pugixml/pugixml.hpp"

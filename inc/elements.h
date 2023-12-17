@@ -679,4 +679,4 @@ inline std::ostream& operator << (std::ostream& strm, const RectMinMax& r)
 
 
 
-#endif  //#ifndef _ELEMENTS_H
+#endif  //#ifndef ELEMENTS_H

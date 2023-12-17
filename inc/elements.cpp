@@ -375,7 +375,7 @@ std::string ElmtText::AsSVGstring(const uint8_t decimals)
         s += "fill=\"" + color + "\">\n";
         for (size_t i=0; i<vsText.size(); i++) {
             s += "      <tspan x=\"" + FormatValue(x, decimals) + "\" dy=\"" + FormatValue(((i>0)*1.5), decimals) + "em\">";
-            s += vsText[i] + "</tspan>\n";
+            s += TextToEntity(vsText[i]) + "</tspan>\n";
         }
         s += "      </text>";
         return s;
@@ -925,7 +925,7 @@ std::string ElmtLine::AsSVGstring(const uint8_t decimals)
     s += "transform=\"translate(" + FormatValue(std::get<1>(polygon[0]), decimals) + ","
                                   + FormatValue(std::get<2>(polygon[0]), decimals) + ")";
     // und falls die Linie eine Schräge ist, auch rotieren:
-    if ( (GetAngle() > 0.1) || (GetAngle() < -0.1))
+    if ( (GetAngle() > 0.05) || (GetAngle() < -0.05))
         s += " rotate(" + FormatValue(GetAngle(), decimals) + ")";
     // Gruppierungs-Anfang beenden:
     s += "\" >\n";
