@@ -145,16 +145,14 @@ std::string TextToEntity(std::string& s){
     std::string result = "";
     for (size_t i = 0; i<s.length(); i++)
     {
-		char c = s[i];
-        // alle Ziffern und Buchstaben kommen direkt rein:
-        if ( ((c>='0') && (c<='9')) || ((c>='A') && (c<='Z')) || ((c>='a') && (c<='z')) || (c==' ') ) {
-            result += s[i];
-        } else {
-        // alles andere wird umgewandelt
+        char c = s[i];
+        if ( (c=='&') || (c=='>') || (c=='<') || (c=='"') || (c=='\'') ) {
             result += "&#x" + toHex<char>(c, false, false) + ";";
+        } else {
+            result += s[i];
         }
     }
-	return result;
+    return result;
 }
 //
 // ###############################################################
