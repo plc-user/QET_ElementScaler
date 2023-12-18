@@ -183,7 +183,10 @@ bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
     rotate    = node.attribute("rotate").as_bool(); // scheint eine Rotation um 0° zu sein!
     if (node.attribute("rotation"))
         rotation  = node.attribute("rotation").as_double();
-    size      = node.attribute("font_size").as_double();
+    if (node.attribute("font_size"))
+        size      = node.attribute("font_size").as_double();
+    if (node.attribute("size"))
+        size      = node.attribute("size").as_double();
     text_width= node.attribute("text_width").as_double();
     if (node.attribute("text"))
         text      = node.attribute("text").as_string();
@@ -228,6 +231,8 @@ bool ElmtDynText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
         node.attribute("z").set_value(FormatValue(z, 0).c_str());
     if (node.attribute("size"))
         node.attribute("size").set_value(FormatValue(size, 0).c_str());
+    if (node.attribute("font_size"))
+        node.attribute("font_size").set_value(FormatValue(size, 0).c_str());
     if (node.attribute("rotation"))
         node.attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
     if (node.attribute("text"))
