@@ -176,7 +176,6 @@ std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
 //
 bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
 {
-    if ((std::string(node.name())) == "input") { xIsOldInput = true; }
     x         = node.attribute("x").as_double();
     y         = node.attribute("y").as_double();
     z         = node.attribute("z").as_double();
@@ -259,16 +258,29 @@ std::string ElmtDynText::AsSVGstring(const uint8_t decimals)
     double rotx;
     double roty;
     std::string s = "";
-    if (xIsOldInput == true) {
-        posx = x + (size / 8.0) + 4.05;
-        posy = y + (0.5 * size);
-        rotx = - ((size / 8.0) + 4.05);
-        roty = - (0.5 * size);
-    } else {
-        posx = ((x + (size/8.0)+4.05) - 0.5);
-        posy = y + (7.0/5.0*size + 26.0/5.0) - 0.5;
-        rotx = (-1) * (((size/8.0)+4.05) - 0.5);
-        roty = (-1) * ((7.0/5.0*size + 26.0/5.0) - 0.5);
+    // Position und Rotationspunkt berechnen:
+    posx = ((x + (size/8.0)+4.05) - 0.5);
+    posy = y + (7.0/5.0*size + 26.0/5.0) - 0.5;
+    rotx = (-1) * (((size/8.0)+4.05) - 0.5);
+    roty = (-1) * ((7.0/5.0*size + 26.0/5.0) - 0.5);
+    // zuerst wird auf mehrzeiligen Text geprüft und behandelt:
+    if ( (!(text.find("\n") == std::string::npos)) ||
+         (!(text.find("\r") == std::string::npos)) )  {
+        //std::cerr << "\"dynamic_text\" mit Umbruch erkannt!\n";
+        std::vector<std::string> vsText;
+        MultiLineText(text, vsText);
+        s += "<text y=\"" + FormatValue(posy, decimals) + "\" transform=\"rotate(";
+        s += FormatValue(rotation, decimals) + " " + FormatValue(x, decimals) + " " + FormatValue(y, decimals) + ")\" ";
+        s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";
+        s += "font-size=\"" + FormatValue(size, 0) + "pt\" ";
+        s += "fill=\"" + color + "\">\n";
+        for (size_t i=0; i<vsText.size(); i++) {
+            s += "      <tspan x=\"" + FormatValue(posx, decimals) + "\" dy=\"" + FormatValue(((i>0)*1.4), decimals) + "em\">";
+            s += TextToEntity(vsText[i]) + "</tspan>\n";
+        }
+        s += "      </text>";
+        // für Multiline-Text in "dynamic_text" war's das
+        return s;
     }
 
     // bei einzeiligem Text bleibt alles wie's war:
@@ -379,7 +391,7 @@ std::string ElmtText::AsSVGstring(const uint8_t decimals)
         s += "font-size=\"" + FormatValue(size, 0) + "pt\" ";
         s += "fill=\"" + color + "\">\n";
         for (size_t i=0; i<vsText.size(); i++) {
-            s += "      <tspan x=\"" + FormatValue(x, decimals) + "\" dy=\"" + FormatValue(((i>0)*1.5), decimals) + "em\">";
+            s += "      <tspan x=\"" + FormatValue(x, decimals) + "\" dy=\"" + FormatValue(((i>0)*1.4), decimals) + "em\">";
             s += TextToEntity(vsText[i]) + "</tspan>\n";
         }
         s += "      </text>";

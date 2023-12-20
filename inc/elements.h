@@ -230,7 +230,6 @@ class ElmtDynText : public BaseElement,
                     public BasePosition
 {
     private:
-      bool xIsOldInput = false;
       double text_width = -1.0;
       bool rotate = true;
       bool frame = false;
@@ -254,9 +253,8 @@ class ElmtDynText : public BaseElement,
       void Clear(void) {
                          BasePosition::Clear();
                          rotate = true; rotation = 0.0;
-                         xIsOldInput = false;
                          font = "";
-                         tagg = "none"; info_name = "";
+                         info_name = "";
                          size = 11.1; text = "_"; color = "#000000";
                          SplitFontString();
                        }
