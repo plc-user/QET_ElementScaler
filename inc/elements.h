@@ -235,7 +235,6 @@ class ElmtDynText : public BaseElement,
       bool frame = false;
       bool keep_visual_rotation = false;
       std::string uuid = "";
-      std::string tagg = "none"; // old element "input"
       std::string Valignment = "AlignTop";
       std::string Halignment = "AlignLeft";
       std::vector<std::string> vsFont;

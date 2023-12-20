@@ -383,7 +383,7 @@ void ProcessElement(pugi::xml_node doc) {
             ElmtMinMax.addy(term.GetY()+5);
             ElmtMinMax.addy(term.GetY()-5);
         }
-        if (((std::string(node.name())) == "dynamic_text") || ((std::string(node.name())) == "input")) {
+        if ((std::string(node.name())) == "dynamic_text") {
             ElmtDynText dyntext;
             dyntext.ReadFromPugiNode(node);
             if (xFlipHor)  dyntext.Flip();
@@ -465,7 +465,6 @@ std::string ToSVG(pugi::xml_node node) {
     for (; node; node = node.next_sibling())
     {   //std::cout << ".";
         if ((std::string(node.name())) == "rect") {
-            //std::cout << "Rechteck in XML gefunden.\n";
             ElmtRect rect;
             rect.Clear();
             rect.ReadFromPugiNode(node);
@@ -477,7 +476,7 @@ std::string ToSVG(pugi::xml_node node) {
             text.ReadFromPugiNode(node);
             s += "    "; s += text.AsSVGstring(decimals); s += "\n";
         }
-        if (((std::string(node.name())) == "dynamic_text") || ((std::string(node.name())) == "input")) {
+        if ((std::string(node.name())) == "dynamic_text") {
             ElmtDynText dyntext;
             dyntext.Clear();
             dyntext.ReadFromPugiNode(node);

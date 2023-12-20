@@ -193,8 +193,6 @@ bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
     if (node.attribute("color"))
         color     = node.attribute("color").as_string();
     frame     = node.attribute("frame").as_bool();
-    tagg      = node.attribute("tagg").as_string();
-    info_name = tagg; // seems to be ...?
     uuid      = node.attribute("uuid").as_string();
     keep_visual_rotation
               = node.attribute("keep_visual_rotation").as_bool();
@@ -285,7 +283,6 @@ std::string ElmtDynText::AsSVGstring(const uint8_t decimals)
 
     // bei einzeiligem Text bleibt alles wie's war:
     s += "<text transform=\"translate(" ;
-    // für "input" und "dynamic_text" gleich, weil oben berechnet
     s += FormatValue(posx, 1) + ", ";
     s += FormatValue(posy, 1) + ")";
     if ((rotation < 0.05) || (rotation > 0.05)) {
