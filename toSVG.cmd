@@ -21,7 +21,7 @@ set "DataPfad=Z:\win\Elemente"
 
 rem Welcher Faktor soll angewendet werden?
 rem Which factor do you want to apply?
-set "Skalierung=0.9"
+set "Skalierung=1.0"
 
 
 rem ------  Ab hier nichts mehr ändern!  ------
@@ -32,7 +32,7 @@ rem Recursively finds all matching files:
 @for /r "%DataPfad%" %%i in ("*.elmt") do (
 rem @for /r "%cd%" %%i in ("*.elmt") do (
     rem edit found files:
-    "%ProgPfad%\QET_ElementScaler.exe" --toSVG "%%i"
+    "%ProgPfad%\QET_ElementScaler.exe" --toSVG -F %Skalierung% "%%i"
     )
 
 @echo + + + Fertig! + + +
