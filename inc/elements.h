@@ -60,7 +60,7 @@ class DefinitionLine {
    protected:
       // enthält nur den Element-Typ:
       std::string Type = "DefinitionLine";
-      std::string version = "0.100";
+      std::string version = "0.100.0";
       std::string link_type = "thumbnail";
       std::string type = "element";
       int width = 10;
