@@ -50,7 +50,9 @@ QET_ElementScaler [options] &lt;file&gt; <br>
                          (useful during creation of elements) 
   "--FlipVertical"       flips all graphical elements vertically
                          (useful during creation of elements) 
-  "--OverwriteOriginal"  the original file is replaced by scaled one 
+  "--Rot90"              rotate element clockwise by 90 degree
+                         (useful during creation of elements)
+  "--OverwriteOriginal"  the original file is replaced by scaled one
                          (CAUTION: Be careful with this option!) 
 ```
 

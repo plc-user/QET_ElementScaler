@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 plc-user
+ * Copyright (c) 2022-2024 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -248,6 +248,14 @@ bool ElmtDynText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     return true;
 }
 // ---
+void ElmtDynText::Rot90(void){
+    RotPoint90(x, y);
+    rotation += 90;
+    if (rotation >= 360.0){
+        rotation -= 360;
+    }
+}
+// ---
 std::string ElmtDynText::AsSVGstring(const uint8_t decimals)
 {
     // Positionen x, y, rotationspunkt, für die beiden Varianten berechnen
@@ -370,6 +378,14 @@ bool ElmtText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     if (node.attribute("color"))
         node.attribute("color").set_value(color.c_str());
     return true;
+}
+// ---
+void ElmtText::Rot90(void){
+    RotPoint90(x, y);
+    rotation += 90;
+    if (rotation >= 360.0){
+        rotation -= 360;
+    }
 }
 // ---
 std::string ElmtText::AsSVGstring(const uint8_t decimals)
@@ -533,6 +549,14 @@ bool ElmtArc::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     node.attribute("antialias").set_value(antialias.c_str());
     node.attribute("style").set_value(style.c_str());
     return true;
+}
+// ---
+void ElmtArc::Rot90(void)
+{
+    start += 270.0;
+    Normalize();
+    RotPos90(x, y, width, height);
+    SwapWidhHeight();
 }
 // ---
 std::string ElmtArc::AsSVGstring(const uint8_t decimals)
@@ -762,6 +786,13 @@ void ElmtPolygon::Mirror(void)
     }
 }
 // ---
+void ElmtPolygon::Rot90(void)
+{// drehen um 90° im Uhrzeigersinn
+    for (uint64_t i=0; i<polygon.size(); i++) {
+        RotPoint90(std::get<1>(polygon[i]), std::get<2>(polygon[i]));
+    }
+}
+// ---
 void ElmtPolygon::Scale(const double factX, const double factY)
 {
     for (uint64_t i=0; i<polygon.size(); i++) {
@@ -830,6 +861,12 @@ bool ElmtEllipse::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     return true;
 }
 // ---
+void ElmtEllipse::Rot90(void)
+{
+    RotPos90(x, y, width, height);
+    SwapWidhHeight();
+}
+// ---
 std::string ElmtEllipse::AsSVGstring(const uint8_t decimals)
 {
     std::string s = "<ellipse ";
@@ -877,6 +914,12 @@ bool ElmtRect::WriteToPugiNode(const pugi::xml_node node, const size_t decimals)
     node.attribute("antialias").set_value(antialias.c_str());
     node.attribute("style").set_value(style.c_str());
     return true;
+}
+// ---
+void ElmtRect::Rot90(void)
+{
+    RotPos90(x, y, width, height);
+    SwapWidhHeight();
 }
 // ---
 std::string ElmtRect::AsSVGstring(const uint8_t decimals)
@@ -1092,6 +1135,16 @@ bool ElmtTerminal::WriteToPugiNode(pugi::xml_node node)
     return true;
 }
 // ---
+void ElmtTerminal::Rot90(void){
+    RotPoint90(x, y);
+    switch (orientation[0]){
+    case 'n': orientation = "e"; break;
+    case 'e': orientation = "s"; break;
+    case 's': orientation = "w"; break;
+    case 'w': orientation = "n"; break;
+    }
+}
+// ---
 std::string ElmtTerminal::AsSVGstring(const uint8_t decimals)
 {
     std::string s = "<use xlink:href=\"#terminal\" ";
@@ -1217,6 +1270,20 @@ double RectMinMax::angle(void){
 //--- END - implementation of class "RectMinMax" -------------------------------
 //
 
+
+void RotPos90(double& x, double& y, double& width, double& height){
+// Parameterübergabe als Referenz - dann werden direkt die Positionen überschrieben.
+// Fallunterscheidung, in welchem Quadranten des Koordinatensystems der Punkt liegt, ist nicht nötig
+    double xneu = (y + height) * (-1);
+    y = x;
+    x = xneu;
+}
+
+void RotPoint90(double& x, double& y){
+        double tmp = y;
+        y = x;
+        x = (-1) * tmp;
+}
 
 
 /****************************************************************************/

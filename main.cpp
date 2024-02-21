@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 plc-user
+ * Copyright (c) 2022-2024 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation

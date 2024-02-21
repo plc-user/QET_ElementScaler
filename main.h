@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 plc-user
+ * Copyright (c) 2022-2024 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -41,7 +41,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta6";
+const std::string sVersion = "v0.5.0beta7";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -63,6 +63,7 @@ static bool xRemoveAllTerminals = false;
 static bool xOverwriteOriginal  = false;
 static bool xFlipHor            = false;
 static bool xFlipVert           = false;
+static bool xRotate90           = false;
 
 // max. Number of decimals:
 static const size_t decimals = 2;    // number of decimals for floating-point values
@@ -94,6 +95,7 @@ static struct option long_options[]={
     {"FlipVertical",no_argument,nullptr,1002},   // "long-opt" only!!!
     {"OverwriteOriginal",no_argument,nullptr,1003},  // "long-opt" only!!!
     {"toSVG",no_argument,nullptr,1004},  // "long-opt" only!!!
+    {"Rot90",no_argument,nullptr,1005},  // "long-opt" only!!!
     {0,0,0,0}
   };
 
@@ -149,6 +151,13 @@ int parseCommandline(int argc, char *argv[]) {
                         std::cerr << "create SVG-data from Element-File\n";
                     xCreateSVG  = true;
                     xCreateELMT = false; // entoder-weder ... Beides gibt's nicht!
+                }
+                break;
+            case 1005:
+                if (std::string(long_options[option_index].name) == "Rot90"){
+                    if (_DEBUG_)
+                        std::cerr << "rotate element clockwise by 90 degree\n";
+                    xRotate90 = true;
                 }
                 break;
             case 'i':
@@ -278,6 +287,8 @@ void PrintHelp(const std::string &s, const std::string &v){
     << "                         (useful during creation of elements)           \n"
     << "  \"--FlipVertical\"       flips all graphical elements vertically      \n"
     << "                         (useful during creation of elements)           \n"
+    << "  \"--Rot90\"              rotate element clockwise by 90 degree        \n"
+    << "                         (useful during creation of elements)           \n"
     << "  \"--OverwriteOriginal\"  the original file is replaced by scaled one  \n"
     << "                         (CAUTION: Be careful with this option!)        \n"
     << std::endl
@@ -323,6 +334,7 @@ void ProcessElement(pugi::xml_node doc) {
             rect.ReadFromPugiNode(node);
             if (xFlipHor)  rect.Flip();
             if (xFlipVert) rect.Mirror();
+            if (xRotate90) rect.Rot90();
             rect.Scale(scaleX, scaleY);
             rect.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(rect.GetX());
@@ -336,6 +348,7 @@ void ProcessElement(pugi::xml_node doc) {
             arc.ReadFromPugiNode(node);
             if (xFlipHor)  arc.Flip();
             if (xFlipVert) arc.Mirror();
+            if (xRotate90) arc.Rot90();
             arc.Scale(scaleX, scaleY);
             arc.Normalize();
             arc.WriteToPugiNode(node, decimals);
@@ -350,6 +363,7 @@ void ProcessElement(pugi::xml_node doc) {
             elli.ReadFromPugiNode(node);
             if (xFlipHor)  elli.Flip();
             if (xFlipVert) elli.Mirror();
+            if (xRotate90) elli.Rot90();
             elli.Scale(scaleX, scaleY);
             elli.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(elli.GetX());
@@ -362,6 +376,7 @@ void ProcessElement(pugi::xml_node doc) {
             text.ReadFromPugiNode(node);
             if (xFlipHor)  text.Flip();
             if (xFlipVert) text.Mirror();
+            if (xRotate90) text.Rot90();
             text.Scale(scaleX, scaleY);
             text.WriteToPugiNode(node, decimals);
             if (!((text.GetText() == "") || (text.GetText() == "_"))) {
@@ -376,6 +391,7 @@ void ProcessElement(pugi::xml_node doc) {
             term.ReadFromPugiNode(node);
             if (xFlipHor)  term.Flip();
             if (xFlipVert) term.Mirror();
+            if (xRotate90) term.Rot90();
             term.Scale(scaleX, scaleY);
             term.WriteToPugiNode(node);
             ElmtMinMax.addx(term.GetX()-5);
@@ -388,6 +404,7 @@ void ProcessElement(pugi::xml_node doc) {
             dyntext.ReadFromPugiNode(node);
             if (xFlipHor)  dyntext.Flip();
             if (xFlipVert) dyntext.Mirror();
+            if (xRotate90) dyntext.Rot90();
             dyntext.Scale(scaleX, scaleY);
             dyntext.WriteToPugiNode(node, decimals);
             if (!((dyntext.GetText() == "") || (dyntext.GetText() == "_"))) {
@@ -402,6 +419,7 @@ void ProcessElement(pugi::xml_node doc) {
             line.ReadFromPugiNode(node);
             if (xFlipHor)  line.Flip();
             if (xFlipVert) line.Mirror();
+            if (xRotate90) line.Rot90();
             line.Scale(scaleX, scaleY);
             line.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(line.GetMinX());
@@ -414,6 +432,7 @@ void ProcessElement(pugi::xml_node doc) {
             poly.ReadFromPugiNode(node);
             if (xFlipHor)  poly.Flip();
             if (xFlipVert) poly.Mirror();
+            if (xRotate90) poly.Rot90();
             poly.Scale(scaleX, scaleY);
             poly.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(poly.GetMinX());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 plc-user
+ * Copyright (c) 2022-2024 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -48,6 +48,8 @@ bool MultiLineText(std::string, std::vector<std::string> & );
 
 class RectMinMax;
 
+void RotPos90(double&, double&, double&, double&);
+void RotPoint90(double&, double&);
 
 //
 // für die Verwaltung von grafischen Elementen:
@@ -209,6 +211,9 @@ class BaseSize {
       double GetHeight()               { return height; }
       void SetWidth(const double val)  { width = val; }
       void SetHeight(const double val) { height = val; }
+      void SwapWidhHeight(void)        { double tmp = width;
+                                         width = height;
+                                         height = tmp;  }
 };
 //
 //--- END - definition of class "BaseSize" -------------------------------------
@@ -265,6 +270,7 @@ class ElmtDynText : public BaseElement,
       std::string GetText(void) { return text; }
       void Flip(void)   { y = (-1) * y; }
       void Mirror(void) { x = (-1) * x; }
+      void Rot90(void);  // rotate clockwise by 90°
       void Scale(const double factX=1.0, const double factY=1.0) {
                        x *= factX; y *= factY;
                        size *= std::min(factX, factY);
@@ -334,6 +340,7 @@ class ElmtText : public BaseElement,
       std::string GetText(void) { return text; }
       void Flip(void)   { y = (-1) * y; }
       void Mirror(void) { x = (-1) * x; }
+      void Rot90(void);  // rotate clockwise by 90°
       void Scale(const double factX=1.0, const double factY=1.0) {
                        x *= factX; y *= factY;
                        size *= std::min(factX, factY);
@@ -405,6 +412,7 @@ class ElmtPolygon : public BaseElement,
       std::string AsSVGstring(const uint8_t);
       void Flip(void);   // vertikal
       void Mirror(void); // horizontal
+      void Rot90(void);  // rotate clockwise by 90°
       void Scale(const double factX=1.0, const double factY=1.0);
 };
 //
@@ -450,6 +458,7 @@ class ElmtLine : public ElmtPolygon {
                        }
       //void Flip(void);   // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
       //void Mirror(void); // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
+      //void Rot90(void);  // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
       void Scale(const double factX=1.0, const double factY=1.0) {
                          ElmtPolygon::Scale(factX, factY);
                          length1 *= std::min(factX, factY);
@@ -484,6 +493,7 @@ class ElmtEllipse : public BaseElement,
       bool WriteToPugiNode(pugi::xml_node, size_t);
       void Flip(void)   { y = (-1) * y - height; }
       void Mirror(void) { x = (-1) * x - width; }
+      void Rot90();  // rotate clockwise by 90°
       void Scale(const double factX=1.0, const double factY=1.0) {
                        x     *= factX;      y *= factY;
                        width *= factX; height *= factY;
@@ -522,6 +532,7 @@ class ElmtRect : public BaseElement,
       void SetRy(const double val)      { ry = val; }
       void Flip(void)   { y = (-1) * y - height; }
       void Mirror(void) { x = (-1) * x - width; }
+      void Rot90();  // rotate clockwise by 90°
       void Scale(const double factX=1.0, const double factY=1.0) {
                        x     *= factX;      y *= factY;
                        rx    *= factX;     ry *= factY;
@@ -575,6 +586,7 @@ class ElmtArc : public BaseElement,
       void coutData(){ std::cout << x << "|" << y << ", " << width << "|" << height << ", " << start << "|" << angle; }
       void Flip();   // vertikal
       void Mirror(); // horizontal
+      void Rot90();  // rotate clockwise by 90°
       void Scale(const double factX=1.0, const double factY=1.0) {
                        x     *= factX;      y *= factY;
                        width *= factX; height *= factY;
@@ -624,6 +636,7 @@ class ElmtTerminal : public BaseElement,
       void Mirror(void) { x *= (-1.0);
                         if (orientation == "e") orientation = "w";
                         if (orientation == "w") orientation = "e"; }   // horizontal
+      void Rot90(void);  // rotate clockwise by 90°
       void Scale(const double factX=1.0, const double factY=1.0){
                         x *= factX; y *= factY;
                         }
