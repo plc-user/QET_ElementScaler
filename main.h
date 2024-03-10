@@ -41,7 +41,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta10";
+const std::string sVersion = "v0.5.0beta11";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -309,14 +309,12 @@ void ProcessElement(pugi::xml_node doc) {
 
     // create or renew element's uuid:
     if (!(doc.child("definition").child("uuid"))) {
-        if (_DEBUG_) std::cerr << "Erstelle UUID fuer das Element!\n" ;
+        if (_DEBUG_) std::cerr << "Erstelle Element-UUID!\n" ;
         doc.child("definition").prepend_child("uuid");
-        std::string sUUID = "{" + CreateUUID(false) + "}";
-        doc.child("definition").child("uuid").append_attribute("uuid").set_value(sUUID.c_str());
+        doc.child("definition").child("uuid").append_attribute("uuid").set_value(("{" + CreateUUID(false) + "}").c_str());
     } else {
         if (_DEBUG_) std::cerr << "Aktualisiere vorhandene Element-UUID!\n" ;
-        std::string sUUID = "{" + CreateUUID(false) + "}";
-        doc.child("definition").child("uuid").attribute("uuid").set_value(sUUID.c_str());
+        doc.child("definition").child("uuid").attribute("uuid").set_value(("{" + CreateUUID(false) + "}").c_str());
     }
     // wenn die Anschlüsse alle weg sollen...
     if (xRemoveAllTerminals==true) {

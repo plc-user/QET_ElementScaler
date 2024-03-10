@@ -40,7 +40,7 @@ std::string FormatValue(const double, const size_t);
 //
 // --- function-prototype for UUID-calculation ---------------------------------
 //
-std::string CreateUUID(bool UpCase=false);
+const std::string CreateUUID(bool UpCase=false);
 
 //
 // --- function-prototype for removing leading zeros ---------------------------

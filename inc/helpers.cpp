@@ -188,7 +188,7 @@ static std::string generate_hex(const unsigned int len) {
     return s;
 }
 //
-std::string CreateUUID(const bool UpCase) {
+const std::string CreateUUID(const bool UpCase) {
     std::string uuid = "";
     uuid  =       generate_hex(4);
     uuid += '-' + generate_hex(2);
