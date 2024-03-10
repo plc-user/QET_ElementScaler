@@ -41,7 +41,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta8";
+const std::string sVersion = "v0.5.0beta9";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -307,17 +307,21 @@ void PrintHelp(const std::string &s, const std::string &v){
 void ProcessElement(pugi::xml_node doc) {
     RectMinMax ElmtMinMax; // for Re-Calc of DefinitionLine!
 
-    // das Element bekommt eine neue UUID:
-    pugi::xml_node node = doc.child("definition").child("uuid");
-    for (pugi::xml_attribute attr: node.attributes())
-    {
-        if (std::string(attr.name())=="uuid") {
-            if (_DEBUG_) std::cerr << "create new uuid - old: " << attr.value() << std::endl;
-            std::string sUUID = "{" + CreateUUID(false) + "}";
-            if (_DEBUG_) std::cerr << "             new uuid: " << sUUID << std::endl;
-            attr.set_value(sUUID.c_str());
-        }
+    // wir brauchen einen Pugi-Node:
+    pugi::xml_node node;
+
+    // create or renew element's uuid:
+    if (!(doc.child("definition").child("uuid"))) {
+        //std::cerr << "Erstelle UUID fuer das Element!\n" ;
+        doc.child("definition").prepend_child("uuid");
+        std::string sUUID = "{" + CreateUUID(false) + "}";
+        doc.child("definition").child("uuid").append_attribute("uuid").set_value(sUUID.c_str());
+    } else {
+        //std::cerr << "Aktualisiere vorhandene Element-UUID!\n" ;
+        std::string sUUID = "{" + CreateUUID(false) + "}";
+        doc.child("definition").child("uuid").attribute("uuid").set_value(sUUID.c_str());
     }
+
     // wenn die Anschlüsse alle weg sollen...
     if (xRemoveAllTerminals==true) {
         if (_DEBUG_) std::cerr << "change \"link_type\" to \"thumbnail\"" << std::endl;
