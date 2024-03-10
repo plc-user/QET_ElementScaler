@@ -41,7 +41,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta7";
+const std::string sVersion = "v0.5.0beta8";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -321,7 +321,9 @@ void ProcessElement(pugi::xml_node doc) {
     // wenn die Anschlüsse alle weg sollen...
     if (xRemoveAllTerminals==true) {
         if (_DEBUG_) std::cerr << "change \"link_type\" to \"thumbnail\"" << std::endl;
-           doc.child("definition").attribute("link_type").set_value("thumbnail");
+        doc.child("definition").attribute("link_type").set_value("thumbnail");
+        node = doc.child("definition").child("description");
+        while(node.remove_child("terminal"));
         }
     // in einer Schleife die Elemente bearbeiten:
     node = doc.child("definition").child("description").first_child();
