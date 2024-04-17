@@ -618,9 +618,11 @@ bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     for (const auto &i : polygon) {
         std::string s = "";
         s = "x" + std::to_string(std::get<0>(i));
-        node.attribute(s.c_str()).set_value(FormatValue(std::get<1>(i), decimals).c_str());
+        node.remove_attribute(s.c_str());   // to sort the polygon-points...
+        node.append_attribute(s.c_str()).set_value(FormatValue(std::get<1>(i), decimals).c_str());
         s = "y" + std::to_string(std::get<0>(i));
-        node.attribute(s.c_str()).set_value(FormatValue(std::get<2>(i), decimals).c_str());
+        node.remove_attribute(s.c_str());   // to sort the polygon-points...
+        node.append_attribute(s.c_str()).set_value(FormatValue(std::get<2>(i), decimals).c_str());
     }
     return true;
 }
