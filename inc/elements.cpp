@@ -1115,25 +1115,31 @@ bool ElmtTerminal::ReadFromPugiNode(pugi::xml_node node)
 // ---
 bool ElmtTerminal::WriteToPugiNode(pugi::xml_node node)
 {
-    node.attribute("x").set_value(FormatValue(x, 0).c_str());
-    node.attribute("y").set_value(FormatValue(y, 0).c_str());
-    node.attribute("orientation").set_value(orientation.c_str());
-    if (node.attribute("type"))
-        node.attribute("type").set_value(type.c_str());
-    if (node.attribute("name"))
-        node.attribute("name").set_value(name.c_str());
-    if (node.attribute("uuid"))
-        node.attribute("uuid").set_value(uuid.c_str());
-
-    x           = node.attribute("x").as_double();
-    y           = node.attribute("y").as_double();
-    orientation = node.attribute("orientation").as_string();
-    type        = node.attribute("type").as_string();
-    name        = node.attribute("name").as_string();
-    uuid        = node.attribute("uuid").as_string();
-    // wir prüfen auf aktuelle Vorgabewerte:
-    if (uuid.length() == 0) { CreateNewUUID(); }
-    if (type.length() == 0) { type = "Generic"; }
+    // to achieve a constant order we need to remove and append attributes
+    if (node.attribute("uuid")) {
+        node.remove_attribute("uuid");
+        node.prepend_attribute("uuid").set_value(uuid.c_str());
+        } else {
+        node.prepend_attribute("uuid").set_value(("{" + CreateUUID(false) + "}").c_str());
+        }
+    if (node.attribute("name")) {
+        node.remove_attribute("name");
+        node.append_attribute("name").set_value(name.c_str());
+        } else {
+        node.append_attribute("name").set_value("");
+        }
+    node.remove_attribute("x");
+    node.append_attribute("x").set_value(FormatValue(x, 0).c_str());
+    node.remove_attribute("y");
+    node.append_attribute("y").set_value(FormatValue(y, 0).c_str());
+    node.remove_attribute("orientation");
+    node.append_attribute("orientation").set_value(orientation.c_str());
+    if (node.attribute("type")) {
+        node.remove_attribute("type");
+        node.append_attribute("type").set_value(type.c_str());
+        } else {
+        node.append_attribute("type").set_value("Generic");
+        }
     return true;
 }
 // ---
