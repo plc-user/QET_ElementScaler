@@ -205,8 +205,10 @@ bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
         frame     = node.attribute("frame").as_bool();
     if (node.attribute("uuid")) {
         uuid      = node.attribute("uuid").as_string();
+        if (uuid.length() != 38)
+            uuid  = "{" + CreateUUID(false) + "}";
     } else {
-        uuid      = ("{" + CreateUUID(false) + "}");
+        uuid      = "{" + CreateUUID(false) + "}";
         node.append_attribute("uuid").set_value(uuid.c_str());
     }
     if (node.attribute("keep_visual_rotation"))
@@ -1133,12 +1135,15 @@ bool ElmtTerminal::ReadFromPugiNode(pugi::xml_node node)
     y           = node.attribute("y").as_double();
     orientation = node.attribute("orientation").as_string();
     type        = node.attribute("type").as_string();
+    if (type.length() == 0) { type = "Generic"; }
     name        = node.attribute("name").as_string();
     uuid        = node.attribute("uuid").as_string();
+    if (uuid.length() != 38) {
+        uuid  = "{" + CreateUUID(false) + "}";
+        node.remove_attribute("uuid");
+        node.prepend_attribute("uuid").set_value(uuid.c_str());
+    }
 
-    // wir prüfen auf aktuelle Vorgabewerte:
-    if (uuid.length() == 0) { CreateNewUUID(); }
-    if (type.length() == 0) { type = "Generic"; }
     return true;
 }
 // ---
