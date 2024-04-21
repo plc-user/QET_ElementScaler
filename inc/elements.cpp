@@ -372,18 +372,29 @@ bool ElmtText::ReadFromPugiNode(pugi::xml_node node)
 }
 // ---
 bool ElmtText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
-{
-    node.attribute("x").set_value(FormatValue(x, decimals).c_str());
-    node.attribute("y").set_value(FormatValue(y, decimals).c_str());
-    if (node.attribute("size"))
-        node.attribute("size").set_value(FormatValue(size, 0).c_str());
-    if (node.attribute("rotation"))
-        node.attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
-    node.attribute("text").set_value(text.c_str());
-    if (node.attribute("font"))
-        node.attribute("font").set_value(font.c_str());
-    if (node.attribute("color"))
-        node.attribute("color").set_value(color.c_str());
+{   // sort attributes by removing and re-adding
+    node.remove_attribute("text");
+    node.prepend_attribute("text").set_value(text.c_str());
+    node.remove_attribute("x");
+    node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    node.remove_attribute("y");
+    node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    if (node.attribute("size")) {
+        node.remove_attribute("size");
+        node.append_attribute("size").set_value(FormatValue(size, 0).c_str());
+    }
+    if (node.attribute("rotation")) {
+        node.remove_attribute("rotation");
+        node.append_attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
+    }
+    if (node.attribute("font")) {
+        node.remove_attribute("font");
+        node.append_attribute("font").set_value(font.c_str());
+    }
+    if (node.attribute("color")) {
+        node.remove_attribute("color");
+        node.append_attribute("color").set_value(color.c_str());
+    }
     return true;
 }
 // ---
