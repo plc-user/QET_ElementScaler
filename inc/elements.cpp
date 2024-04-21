@@ -193,16 +193,25 @@ bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
         size      = node.attribute("font_size").as_double();
     if (node.attribute("size"))
         size      = node.attribute("size").as_double();
-    text_width= node.attribute("text_width").as_double();
+    if (node.attribute("text_width"))
+        text_width= node.attribute("text_width").as_double();
     if (node.attribute("text"))
         text      = node.attribute("text").as_string();
-    font      = node.attribute("font").as_string();
+    if (node.attribute("font"))
+        font      = node.attribute("font").as_string();
     if (node.attribute("color"))
         color     = node.attribute("color").as_string();
-    frame     = node.attribute("frame").as_bool();
-    uuid      = node.attribute("uuid").as_string();
-    keep_visual_rotation
-              = node.attribute("keep_visual_rotation").as_bool();
+    if (node.attribute("frame"))
+        frame     = node.attribute("frame").as_bool();
+    if (node.attribute("uuid")) {
+        uuid      = node.attribute("uuid").as_string();
+    } else {
+        uuid      = ("{" + CreateUUID(false) + "}");
+        node.append_attribute("uuid").set_value(uuid.c_str());
+    }
+    if (node.attribute("keep_visual_rotation"))
+        keep_visual_rotation
+                  = node.attribute("keep_visual_rotation").as_bool();
 
     // nun die Unter-Elemente:
     if (node.child("text"))
@@ -241,6 +250,8 @@ bool ElmtDynText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
         node.attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
     if (node.attribute("text"))
         node.attribute("text").set_value(text.c_str());
+    if (node.attribute("uuid"))
+        node.attribute("uuid").set_value(uuid.c_str());
     if (node.attribute("font"))
         node.attribute("font").set_value(font.c_str());
     if (node.attribute("color"))
