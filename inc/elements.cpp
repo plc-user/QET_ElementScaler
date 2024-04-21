@@ -70,13 +70,20 @@ void DefinitionLine::ReCalc(RectMinMax XYMinMax) {
 // ---
 bool DefinitionLine::WriteToPugiNode(pugi::xml_node node)
 {
-    node.attribute("version").set_value(version.c_str());
-    node.attribute("link_type").set_value(link_type.c_str());
-    node.attribute("type").set_value(type.c_str());
-    node.attribute("width").set_value(std::to_string(width).c_str());
-    node.attribute("height").set_value(std::to_string(height).c_str());
-    node.attribute("hotspot_x").set_value(std::to_string(hotspot_x).c_str());
-    node.attribute("hotspot_y").set_value(std::to_string(hotspot_y).c_str());
+    node.remove_attribute("version");
+    node.append_attribute("version").set_value(version.c_str());
+    node.remove_attribute("type");
+    node.append_attribute("type").set_value(type.c_str());
+    node.remove_attribute("link_type");
+    node.append_attribute("link_type").set_value(link_type.c_str());
+    node.remove_attribute("width");
+    node.append_attribute("width").set_value(std::to_string(width).c_str());
+    node.remove_attribute("height");
+    node.append_attribute("height").set_value(std::to_string(height).c_str());
+    node.remove_attribute("hotspot_x");
+    node.append_attribute("hotspot_x").set_value(std::to_string(hotspot_x).c_str());
+    node.remove_attribute("hotspot_y");
+    node.append_attribute("hotspot_y").set_value(std::to_string(hotspot_y).c_str());
     return true;
 }
 //
