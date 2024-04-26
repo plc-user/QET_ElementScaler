@@ -631,17 +631,26 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node node)
         if (attr.name()[0]=='x') {
             std::string str = attr.name();
             str.erase(0, 1);
-            InsertXat(std::stoi(str), attr.as_double());
+            if (((std::string)attr.as_string() == "nan") || (!(std::isfinite(attr.as_double())))) {
+                std::cerr << " * * * Polygon-Point with invalid value!\n";
+            } else {
+                InsertXat(std::stoi(str), attr.as_double());
+            }
             if (_DEBUG_) Write();
         }
         if (attr.name()[0]=='y') {
             std::string str = attr.name();
             str.erase(0, 1);
-            InsertYat(std::stoi(str), attr.as_double());
+            if (((std::string)attr.as_string() == "nan") || (!(std::isfinite(attr.as_double())))) {
+                std::cerr << " * * * Polygon-Point with invalid value!\n";
+            } else {
+                InsertYat(std::stoi(str), attr.as_double());
+            }
             if (_DEBUG_) Write();
         }
     } // for (pugi::xml_attribute ...
-    return true;
+    // Check the Polygon:
+    return CheckIndex();
 }
 // ---
 bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
@@ -660,7 +669,8 @@ bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
 // ---
 bool ElmtPolygon::CheckIndex(void){
    if (polygon.size() == 0 ) {
-     return true;
+     std::cerr << "Polygon without points!\n";
+     return false;
    }
    if ( !(std::get<0>(polygon[polygon.size()-1]) == polygon.size()) ) {
      std::cerr << "max. index not equal size\n";

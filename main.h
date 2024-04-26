@@ -41,7 +41,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta12";
+const std::string sVersion = "v0.5.0beta13";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -103,7 +103,7 @@ static struct option long_options[]={
 
 
 
-/*****************************************************************************/
+/******************************************************************************/
 int parseCommandline(int argc, char *argv[]) {
     int c;
     int option_index = 12345;
@@ -250,7 +250,7 @@ int parseCommandline(int argc, char *argv[]) {
     // return number of non-option-arguments:
     return iDiff;
 }
-/*****************************************************************************/
+/******************************************************************************/
 
 
 /******************************************************************************/
@@ -415,31 +415,42 @@ void ProcessElement(pugi::xml_node doc) {
         }
         if ((std::string(node.name())) == "line") {
             ElmtLine line;
-            line.ReadFromPugiNode(node);
-            if (xFlipHor)  line.Flip();
-            if (xFlipVert) line.Mirror();
-            if (xRotate90) line.Rot90();
-            line.Scale(scaleX, scaleY);
-            line.WriteToPugiNode(node, decimals);
-            ElmtMinMax.addx(line.GetMinX());
-            ElmtMinMax.addx(line.GetMaxX());
-            ElmtMinMax.addy(line.GetMinY());
-            ElmtMinMax.addy(line.GetMaxY());
+            if (line.ReadFromPugiNode(node) == true) {
+                if (xFlipHor)  line.Flip();
+                if (xFlipVert) line.Mirror();
+                if (xRotate90) line.Rot90();
+                line.Scale(scaleX, scaleY);
+                line.WriteToPugiNode(node, decimals);
+                ElmtMinMax.addx(line.GetMinX());
+                ElmtMinMax.addx(line.GetMaxX());
+                ElmtMinMax.addy(line.GetMinY());
+                ElmtMinMax.addy(line.GetMaxY());
+            } else {
+                // Invalid line will be ignored and deleted later!
+                node.set_name("LINE_NodeToDelete");
+            }
         }
         if ((std::string(node.name())) == "polygon") {
             ElmtPolygon poly;
-            poly.ReadFromPugiNode(node);
-            if (xFlipHor)  poly.Flip();
-            if (xFlipVert) poly.Mirror();
-            if (xRotate90) poly.Rot90();
-            poly.Scale(scaleX, scaleY);
-            poly.WriteToPugiNode(node, decimals);
-            ElmtMinMax.addx(poly.GetMinX());
-            ElmtMinMax.addx(poly.GetMaxX());
-            ElmtMinMax.addy(poly.GetMinY());
-            ElmtMinMax.addy(poly.GetMaxY());
+            if (poly.ReadFromPugiNode(node) == true) {
+                if (xFlipHor)  poly.Flip();
+                if (xFlipVert) poly.Mirror();
+                if (xRotate90) poly.Rot90();
+                poly.Scale(scaleX, scaleY);
+                poly.WriteToPugiNode(node, decimals);
+                ElmtMinMax.addx(poly.GetMinX());
+                ElmtMinMax.addx(poly.GetMaxX());
+                ElmtMinMax.addy(poly.GetMinY());
+                ElmtMinMax.addy(poly.GetMaxY());
+            } else {
+                // Invalid polygon will be ignored and deleted later!
+                node.set_name("POLYGON_NodeToDelete");
+            }
         }
     }
+    // Cleanup the QET-Element by removing invalid parts:
+    while(doc.child("definition").child("description").remove_child("LINE_NodeToDelete"));
+    while(doc.child("definition").child("description").remove_child("POLYGON_NodeToDelete"));
     // die definitionLine muss auf jeden Fall angepasst werden:
     DefinitionLine defline;
     defline.ReadFromPugiNode(doc.child("definition"));
@@ -521,21 +532,19 @@ std::string ToSVG(pugi::xml_node node) {
         if ((std::string(node.name())) == "polygon") {
             ElmtPolygon pol;
             pol.Clear();
-            pol.ReadFromPugiNode(node);
-            if (pol.CheckIndex() == true) {
+            if (pol.ReadFromPugiNode(node) == true) {
                 s += "    "; s += pol.AsSVGstring(decimals); s += "\n";
             } else {
-            s += "    INVALID Polygon in Element-File\n";
+                s += "    INVALID Polygon in Element-File\n";
             }
         }
         if ((std::string(node.name())) == "line") {
             ElmtLine lin;
             lin.Clear();
-            lin.ReadFromPugiNode(node);
-            if (lin.CheckIndex() == true) {
+            if (lin.ReadFromPugiNode(node) == true) {
                 s += "    "; s += lin.AsSVGstring(decimals); s += "\n";
             } else {
-            s += "    INVALID Line in Element-File\n";
+                s += "    INVALID Line in Element-File\n";
             }
         }
     }
