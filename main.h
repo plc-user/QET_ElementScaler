@@ -34,6 +34,7 @@
 #include <getopt.h>     // for Commandline-Parameters
 #include <filesystem>   // for exe-filename
 #include <regex>        // for "double"-Check
+#include <list>         // for list of UUIDs
 
 #define _DEBUG_ 0
 
@@ -41,7 +42,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta13";
+const std::string sVersion = "v0.5.0beta14";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -65,6 +66,12 @@ static bool xFlipHor            = false;
 static bool xFlipVert           = false;
 static bool xRotate90           = false;
 
+// to find out, if we need to renew UUIDs for "dynamic_text" or "terminal":
+static std::list <std::string> lsUUIDsDynTexts;
+static std::list <std::string> lsUUIDsTerminals;
+static bool xTerminalsUUIDsUnique = true;
+static bool xDynTextsUUIDsUnique = true;
+
 // max. Number of decimals:
 static const size_t decimals = 2;    // number of decimals for floating-point values
 
@@ -76,8 +83,10 @@ static double scaleY = 1.0;
 //
 int parseCommandline(int argc, char *argv[]);
 void PrintHelp(const std::string &s, const std::string &v);
-std::string CheckForDoubleString(std::string &sArg);
+bool CheckUUIDs(void);
 void ProcessElement(pugi::xml_node);
+std::string ToSVG(pugi::xml_node node);
+std::string CheckForDoubleString(std::string &sArg);
 
 
 
@@ -299,7 +308,25 @@ void PrintHelp(const std::string &s, const std::string &v){
 
 
 
-
+/******************************************************************************/
+bool CheckUUIDs(void) {
+    uint64_t u64DynTextsOrg = lsUUIDsDynTexts.size();
+    lsUUIDsDynTexts.sort();
+    lsUUIDsDynTexts.unique();
+    xDynTextsUUIDsUnique = (lsUUIDsDynTexts.size() == u64DynTextsOrg);
+    if (xDynTextsUUIDsUnique == false) {
+        std::cerr << " * * UUIDs of dynamic_texts are not unique: Create new ones! * *\n";
+    }
+    uint64_t u64TerminalsOrg = lsUUIDsTerminals.size();
+    lsUUIDsTerminals.sort();
+    lsUUIDsTerminals.unique();
+    xTerminalsUUIDsUnique = (lsUUIDsTerminals.size() == u64TerminalsOrg);
+    if (xTerminalsUUIDsUnique == false) {
+        std::cerr << " * * UUIDs of terminals are not unique: Create new ones! * *\n";
+    }
+    return (xDynTextsUUIDsUnique && xTerminalsUUIDsUnique);
+}
+/******************************************************************************/
 
 
 
@@ -392,6 +419,9 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) term.Mirror();
             if (xRotate90) term.Rot90();
             term.Scale(scaleX, scaleY);
+            if (node.attribute("uuid")) {
+                lsUUIDsTerminals.push_back(node.attribute("uuid").as_string());
+            }
             term.WriteToPugiNode(node);
             ElmtMinMax.addx(term.GetX()-5);
             ElmtMinMax.addx(term.GetX()+5);
@@ -405,6 +435,9 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) dyntext.Mirror();
             if (xRotate90) dyntext.Rot90();
             dyntext.Scale(scaleX, scaleY);
+            if (node.attribute("uuid")) {
+                lsUUIDsDynTexts.push_back(node.attribute("uuid").as_string());
+            }
             dyntext.WriteToPugiNode(node, decimals);
             if (!((dyntext.GetText() == "") || (dyntext.GetText() == "_"))) {
                 ElmtMinMax.addx(dyntext.GetX()-dyntext.GetSize());
@@ -451,6 +484,25 @@ void ProcessElement(pugi::xml_node doc) {
     // Cleanup the QET-Element by removing invalid parts:
     while(doc.child("definition").child("description").remove_child("LINE_NodeToDelete"));
     while(doc.child("definition").child("description").remove_child("POLYGON_NodeToDelete"));
+    // die UUIDs prüfen, ob sie denn wirklich "unique" sind:
+    if (CheckUUIDs() == false) {
+        // in einer Schleife die UUIDs der Elemente bearbeiten:
+        node = doc.child("definition").child("description").first_child();
+        for (; node; node = node.next_sibling())
+        {
+            if (((std::string(node.name())) == "terminal") && (xTerminalsUUIDsUnique == false)) {
+                std::string uuid = "{" + CreateUUID(false) + "}";
+                node.attribute("uuid").set_value(uuid.c_str());
+            }
+            if (((std::string(node.name())) == "dynamic_text") && (xDynTextsUUIDsUnique == false)) {
+                std::string uuid = "{" + CreateUUID(false) + "}";
+                node.attribute("uuid").set_value(uuid.c_str());
+            }
+        }
+    }
+    // die Listen der UUIDs werden nicht mehr benötigt: leeren!
+    lsUUIDsDynTexts.clear();
+    lsUUIDsTerminals.clear();
     // die definitionLine muss auf jeden Fall angepasst werden:
     DefinitionLine defline;
     defline.ReadFromPugiNode(doc.child("definition"));
