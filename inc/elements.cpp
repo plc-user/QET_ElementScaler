@@ -685,8 +685,8 @@ bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
 }
 // ---
 bool ElmtPolygon::CheckIndex(void){
-   if (polygon.size() == 0 ) {
-     std::cerr << "Polygon without points!\n";
+   if (polygon.size() <= 1 ) {
+     std::cerr << "Polygon: not enough points!\n";
      return false;
    }
    if ( !(std::get<0>(polygon[polygon.size()-1]) == polygon.size()) ) {
