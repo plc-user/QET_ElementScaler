@@ -146,19 +146,19 @@ std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
     // "line-style:dashdotted" --> stroke-dasharray="8,2,1,2"
     // aber abhängig von der Strichbreite!
     if      (lineStyle == "dotted")
-        s += "stroke-dasharray=\"" + FormatValue((1.0 * dStrokeWidth), 2) + "," +
-                                     FormatValue((2.0 * dStrokeWidth), 2) + "\" ";
+        s += "stroke-dasharray=\"" + FormatValue((1.0 * dStrokeWidth), decimals) + "," +
+                                     FormatValue((2.0 * dStrokeWidth), decimals) + "\" ";
     else if (lineStyle == "dashed")
-        s += "stroke-dasharray=\"" + FormatValue((4.0 * dStrokeWidth), 2) + "," +
-                                     FormatValue((2.0 * dStrokeWidth), 2) + "\" ";
+        s += "stroke-dasharray=\"" + FormatValue((4.0 * dStrokeWidth), decimals) + "," +
+                                     FormatValue((2.0 * dStrokeWidth), decimals) + "\" ";
     else if (lineStyle == "dashdotted")
-        s += "stroke-dasharray=\"" + FormatValue((4.0 * dStrokeWidth), 2) + "," +
-                                     FormatValue((2.0 * dStrokeWidth), 2) + "," +
-                                     FormatValue((1.0 * dStrokeWidth), 2) + "," +
-                                     FormatValue((2.0 * dStrokeWidth), 2) + "\" ";
+        s += "stroke-dasharray=\"" + FormatValue((4.0 * dStrokeWidth), decimals) + "," +
+                                     FormatValue((2.0 * dStrokeWidth), decimals) + "," +
+                                     FormatValue((1.0 * dStrokeWidth), decimals) + "," +
+                                     FormatValue((2.0 * dStrokeWidth), decimals) + "\" ";
 
     // Linienbreite liegt bereits als Zahlwert vor (s.o.):
-    s += "stroke-width=\"" + FormatValue((dStrokeWidth), 2) + "\" ";
+    s += "stroke-width=\"" + FormatValue((dStrokeWidth), decimals) + "\" ";
 
     // "filling:none" --> fill:none
     s += "fill=\"" + ColorToValue(lineFilling) + "\" ";

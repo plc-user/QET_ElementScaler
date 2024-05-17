@@ -91,7 +91,7 @@ std::string FormatValue(const double value, const size_t dec){
         dVal = (dVal / 10.0);
     std::stringstream ss;
     ss.imbue(std::locale(std::cout.getloc(), new DecSep));
-    ss << std::fixed << std::setprecision(2) << dVal;
+    ss << std::fixed << std::setprecision(dec) << dVal;
     std::string s = ss.str();  // "s" is number always (!) with decimals
     // delete this range of characters in order from the end of string:
     const char chars[] = {'0', cDecSep};

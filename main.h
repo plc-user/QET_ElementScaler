@@ -42,7 +42,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta14";
+const std::string sVersion = "v0.5.0beta15";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -73,7 +73,7 @@ static bool xTerminalsUUIDsUnique = true;
 static bool xDynTextsUUIDsUnique = true;
 
 // max. Number of decimals:
-static const size_t decimals = 2;    // number of decimals for floating-point values
+static size_t decimals = 2;    // number of decimals for floating-point values
 
 static double scaleX = 1.0;
 static double scaleY = 1.0;
@@ -99,6 +99,7 @@ static struct option long_options[]={
     {"factor",required_argument,nullptr,'F'},
     {"factorx",required_argument,nullptr,'x'},
     {"factory",required_argument,nullptr,'y'},
+    {"decimals",required_argument,nullptr,'d'},
     {"RemoveAllTerminals",no_argument,nullptr,1000}, // "long-opt" only!!!
     {"FlipHorizontal",no_argument,nullptr,1001}, // "long-opt" only!!!
     {"FlipVertical",no_argument,nullptr,1002},   // "long-opt" only!!!
@@ -117,7 +118,7 @@ int parseCommandline(int argc, char *argv[]) {
     int c;
     int option_index = 12345;
     std::string sTmp = "";
-    while ((c=getopt_long(argc,argv,"f:hioF:x:y:",long_options,&option_index))!=-1) {
+    while ((c=getopt_long(argc,argv,"f:hioF:x:y:d:",long_options,&option_index))!=-1) {
         if (_DEBUG_) std::cerr << "long-opt-name: " << long_options[option_index].name << std::endl;
         switch(c) {
             case 0:
@@ -167,6 +168,18 @@ int parseCommandline(int argc, char *argv[]) {
                     if (_DEBUG_)
                         std::cerr << "rotate element clockwise by 90 degree\n";
                     xRotate90 = true;
+                }
+                break;
+            case 'd':
+                sTmp = std::string(optarg);
+                sTmp = CheckForDoubleString(sTmp);
+                if ((sTmp == "WontWork") || (stoi(std::string(optarg)) < 0)) {
+                    std::cerr << "could not convert \"" << optarg << "\" to positive number!" << std::endl;
+                    xStopWithError = true;
+                } else {
+                    if (_DEBUG_)
+                        std::cerr << "set number of decimals to " << optarg << "\n";
+                    decimals = stoi(std::string(optarg));
                 }
                 break;
             case 'i':
@@ -284,6 +297,8 @@ void PrintHelp(const std::string &s, const std::string &v){
     << "   --factory VALUE  factor for y-values (y, ry, height, ...)            \n"
     << "   -f FILENAME      or                                                  \n"
     << "   --file FILENAME  the file that will be used                          \n"
+    << "   -d VALUE         or                                                  \n"
+    << "   --decimals VALUE number of decimals for float-values in output       \n"
     << "   -h | --help      show this help                                      \n"
     << std::endl
     << "  there are also some \"long-opt\"-only options:                        \n"
