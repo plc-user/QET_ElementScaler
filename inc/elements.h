@@ -240,6 +240,7 @@ class ElmtDynText : public BaseElement,
       bool frame = false;
       bool keep_visual_rotation = false;
       std::string uuid = "";
+      std::string text_from = "ElementInfo";
       std::string Valignment = "AlignTop";
       std::string Halignment = "AlignLeft";
       std::vector<std::string> vsFont;
@@ -257,9 +258,11 @@ class ElmtDynText : public BaseElement,
       void Clear(void) {
                          BasePosition::Clear();
                          rotate = true; rotation = 0.0;
+                         text_width = -1.0;
                          font = "";
                          info_name = "";
                          size = 11.1; text = "_"; color = "#000000";
+                         text_from = "ElementInfo";
                          SplitFontString();
                        }
       bool ReadFromPugiNode(pugi::xml_node);

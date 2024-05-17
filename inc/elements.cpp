@@ -197,6 +197,8 @@ bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
         text_width= node.attribute("text_width").as_double();
     if (node.attribute("text"))
         text      = node.attribute("text").as_string();
+    if (node.attribute("text_from"))
+        text_from = node.attribute("text_from").as_string();
     if (node.attribute("font"))
         font      = node.attribute("font").as_string();
     if (node.attribute("color"))
@@ -240,17 +242,32 @@ bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
 // ---
 bool ElmtDynText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
 {
-    node.attribute("x").set_value(FormatValue(x, decimals).c_str());
-    node.attribute("y").set_value(FormatValue(y, decimals).c_str());
-    if (node.attribute("z"))
-        node.attribute("z").set_value(FormatValue(z, 0).c_str());
+    // Attribute löschen und in umgekehrter Reihenfolge VORNE wieder einfügen:
+    if (node.attribute("text_width")) {
+        node.remove_attribute("text_width");
+        if ( text_width < 0.0 ) { text_width = -1.0; }
+        node.prepend_attribute("text_width").set_value(FormatValue(text_width, 0).c_str());
+    }
+    if (node.attribute("text_from")) {
+        node.remove_attribute("text_from");
+        node.prepend_attribute("text_from").set_value(text_from.c_str());
+    }
+    if (node.attribute("z")) {
+        node.remove_attribute("z");
+        node.prepend_attribute("z").set_value(FormatValue(z, 0).c_str());
+    }
+    node.remove_attribute("y");
+    node.prepend_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    node.remove_attribute("x");
+    node.prepend_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    // Reihenfolge wie vorher:
     if (node.attribute("size"))
         node.attribute("size").set_value(FormatValue(size, 0).c_str());
     if (node.attribute("font_size"))
         node.attribute("font_size").set_value(FormatValue(size, 0).c_str());
     if (node.attribute("rotation"))
         node.attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
-    if (node.attribute("text"))
+    if (node.attribute("text")) // noch nötig??
         node.attribute("text").set_value(text.c_str());
     if (node.attribute("uuid"))
         node.attribute("uuid").set_value(uuid.c_str());
