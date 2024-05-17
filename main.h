@@ -74,6 +74,7 @@ static bool xDynTextsUUIDsUnique = true;
 
 // max. Number of decimals:
 static size_t decimals = 2;    // number of decimals for floating-point values
+static double MinLineLength = 0.01;  //
 
 static double scaleX = 1.0;
 static double scaleY = 1.0;
@@ -180,6 +181,8 @@ int parseCommandline(int argc, char *argv[]) {
                     if (_DEBUG_)
                         std::cerr << "set number of decimals to " << optarg << "\n";
                     decimals = stoi(std::string(optarg));
+                    MinLineLength = 1;
+                    for (uint8_t i=0; i < decimals; i++) { MinLineLength /= 10.0; }
                 }
                 break;
             case 'i':
@@ -463,7 +466,7 @@ void ProcessElement(pugi::xml_node doc) {
         }
         if ((std::string(node.name())) == "line") {
             ElmtLine line;
-            if (line.ReadFromPugiNode(node) == true) {
+            if ((line.ReadFromPugiNode(node) == true) && (line.GetLength() >= MinLineLength)) {
                 if (xFlipHor)  line.Flip();
                 if (xFlipVert) line.Mirror();
                 if (xRotate90) line.Rot90();
