@@ -5,7 +5,7 @@ With the optional parameter &quot;-o&quot; or &quot;--stdout&quot; the changed d
 
 As a gimmick, you can convert QET-Elements to SVG! (see options below)<br>
 
-It compiles with C++17 activated on Debian/GNU Linux (unstable), ReactOS (0.4.15-dev-6811), win, ...<br>
+It compiles with C++17 activated on Debian/GNU Linux (stable and unstable), ReactOS (0.4.15-dev), win, ...<br>
 The ReactOS-Build can also be used with Win in a cmd-window.<br>
 
 QET_ElementScaler can process one file at a time.
@@ -37,7 +37,9 @@ QET_ElementScaler [options] &lt;file&gt; <br>
    --factory VALUE  factor for y-values (y, ry, height, ...)
    -f FILENAME      or
    --file FILENAME  the file that will be used 
-   -h | --help      show this help 
+   -d VALUE         or
+   --decimals VALUE number of decimals for float-values in output
+   -h | --help      show this help
 ```
 
   there are also some "long-opt"-only options: 
