@@ -417,6 +417,7 @@ class ElmtPolygon : public BaseElement,
       void Mirror(void); // horizontal
       void Rot90(void);  // rotate clockwise by 90°
       void Scale(const double factX=1.0, const double factY=1.0);
+      void CleanUp(pugi::xml_node, const double);
 };
 //
 //--- END - definition of class "Polygon" --------------------------------------

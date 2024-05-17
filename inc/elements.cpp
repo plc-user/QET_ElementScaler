@@ -672,6 +672,12 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node node)
 // ---
 bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
 {   // Noch nicht komplett implementiert
+    if (!(node.attribute("closed")))
+        node.prepend_attribute("closed");
+    if (closed == true)
+        node.attribute("closed").set_value("true");
+    else
+        node.attribute("closed").set_value("false");
     for (const auto &i : polygon) {
         std::string s = "";
         s = "x" + std::to_string(std::get<0>(i));
@@ -876,6 +882,49 @@ std::string ElmtPolygon::AsSVGstring(const uint8_t decimals)
     //
     s += StyleAsSVGstring(2);
     return s + "/>";
+}
+// ---
+void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
+// prüfen, ob direkt aufeinander folgende Polygon-Punkte gleich sind -> den zweiten löschen!
+// und aus dem pugi-node den letzten Punkt löschen. Zum Schluß die Punkte neu durchnummerieren
+{
+    bool xDeletedPoint = false;
+    // das gesamte Polygon durchgehen:
+    for (uint64_t i=(polygon.size()-2); i>0; i--) {
+        double diffx = std::abs(std::get<1>(polygon[i]) - std::get<1>(polygon[i+1]));
+        double diffy = std::abs(std::get<2>(polygon[i]) - std::get<2>(polygon[i+1]));
+        if ((diffx <= epsilon) && (diffy <= epsilon)) {
+            // letzten Punkt aus dem Pugi-Node löschen
+            std::string s = "x" + std::to_string(polygon.size());
+            node.remove_attribute(s.c_str());   // to get rid of double points
+            s = "y" + std::to_string(polygon.size());
+            node.remove_attribute(s.c_str());   // to get rid of double points
+            // den Punkt i+1 aus vector entfernen:
+            polygon.erase(polygon.begin() + i+1);
+            xDeletedPoint = true;
+        }
+    }
+    // und nun mal schauen, ob das Polygon durch Punkte geschlossen wurde:
+    double diffx = std::abs(std::get<1>(polygon[0]) - std::get<1>(polygon[polygon.size()-1]));
+    double diffy = std::abs(std::get<2>(polygon[0]) - std::get<2>(polygon[polygon.size()-1]));
+    if ((diffx <= epsilon) && (diffy <= epsilon)) {
+        // letzten Punkt aus dem Pugi-Node löschen
+        std::string s = "x" + std::to_string(polygon.size());
+        node.remove_attribute(s.c_str());   // to get rid of double points
+        s = "y" + std::to_string(polygon.size());
+        node.remove_attribute(s.c_str());   // to get rid of double points
+        // den Punkt i+1 aus vector entfernen:
+        polygon.erase(polygon.end());
+        // nun ist aber das Polygon geschlossen:
+        closed = true;
+        xDeletedPoint = true;
+    }
+    // Polygon muss neu durchnummeriert werden?
+    if (xDeletedPoint == true) {
+        for (uint64_t i=0; i<polygon.size(); i++) {
+            std::get<0>(polygon[i]) = i + 1;
+        }
+    }
 }
 //
 //--- END - implementation of class "ElmtPolygon" ------------------------------

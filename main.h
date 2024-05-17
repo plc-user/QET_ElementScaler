@@ -488,7 +488,10 @@ void ProcessElement(pugi::xml_node doc) {
                 if (xFlipVert) poly.Mirror();
                 if (xRotate90) poly.Rot90();
                 poly.Scale(scaleX, scaleY);
+                poly.CleanUp(node, 2*MinLineLength);
                 poly.WriteToPugiNode(node, decimals);
+            }
+            if (poly.CheckIndex() == true) {
                 ElmtMinMax.addx(poly.GetMinX());
                 ElmtMinMax.addx(poly.GetMaxX());
                 ElmtMinMax.addy(poly.GetMinY());
