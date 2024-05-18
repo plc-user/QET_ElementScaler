@@ -466,7 +466,7 @@ void ProcessElement(pugi::xml_node doc) {
         }
         if ((std::string(node.name())) == "line") {
             ElmtLine line;
-            if ((line.ReadFromPugiNode(node) == true) && (line.GetLength() >= MinLineLength)) {
+            if ((line.ReadFromPugiNode(node) == true) && (line.GetLength() >= 1.5*MinLineLength)) {
                 if (xFlipHor)  line.Flip();
                 if (xFlipVert) line.Mirror();
                 if (xRotate90) line.Rot90();
@@ -487,8 +487,8 @@ void ProcessElement(pugi::xml_node doc) {
                 if (xFlipHor)  poly.Flip();
                 if (xFlipVert) poly.Mirror();
                 if (xRotate90) poly.Rot90();
+                poly.CleanUp(node, 1.5*MinLineLength);
                 poly.Scale(scaleX, scaleY);
-                poly.CleanUp(node, 2*MinLineLength);
                 poly.WriteToPugiNode(node, decimals);
             }
             if (poly.CheckIndex() == true) {
