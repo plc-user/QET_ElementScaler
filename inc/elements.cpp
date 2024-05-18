@@ -1076,6 +1076,8 @@ bool ElmtLine::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     node.attribute("x2").set_value(FormatValue(std::get<1>(polygon[1]), decimals).c_str());
     node.attribute("y1").set_value(FormatValue(std::get<2>(polygon[0]), decimals).c_str());
     node.attribute("y2").set_value(FormatValue(std::get<2>(polygon[1]), decimals).c_str());
+    node.attribute("length1").set_value(FormatValue(length1, decimals).c_str());
+    node.attribute("length2").set_value(FormatValue(length2, decimals).c_str());
     return true;
 }
 // ---

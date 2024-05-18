@@ -465,8 +465,8 @@ class ElmtLine : public ElmtPolygon {
       //void Rot90(void);  // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
       void Scale(const double factX=1.0, const double factY=1.0) {
                          ElmtPolygon::Scale(factX, factY);
-                         length1 *= std::min(factX, factY);
-                         length2 *= std::min(factX, factY);
+                         length1 *= std::min(factX, factY); length1 = std::min(length1, 99.0);
+                         length2 *= std::min(factX, factY); length2 = std::min(length2, 99.0);
                        }
       std::string AsSVGstring(const uint8_t);
 };
