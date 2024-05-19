@@ -414,6 +414,7 @@ void ProcessElement(pugi::xml_node doc) {
             ElmtMinMax.addx(elli.GetX()+elli.GetWidth());
             ElmtMinMax.addy(elli.GetY());
             ElmtMinMax.addy(elli.GetY()+elli.GetHeight());
+            node.set_name("ellipse");
         }
         if ((std::string(node.name())) == "text") {
             ElmtText text;
