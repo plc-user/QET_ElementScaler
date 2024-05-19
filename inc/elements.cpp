@@ -672,10 +672,14 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node node)
 // ---
 bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
 {   // Noch nicht komplett implementiert
-    if (!(node.attribute("closed")) && (closed == false))
-        node.prepend_attribute("closed").set_value("false");
-    if ( (node.attribute("closed")) && (closed == true))
+    if (node.attribute("closed"))
         node.remove_attribute("closed");
+    // egal was QET macht: "closed" ist hier immer drin:
+    if (closed == true)
+        node.prepend_attribute("closed").set_value("true");
+    else
+        node.prepend_attribute("closed").set_value("false");
+    // und nun die Polygon-Punkte hinten dran:
     for (const auto &i : polygon) {
         std::string s = "";
         s = "x" + std::to_string(std::get<0>(i));
