@@ -74,7 +74,7 @@ static bool xDynTextsUUIDsUnique = true;
 
 // max. Number of decimals:
 static size_t decimals = 2;    // number of decimals for floating-point values
-static double MinLineLength = 0.01;  //
+static double MinLineLength = 0.015;  //
 
 static double scaleX = 1.0;
 static double scaleY = 1.0;
@@ -181,7 +181,7 @@ int parseCommandline(int argc, char *argv[]) {
                     if (_DEBUG_)
                         std::cerr << "set number of decimals to " << optarg << "\n";
                     decimals = stoi(std::string(optarg));
-                    MinLineLength = 1;
+                    MinLineLength = 1.5;
                     for (uint8_t i=0; i < decimals; i++) { MinLineLength /= 10.0; }
                 }
                 break;
@@ -467,12 +467,15 @@ void ProcessElement(pugi::xml_node doc) {
         }
         if ((std::string(node.name())) == "line") {
             ElmtLine line;
-            if ((line.ReadFromPugiNode(node) == true) && (line.GetLength() >= 1.5*MinLineLength)) {
+            if (line.ReadFromPugiNode(node) == true) {
                 if (xFlipHor)  line.Flip();
                 if (xFlipVert) line.Mirror();
                 if (xRotate90) line.Rot90();
                 line.Scale(scaleX, scaleY);
+                line.CleanUp(node, MinLineLength);
                 line.WriteToPugiNode(node, decimals);
+            }
+            if (line.CheckIndex() == true) {
                 ElmtMinMax.addx(line.GetMinX());
                 ElmtMinMax.addx(line.GetMaxX());
                 ElmtMinMax.addy(line.GetMinY());
@@ -488,8 +491,8 @@ void ProcessElement(pugi::xml_node doc) {
                 if (xFlipHor)  poly.Flip();
                 if (xFlipVert) poly.Mirror();
                 if (xRotate90) poly.Rot90();
-                poly.CleanUp(node, 1.5*MinLineLength);
                 poly.Scale(scaleX, scaleY);
+                poly.CleanUp(node, MinLineLength);
                 poly.WriteToPugiNode(node, decimals);
             }
             if (poly.CheckIndex() == true) {
