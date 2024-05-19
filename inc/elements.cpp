@@ -69,7 +69,7 @@ void DefinitionLine::ReCalc(RectMinMax XYMinMax) {
 }
 // ---
 bool DefinitionLine::WriteToPugiNode(pugi::xml_node node)
-{
+{   // sort attributes:
     node.remove_attribute("version");
     node.append_attribute("version").set_value(version.c_str());
     node.remove_attribute("type");
@@ -949,13 +949,18 @@ bool ElmtEllipse::ReadFromPugiNode(pugi::xml_node node)
 {
     x         = node.attribute("x").as_double();
     y         = node.attribute("y").as_double();
-    if (std::string(node.name()) == "ellipse") {
+    if (node.attribute("width"))
         width     = node.attribute("width").as_double();
+    else
+        node.append_attribute("width");
+    if (node.attribute("height"))
         height    = node.attribute("height").as_double();
-    }
-    if (std::string(node.name()) == "circle") {
+    else
+        node.append_attribute("height");
+    if (node.attribute("diameter")) {
         width     = node.attribute("diameter").as_double();
         height    = width;
+        node.remove_attribute("diameter");
     }
     antialias = node.attribute("antialias").as_string();
     style     = node.attribute("style").as_string();
@@ -963,18 +968,31 @@ bool ElmtEllipse::ReadFromPugiNode(pugi::xml_node node)
 }
 // ---
 bool ElmtEllipse::WriteToPugiNode(pugi::xml_node node, size_t decimals)
-{
-    node.attribute("x").set_value(FormatValue(x, decimals).c_str());
-    node.attribute("y").set_value(FormatValue(y, decimals).c_str());
-    if (std::string(node.name()) == "ellipse") {
-        node.attribute("width").set_value(FormatValue(width, decimals).c_str());
-        node.attribute("height").set_value(FormatValue(height, decimals).c_str());
+{   // sort attributes:
+    if (node.attribute("x")){
+        node.remove_attribute("x");
+        node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
     }
-    if (std::string(node.name()) == "circle") {
-        node.attribute("diameter").set_value(FormatValue(width, decimals).c_str());
+    if (node.attribute("y")){
+        node.remove_attribute("y");
+        node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
     }
-    node.attribute("antialias").set_value(antialias.c_str());
-    node.attribute("style").set_value(style.c_str());
+    if (node.attribute("width")){
+        node.remove_attribute("width");
+        node.append_attribute("width").set_value(FormatValue(width, decimals).c_str());
+    }
+    if (node.attribute("height")){
+        node.remove_attribute("height");
+        node.append_attribute("height").set_value(FormatValue(height, decimals).c_str());
+    }
+    if (node.attribute("style")){
+        node.remove_attribute("style");
+        node.append_attribute("style").set_value(style.c_str());
+    }
+    if (node.attribute("antialias")){
+        node.remove_attribute("antialias");
+        node.append_attribute("antialias").set_value(antialias.c_str());
+    }
     return true;
 }
 // ---
