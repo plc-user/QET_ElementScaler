@@ -42,7 +42,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta15";
+const std::string sVersion = "v0.5.0beta16";
 
 // the element-file to process:
 static std::string ElementFile       = "";
