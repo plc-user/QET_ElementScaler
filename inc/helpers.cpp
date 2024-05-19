@@ -45,10 +45,12 @@ struct DecSep : std::numpunct<char> {
 /****************************************************************************/
 /****************************************************************************/
 std::string FormatValue(const double value, const size_t dec){
-    size_t i = 0; // index for loops
+    if (dec == 0) {
+        return std::to_string(int(std::round(value)));
+    }
     double val = value;
     double epsilon = 0.1; // too small values will be set to "0"
-    for (i=0; i<dec; i++)
+    for (size_t i=0; i<dec; i++)
         epsilon = epsilon / 10.0;
     if (val < 0.0){    // for negative values
         if (val >= (epsilon * (-1.0)))
@@ -57,7 +59,7 @@ std::string FormatValue(const double value, const size_t dec){
         if (val <= epsilon)
             val = 0.0;
     }
-    for (i=0; i<dec; i++)
+    for (size_t i=0; i<dec; i++)
         val = (val * 10.0);
     long int iVal = round(val);
     // we're done, if "0"
@@ -66,7 +68,7 @@ std::string FormatValue(const double value, const size_t dec){
     // additional rounding, if value is VERY close to the next integer:
     if (dec>1) {
         int Divider = 1;
-        for (i=0; i<dec; i++) Divider *= 10;
+        for (size_t i=0; i<dec; i++) Divider *= 10;
         int Rest = iVal % Divider;
         if (((Rest > 0) && (Rest <  5)) || ((Rest < 0) && (Rest > -5))) {
             if (_DEBUG_) std::cerr << "Divider: " << Divider << " - Rest: " << Rest
@@ -87,7 +89,7 @@ std::string FormatValue(const double value, const size_t dec){
 
     // prepare to return the new value as string
     double dVal = iVal;
-    for (i=0; i<dec; i++)
+    for (size_t i=0; i<dec; i++)
         dVal = (dVal / 10.0);
     std::stringstream ss;
     ss.imbue(std::locale(std::cout.getloc(), new DecSep));
