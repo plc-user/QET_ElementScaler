@@ -121,7 +121,7 @@ class BaseElement {
 class BaseStyle {
    protected:
       // enthält Daten zu Linien-Stil, etc:
-      std::string antialias = "false";
+      bool        antialias = false;
       std::string style = "line-style:normal;line-weight:normal;filling:none;color:black";
       std::string lineStyle = "normal"; // "normal", "dotted", "dashed", "dash-dotted"
       std::string lineWeight = "normal"; // "none", "thin", "normal", "hight", "eleve"
@@ -131,7 +131,7 @@ class BaseStyle {
       BaseStyle() {
                    // std::cerr << " default-constructor BaseStyle\n";
                   }
-      std::string GetAntialias() { return antialias; }
+      bool        GetAntialias() { return antialias; }
       std::string GetStyle() { return style; }
       double GetLineWidth() {
               if      (lineWeight == "none")
@@ -147,7 +147,7 @@ class BaseStyle {
               else
                   return 1.0;
       }
-      void SetAntialias(const std::string val) { antialias = val; }
+      void SetAntialias(const bool val) { antialias = val; }
       void SetStyle(const std::string val) { style = val; }
       std::string StyleAsSVGstring(const uint8_t);
 };

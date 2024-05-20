@@ -558,7 +558,7 @@ bool ElmtArc::ReadFromPugiNode(pugi::xml_node node)
     height    = node.attribute("height").as_double();
     start     = node.attribute("start").as_double();
     angle     = node.attribute("angle").as_double();
-    antialias = node.attribute("antialias").as_string();
+    antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
 
     Normalize();
@@ -603,7 +603,8 @@ bool ElmtArc::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     node.remove_attribute("style");
     node.append_attribute("style").set_value(style.c_str());
     node.remove_attribute("antialias");
-    node.append_attribute("antialias").set_value(antialias.c_str());
+    node.append_attribute("antialias").set_value(antialias);
+    return true;
 }
 // ---
 void ElmtArc::Rot90(void)
@@ -648,7 +649,7 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node node)
 {
     if (node.attribute("closed"))
         closed    = node.attribute("closed").as_bool();
-    antialias = node.attribute("antialias").as_string();
+    antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
     // walk through the attributes to read all points:
     for (pugi::xml_attribute attr: node.attributes()) {
@@ -681,7 +682,7 @@ bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
 {   // wir sortieren die Attribute:
     if (node.attribute("antialias"))
         node.remove_attribute("antialias");
-    node.prepend_attribute("antialias").set_value(antialias.c_str());
+    node.prepend_attribute("antialias").set_value(antialias);
     if (node.attribute("closed"))
         node.remove_attribute("closed");
     // egal was QET macht: "closed" ist hier immer drin:
@@ -966,7 +967,7 @@ bool ElmtEllipse::ReadFromPugiNode(pugi::xml_node node)
         height    = width;
         node.remove_attribute("diameter");
     }
-    antialias = node.attribute("antialias").as_string();
+    antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
     return true;
 }
@@ -995,7 +996,7 @@ bool ElmtEllipse::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     }
     if (node.attribute("antialias")){
         node.remove_attribute("antialias");
-        node.append_attribute("antialias").set_value(antialias.c_str());
+        node.append_attribute("antialias").set_value(antialias);
     }
     return true;
 }
@@ -1037,7 +1038,7 @@ bool ElmtRect::ReadFromPugiNode(const pugi::xml_node node)
     ry        = node.attribute("ry").as_double();
     width     = node.attribute("width").as_double();
     height    = node.attribute("height").as_double();
-    antialias = node.attribute("antialias").as_string();
+    antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
     return true;
 }
@@ -1050,7 +1051,7 @@ bool ElmtRect::WriteToPugiNode(const pugi::xml_node node, const size_t decimals)
     node.attribute("ry").set_value(FormatValue(ry, decimals).c_str());
     node.attribute("width").set_value(FormatValue(width, decimals).c_str());
     node.attribute("height").set_value(FormatValue(height, decimals).c_str());
-    node.attribute("antialias").set_value(antialias.c_str());
+    node.attribute("antialias").set_value(antialias);
     node.attribute("style").set_value(style.c_str());
     return true;
 }
@@ -1091,7 +1092,7 @@ bool ElmtLine::ReadFromPugiNode(pugi::xml_node node)
     length2   = node.attribute("length2").as_double();
     end1      = node.attribute("end1").as_string();
     end2      = node.attribute("end2").as_string();
-    antialias = node.attribute("antialias").as_string();
+    antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
 
     InsertXYat(1, node.attribute("x1").as_double(), node.attribute("y1").as_double());
