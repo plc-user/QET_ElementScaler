@@ -587,16 +587,23 @@ void ElmtArc::DetermineMinMax(){
 }
 // ---
 bool ElmtArc::WriteToPugiNode(pugi::xml_node node, size_t decimals)
-{
-    node.attribute("x").set_value(FormatValue(x, decimals).c_str());
-    node.attribute("y").set_value(FormatValue(y, decimals).c_str());
-    node.attribute("width").set_value(FormatValue(width, decimals).c_str());
-    node.attribute("height").set_value(FormatValue(height, decimals).c_str());
-    node.attribute("start").set_value(FormatValue(start, 0).c_str());
-    node.attribute("angle").set_value(FormatValue(angle, 0).c_str());
-    node.attribute("antialias").set_value(antialias.c_str());
-    node.attribute("style").set_value(style.c_str());
-    return true;
+{   // sort attributes:
+    node.remove_attribute("x");
+    node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    node.remove_attribute("y");
+    node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    node.remove_attribute("width");
+    node.append_attribute("width").set_value(FormatValue(width, decimals).c_str());
+    node.remove_attribute("height");
+    node.append_attribute("height").set_value(FormatValue(height, decimals).c_str());
+    node.remove_attribute("start");
+    node.append_attribute("start").set_value(FormatValue(start, 0).c_str());
+    node.remove_attribute("angle");
+    node.append_attribute("angle").set_value(FormatValue(angle, 0).c_str());
+    node.remove_attribute("style");
+    node.append_attribute("style").set_value(style.c_str());
+    node.remove_attribute("antialias");
+    node.append_attribute("antialias").set_value(antialias.c_str());
 }
 // ---
 void ElmtArc::Rot90(void)
