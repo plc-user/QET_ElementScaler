@@ -632,7 +632,7 @@ std::string ElmtArc::AsSVGstring(const uint8_t decimals)
     double ey = y + (height / 2.0) * (1 - sin((start+angle) / 360.0 * 2.0 * pi));
     s += FormatValue(ex, decimals) + " " + FormatValue(ey, decimals) + "\" ";
     //
-    s += StyleAsSVGstring(2);
+    s += StyleAsSVGstring(decimals);
     return s + "/>";
 }
 //
@@ -892,7 +892,7 @@ std::string ElmtPolygon::AsSVGstring(const uint8_t decimals)
     s[s.length()-1] = '\"';
     s += " ";
     //
-    s += StyleAsSVGstring(2);
+    s += StyleAsSVGstring(decimals);
     return s + "/>";
 }
 // ---
@@ -1015,7 +1015,7 @@ std::string ElmtEllipse::AsSVGstring(const uint8_t decimals)
     s += "rx=\"" + FormatValue(width/2, decimals) + "\" ";
     s += "ry=\"" + FormatValue(height/2, decimals) + "\" ";
     //
-    s += StyleAsSVGstring(2);
+    s += StyleAsSVGstring(decimals);
     return s + "/>";
 }
 //
@@ -1072,7 +1072,7 @@ std::string ElmtRect::AsSVGstring(const uint8_t decimals)
     if (rx > 0.0) s += "rx=\"" + FormatValue(rx, decimals) + "\" ";
     if (ry > 0.0) s += "ry=\"" + FormatValue(ry, decimals) + "\" ";
     //
-    s += StyleAsSVGstring(2);
+    s += StyleAsSVGstring(decimals);
     return s + "/>";
 }
 //
@@ -1118,7 +1118,7 @@ std::string ElmtLine::AsSVGstring(const uint8_t decimals)
     // Hier müssen die Enden mit verwurstet werden: Alles in eine Gruppierung
     std::string s = "<g ";
     // hier kommen die Linienattribute mit rein
-    s += StyleAsSVGstring(2);
+    s += StyleAsSVGstring(decimals);
     // Anfang auf x1|y1 verschieben:
     s += "transform=\"translate(" + FormatValue(std::get<1>(polygon[0]), decimals) + ","
                                   + FormatValue(std::get<2>(polygon[0]), decimals) + ")";
