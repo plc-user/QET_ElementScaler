@@ -685,10 +685,7 @@ bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     if (node.attribute("closed"))
         node.remove_attribute("closed");
     // egal was QET macht: "closed" ist hier immer drin:
-    if (closed == true)
-        node.prepend_attribute("closed").set_value("true");
-    else
-        node.prepend_attribute("closed").set_value("false");
+    node.prepend_attribute("closed").set_value(closed);
     if (node.attribute("style"))
         node.remove_attribute("style");
     node.prepend_attribute("style").set_value(style.c_str());
