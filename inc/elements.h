@@ -70,9 +70,9 @@ class DefinitionLine {
       int hotspot_x = 5;
       int hotspot_y = 6;
    public:
-      bool ReadFromPugiNode(pugi::xml_node);
+      void ReadFromPugiNode(pugi::xml_node);
       void ReCalc(RectMinMax);
-      bool WriteToPugiNode(pugi::xml_node);
+      void WriteToPugiNode(pugi::xml_node);
       int Getwidth(){ return width; }
       int Getheight(){ return height; }
       int Gethotspot_x(){ return hotspot_x; }
@@ -149,7 +149,7 @@ class BaseStyle {
       }
       void SetAntialias(const bool val) { antialias = val; }
       void SetStyle(const std::string val) { style = val; }
-      std::string StyleAsSVGstring(const uint8_t);
+      std::string StyleAsSVGstring(const size_t&);
 };
 //
 //--- END - definition of class "BaseStyle" ------------------------------------
@@ -265,8 +265,8 @@ class ElmtDynText : public BaseElement,
                          text_from = "ElementInfo";
                          SplitFontString();
                        }
-      bool ReadFromPugiNode(pugi::xml_node);
-      bool WriteToPugiNode(pugi::xml_node, size_t);
+      void ReadFromPugiNode(pugi::xml_node&);
+      void WriteToPugiNode(pugi::xml_node&, const size_t&);
       void SplitFontString(void);
       void CreateFontString(void);
       int GetSize(void) { return (int)round(size); }
@@ -279,7 +279,7 @@ class ElmtDynText : public BaseElement,
                        size *= std::min(factX, factY);
                        CreateFontString();
                        }
-      std::string AsSVGstring(const uint8_t);
+      std::string AsSVGstring(const size_t&);
 };
 //
 //--- END - definition of class "ElmtDynText" ----------------------------------
@@ -335,8 +335,8 @@ class ElmtText : public BaseElement,
                          size = 11.1; text = "_"; color = "#000000";
                          SplitFontString();
                        }
-      bool ReadFromPugiNode(pugi::xml_node);
-      bool WriteToPugiNode(pugi::xml_node, size_t);
+      void ReadFromPugiNode(pugi::xml_node&);
+      void WriteToPugiNode(pugi::xml_node&, const size_t&);
       void SplitFontString(void);
       void CreateFontString(void);
       int GetSize(void) { return (int)round(size); }
@@ -349,7 +349,7 @@ class ElmtText : public BaseElement,
                        size *= std::min(factX, factY);
                        CreateFontString();
                        }
-      std::string AsSVGstring(const uint8_t);
+      std::string AsSVGstring(const size_t&);
 };
 //
 //--- END - definition of class "ElmtText" -------------------------------------
@@ -375,8 +375,8 @@ class ElmtPolygon : public BaseElement,
       ElmtPolygon(std::string s) : BaseElement(s) {
                        //std::cerr << "         constructor ElmtPolygon - Typ: " << Type << "\n";
                        }
-      bool ReadFromPugiNode(pugi::xml_node);
-      bool WriteToPugiNode(pugi::xml_node, size_t);
+      bool ReadFromPugiNode(pugi::xml_node&);
+      void WriteToPugiNode(pugi::xml_node&, const size_t&);
       void InsertXat(uint64_t, double);
       void InsertYat(uint64_t, double);
       void InsertXYat(uint64_t, double, double);
@@ -412,7 +412,7 @@ class ElmtPolygon : public BaseElement,
                          for(const auto &i : polygon)
                              std::cout<<std::get<0>(i)<<" - "<<std::get<1>(i)<<" - "<<std::get<2>(i)<<"\n";
                          }
-      std::string AsSVGstring(const uint8_t);
+      std::string AsSVGstring(const size_t&);
       void Flip(void);   // vertikal
       void Mirror(void); // horizontal
       void Rot90(void);  // rotate clockwise by 90°
@@ -440,8 +440,8 @@ class ElmtLine : public ElmtPolygon {
       ElmtLine() : ElmtPolygon("line") {
                        //std::cerr << " default-constructor ElmtLine - Typ: " << Type << "\n";
                        }
-      bool ReadFromPugiNode(pugi::xml_node);
-      bool WriteToPugiNode(pugi::xml_node, size_t);
+      bool ReadFromPugiNode(pugi::xml_node&);
+      void WriteToPugiNode(pugi::xml_node&, const size_t&);
       double GetLength(void) {
           return (sqrt( pow((std::get<2>(polygon[1])-(std::get<2>(polygon[0]))), 2) +
                         pow((std::get<1>(polygon[1])-(std::get<1>(polygon[0]))), 2)) );
@@ -468,7 +468,7 @@ class ElmtLine : public ElmtPolygon {
                          length1 *= std::min(factX, factY); length1 = std::min(length1, 99.0);
                          length2 *= std::min(factX, factY); length2 = std::min(length2, 99.0);
                        }
-      std::string AsSVGstring(const uint8_t);
+      std::string AsSVGstring(const size_t&);
 };
 //
 //--- END - definition of class "ElmtLine" -------------------------------------
@@ -493,8 +493,8 @@ class ElmtEllipse : public BaseElement,
                        //std::cerr << " default-constructor ElmtEllipse - Typ: " << Type << "\n";
                        }
       void Clear(void) { BasePosition::Clear(); BaseSize::Clear(); }
-      bool ReadFromPugiNode(pugi::xml_node);
-      bool WriteToPugiNode(pugi::xml_node, size_t);
+      void ReadFromPugiNode(pugi::xml_node&);
+      void WriteToPugiNode(pugi::xml_node&, const size_t&);
       void Flip(void)   { y = (-1) * y - height; }
       void Mirror(void) { x = (-1) * x - width; }
       void Rot90();  // rotate clockwise by 90°
@@ -502,7 +502,7 @@ class ElmtEllipse : public BaseElement,
                        x     *= factX;      y *= factY;
                        width *= factX; height *= factY;
                        }
-      std::string AsSVGstring(const uint8_t);
+      std::string AsSVGstring(const size_t&);
 };
 //
 //--- END - definition of class "ElmtEllipse" ----------------------------------
@@ -528,8 +528,8 @@ class ElmtRect : public BaseElement,
                        //std::cerr << " default-constructor ElmtRect - Typ: " << Type << "\n";
                        }
       void Clear(void) { BasePosition::Clear(); BaseSize::Clear(); rx = 0.0; ry = 0.0; }
-      bool ReadFromPugiNode(pugi::xml_node);
-      bool WriteToPugiNode(pugi::xml_node, size_t);
+      void ReadFromPugiNode(pugi::xml_node&);
+      void WriteToPugiNode(pugi::xml_node&, const size_t&);
       double GetRx(void)      { return rx; }
       double GetRy(void)      { return ry; }
       void SetRx(const double val)      { rx = val; }
@@ -542,7 +542,7 @@ class ElmtRect : public BaseElement,
                        rx    *= factX;     ry *= factY;
                        width *= factX; height *= factY;
                        }
-      std::string AsSVGstring(const uint8_t);
+      std::string AsSVGstring(const size_t&);
 };
 //
 //--- END - definition of class "ElmtRect" -------------------------------------
@@ -577,8 +577,8 @@ class ElmtArc : public BaseElement,
       double GetAngle()  { return angle; }
       //
       void Clear(void) { BasePosition::Clear(); BaseSize::Clear(); start = 0.0; angle = 0.0; }
-      bool ReadFromPugiNode(pugi::xml_node);
-      bool WriteToPugiNode(pugi::xml_node, size_t);
+      void ReadFromPugiNode(pugi::xml_node&);
+      void WriteToPugiNode(pugi::xml_node&, const size_t&);
       double GetMinX() { return MinX; }
       double GetMaxX() { return MaxX; }
       double GetMinY() { return MinY; }
@@ -596,7 +596,7 @@ class ElmtArc : public BaseElement,
                        width *= factX; height *= factY;
                        DetermineMinMax();
                        }
-      std::string AsSVGstring(const uint8_t);
+      std::string AsSVGstring(const size_t&);
 };
 //
 //--- END - definition of class "ElmtArc" --------------------------------------
@@ -622,8 +622,8 @@ class ElmtTerminal : public BaseElement,
                        //std::cerr << " default-constructor Terminal - Typ: " << Type << "\n";
                        }
       void Clear(void) { x = 0.0; y = 0.0; orientation = "n"; type = "Generic"; name = ""; uuid = ""; }
-      bool ReadFromPugiNode(pugi::xml_node);
-      bool WriteToPugiNode(pugi::xml_node);
+      void ReadFromPugiNode(pugi::xml_node&);
+      void WriteToPugiNode(pugi::xml_node&);
       void CreateNewUUID(void) { uuid = "{" + CreateUUID(false) + "}"; }
       std::string GetOrientation() { return orientation; }
       std::string GetType()        { return type; }
@@ -633,7 +633,7 @@ class ElmtTerminal : public BaseElement,
       void SetType(const std::string val)        { type = val; }
       void SetName(const std::string val)        { name = val; }
       void SetUUID(const std::string val)        { uuid = val; }
-      std::string AsSVGstring(const uint8_t);
+      std::string AsSVGstring(const size_t&);
       void Flip(void) { y *= (-1.0);
                         if (orientation == "n") orientation = "s";
                         if (orientation == "s") orientation = "n"; }   // vertikal

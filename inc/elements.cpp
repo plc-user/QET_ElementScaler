@@ -36,7 +36,7 @@
 //
 //--- implementation of class "DefinitionLine" ---------------------------------
 //
-bool DefinitionLine::ReadFromPugiNode(pugi::xml_node node)
+void DefinitionLine::ReadFromPugiNode(pugi::xml_node node)
 {
     version   = node.attribute("version").as_string();
     link_type = node.attribute("link_type").as_string();
@@ -45,7 +45,6 @@ bool DefinitionLine::ReadFromPugiNode(pugi::xml_node node)
     height    = node.attribute("height").as_int();
     hotspot_x = node.attribute("hotspot_x").as_int();
     hotspot_y = node.attribute("hotspot_y").as_int();
-    return true;
 }
 // ---
 void DefinitionLine::ReCalc(RectMinMax XYMinMax) {
@@ -68,7 +67,7 @@ void DefinitionLine::ReCalc(RectMinMax XYMinMax) {
     hotspot_y = -((int)round(XYMinMax.ymin() - (ymargin/2)));
 }
 // ---
-bool DefinitionLine::WriteToPugiNode(pugi::xml_node node)
+void DefinitionLine::WriteToPugiNode(pugi::xml_node node)
 {   // sort attributes:
     node.remove_attribute("version");
     node.append_attribute("version").set_value(version.c_str());
@@ -84,7 +83,6 @@ bool DefinitionLine::WriteToPugiNode(pugi::xml_node node)
     node.append_attribute("hotspot_x").set_value(std::to_string(hotspot_x).c_str());
     node.remove_attribute("hotspot_y");
     node.append_attribute("hotspot_y").set_value(std::to_string(hotspot_y).c_str());
-    return true;
 }
 //
 //--- END - implementation of class "DefinitionLine" ---------------------------
@@ -95,7 +93,7 @@ bool DefinitionLine::WriteToPugiNode(pugi::xml_node node)
 //
 //--- implementation of class "BaseStyle" --------------------------------------
 //
-std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
+std::string BaseStyle::StyleAsSVGstring(const size_t& decimals)
 {
 // in Element:   style = "line-style:normal;line-weight:normal;filling:none;color:black"
 // SVG-Beispiel: style="fill:yellow;stroke:purple;stroke-width:2"
@@ -181,7 +179,7 @@ std::string BaseStyle::StyleAsSVGstring(const uint8_t decimals)
 //
 //--- implementation of class "ElmtDynText" ------------------------------------
 //
-bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
+void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)
 {
     x         = node.attribute("x").as_double();
     y         = node.attribute("y").as_double();
@@ -237,10 +235,9 @@ bool ElmtDynText::ReadFromPugiNode(pugi::xml_node node)
       vsFont[1] = FormatValue(size, 0);
       CreateFontString();
     }
-    return true;
 }
 // ---
-bool ElmtDynText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
+void ElmtDynText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {
     // Attribute löschen und in umgekehrter Reihenfolge VORNE wieder einfügen:
     if (node.attribute("text_width")) {
@@ -282,7 +279,6 @@ bool ElmtDynText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
         node.child("color").child_value(color.c_str());
     if (node.child("info_name"))
         node.child("info_name").child_value(info_name.c_str());
-    return true;
 }
 // ---
 void ElmtDynText::Rot90(void){
@@ -293,7 +289,7 @@ void ElmtDynText::Rot90(void){
     }
 }
 // ---
-std::string ElmtDynText::AsSVGstring(const uint8_t decimals)
+std::string ElmtDynText::AsSVGstring(const size_t& decimals)
 {
     // Positionen x, y, rotationspunkt, für die beiden Varianten berechnen
     double posx;
@@ -375,7 +371,7 @@ void ElmtDynText::CreateFontString(void)
 //
 //--- implementation of class "ElmtText" --------------------------------------
 //
-bool ElmtText::ReadFromPugiNode(pugi::xml_node node)
+void ElmtText::ReadFromPugiNode(pugi::xml_node& node)
 {
     x         = node.attribute("x").as_double();
     y         = node.attribute("y").as_double();
@@ -398,10 +394,9 @@ bool ElmtText::ReadFromPugiNode(pugi::xml_node node)
       vsFont[1] = FormatValue(size, 0);
       CreateFontString();
     }
-    return true;
 }
 // ---
-bool ElmtText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
+void ElmtText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes by removing and re-adding
     node.remove_attribute("text");
     node.prepend_attribute("text").set_value(text.c_str());
@@ -425,7 +420,6 @@ bool ElmtText::WriteToPugiNode(pugi::xml_node node, size_t decimals)
         node.remove_attribute("color");
         node.append_attribute("color").set_value(color.c_str());
     }
-    return true;
 }
 // ---
 void ElmtText::Rot90(void){
@@ -436,7 +430,7 @@ void ElmtText::Rot90(void){
     }
 }
 // ---
-std::string ElmtText::AsSVGstring(const uint8_t decimals)
+std::string ElmtText::AsSVGstring(const size_t& decimals)
 {
     // mehrzeiliger Text wird in einem "Vector of String" abgelegt
     // als Trennzeichen für die Teil-Strings: "\n" und "\r"
@@ -550,7 +544,7 @@ void ElmtArc::SetData(double X, double Y,
     Normalize();
 }
 //---
-bool ElmtArc::ReadFromPugiNode(pugi::xml_node node)
+void ElmtArc::ReadFromPugiNode(pugi::xml_node& node)
 {
     x         = node.attribute("x").as_double();
     y         = node.attribute("y").as_double();
@@ -563,7 +557,6 @@ bool ElmtArc::ReadFromPugiNode(pugi::xml_node node)
 
     Normalize();
     DetermineMinMax();
-    return true;
 }
 // ---
 void ElmtArc::DetermineMinMax(){
@@ -586,7 +579,7 @@ void ElmtArc::DetermineMinMax(){
     }
 }
 // ---
-bool ElmtArc::WriteToPugiNode(pugi::xml_node node, size_t decimals)
+void ElmtArc::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes:
     node.remove_attribute("x");
     node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
@@ -604,7 +597,6 @@ bool ElmtArc::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     node.append_attribute("style").set_value(style.c_str());
     node.remove_attribute("antialias");
     node.append_attribute("antialias").set_value(antialias);
-    return true;
 }
 // ---
 void ElmtArc::Rot90(void)
@@ -615,7 +607,7 @@ void ElmtArc::Rot90(void)
     SwapWidhHeight();
 }
 // ---
-std::string ElmtArc::AsSVGstring(const uint8_t decimals)
+std::string ElmtArc::AsSVGstring(const size_t& decimals)
 {
     const double pi = 3.141592653589793116; // also in <cmath> as M_PI
     std::string s = "<path d=\"M ";
@@ -645,7 +637,7 @@ std::string ElmtArc::AsSVGstring(const uint8_t decimals)
 //
 //--- implementation of class "ElmtPolygon" ------------------------------------
 //
-bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node node)
+bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node& node)
 {
     if (node.attribute("closed"))
         closed    = node.attribute("closed").as_bool();
@@ -678,7 +670,7 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node node)
     return CheckIndex();
 }
 // ---
-bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
+void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // wir sortieren die Attribute:
     if (node.attribute("antialias"))
         node.remove_attribute("antialias");
@@ -700,7 +692,6 @@ bool ElmtPolygon::WriteToPugiNode(pugi::xml_node node, size_t decimals)
         node.remove_attribute(s.c_str());   // to sort the polygon-points...
         node.append_attribute(s.c_str()).set_value(FormatValue(std::get<2>(i), decimals).c_str());
     }
-    return true;
 }
 // ---
 bool ElmtPolygon::CheckIndex(void){
@@ -880,7 +871,7 @@ void ElmtPolygon::Scale(const double factX, const double factY)
     }
 }
 // ---
-std::string ElmtPolygon::AsSVGstring(const uint8_t decimals)
+std::string ElmtPolygon::AsSVGstring(const size_t& decimals)
 {
     if (polygon.size() == 0) return "<polygon />";
     std::string s = "<polygon points=\"";
@@ -950,7 +941,7 @@ void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
 //
 //--- implementation of class "ElmtEllipse" ------------------------------------
 //
-bool ElmtEllipse::ReadFromPugiNode(pugi::xml_node node)
+void ElmtEllipse::ReadFromPugiNode(pugi::xml_node& node)
 {
     x         = node.attribute("x").as_double();
     y         = node.attribute("y").as_double();
@@ -969,10 +960,9 @@ bool ElmtEllipse::ReadFromPugiNode(pugi::xml_node node)
     }
     antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
-    return true;
 }
 // ---
-bool ElmtEllipse::WriteToPugiNode(pugi::xml_node node, size_t decimals)
+void ElmtEllipse::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes:
     if (node.attribute("x")){
         node.remove_attribute("x");
@@ -998,7 +988,6 @@ bool ElmtEllipse::WriteToPugiNode(pugi::xml_node node, size_t decimals)
         node.remove_attribute("antialias");
         node.append_attribute("antialias").set_value(antialias);
     }
-    return true;
 }
 // ---
 void ElmtEllipse::Rot90(void)
@@ -1007,7 +996,7 @@ void ElmtEllipse::Rot90(void)
     SwapWidhHeight();
 }
 // ---
-std::string ElmtEllipse::AsSVGstring(const uint8_t decimals)
+std::string ElmtEllipse::AsSVGstring(const size_t& decimals)
 {
     std::string s = "<ellipse ";
     //
@@ -1030,7 +1019,7 @@ std::string ElmtEllipse::AsSVGstring(const uint8_t decimals)
 //
 //--- implementation of class "ElmtRect" ---------------------------------------
 //
-bool ElmtRect::ReadFromPugiNode(const pugi::xml_node node)
+void ElmtRect::ReadFromPugiNode(pugi::xml_node& node)
 {
     x         = node.attribute("x").as_double();
     y         = node.attribute("y").as_double();
@@ -1040,10 +1029,9 @@ bool ElmtRect::ReadFromPugiNode(const pugi::xml_node node)
     height    = node.attribute("height").as_double();
     antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
-    return true;
 }
 // ---
-bool ElmtRect::WriteToPugiNode(const pugi::xml_node node, const size_t decimals)
+void ElmtRect::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {
     node.attribute("x").set_value(FormatValue(x, decimals).c_str());
     node.attribute("y").set_value(FormatValue(y, decimals).c_str());
@@ -1053,7 +1041,7 @@ bool ElmtRect::WriteToPugiNode(const pugi::xml_node node, const size_t decimals)
     node.attribute("height").set_value(FormatValue(height, decimals).c_str());
     node.attribute("antialias").set_value(antialias);
     node.attribute("style").set_value(style.c_str());
-    return true;
+
 }
 // ---
 void ElmtRect::Rot90(void)
@@ -1062,7 +1050,7 @@ void ElmtRect::Rot90(void)
     SwapWidhHeight();
 }
 // ---
-std::string ElmtRect::AsSVGstring(const uint8_t decimals)
+std::string ElmtRect::AsSVGstring(const size_t& decimals)
 {
     std::string s = "<rect ";
     //
@@ -1086,7 +1074,7 @@ std::string ElmtRect::AsSVGstring(const uint8_t decimals)
 //
 //--- implementation of class "ElmtLine" ---------------------------------------
 //
-bool ElmtLine::ReadFromPugiNode(pugi::xml_node node)
+bool ElmtLine::ReadFromPugiNode(pugi::xml_node& node)
 {
     length1   = node.attribute("length1").as_double();
     length2   = node.attribute("length2").as_double();
@@ -1097,11 +1085,10 @@ bool ElmtLine::ReadFromPugiNode(pugi::xml_node node)
 
     InsertXYat(1, node.attribute("x1").as_double(), node.attribute("y1").as_double());
     InsertXYat(2, node.attribute("x2").as_double(), node.attribute("y2").as_double());
-
-    return true;
+    return CheckIndex();
 }
 // ---
-bool ElmtLine::WriteToPugiNode(pugi::xml_node node, size_t decimals)
+void ElmtLine::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // Noch nicht komplett implementiert
     node.attribute("x1").set_value(FormatValue(std::get<1>(polygon[0]), decimals).c_str());
     node.attribute("x2").set_value(FormatValue(std::get<1>(polygon[1]), decimals).c_str());
@@ -1109,10 +1096,9 @@ bool ElmtLine::WriteToPugiNode(pugi::xml_node node, size_t decimals)
     node.attribute("y2").set_value(FormatValue(std::get<2>(polygon[1]), decimals).c_str());
     node.attribute("length1").set_value(FormatValue(length1, decimals).c_str());
     node.attribute("length2").set_value(FormatValue(length2, decimals).c_str());
-    return true;
 }
 // ---
-std::string ElmtLine::AsSVGstring(const uint8_t decimals)
+std::string ElmtLine::AsSVGstring(const size_t& decimals)
 {
     if (polygon.size() == 0) return "<line />";
 
@@ -1238,7 +1224,7 @@ std::string ElmtLine::AsSVGstring(const uint8_t decimals)
 //
 //--- implementation of class "ElmtTerminal" -----------------------------------
 //
-bool ElmtTerminal::ReadFromPugiNode(pugi::xml_node node)
+void ElmtTerminal::ReadFromPugiNode(pugi::xml_node& node)
 {
     x           = node.attribute("x").as_double();
     y           = node.attribute("y").as_double();
@@ -1252,11 +1238,9 @@ bool ElmtTerminal::ReadFromPugiNode(pugi::xml_node node)
         node.remove_attribute("uuid");
         node.prepend_attribute("uuid").set_value(uuid.c_str());
     }
-
-    return true;
 }
 // ---
-bool ElmtTerminal::WriteToPugiNode(pugi::xml_node node)
+void ElmtTerminal::WriteToPugiNode(pugi::xml_node& node)
 {
     // to achieve a constant order we need to remove and append attributes
     if (node.attribute("uuid")) {
@@ -1283,7 +1267,6 @@ bool ElmtTerminal::WriteToPugiNode(pugi::xml_node node)
         } else {
         node.append_attribute("type").set_value("Generic");
         }
-    return true;
 }
 // ---
 void ElmtTerminal::Rot90(void){
@@ -1296,7 +1279,7 @@ void ElmtTerminal::Rot90(void){
     }
 }
 // ---
-std::string ElmtTerminal::AsSVGstring(const uint8_t decimals)
+std::string ElmtTerminal::AsSVGstring(const size_t& decimals)
 {
     std::string s = "<use xlink:href=\"#terminal\" ";
     //
