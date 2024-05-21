@@ -78,11 +78,11 @@ class DefinitionLine {
       int Gethotspot_x(){ return hotspot_x; }
       int Gethotspot_y(){ return hotspot_y; }
       std::string Getlink_type() { return link_type; }
-      void Setwidth( int val ){ width = val; }
-      void Setheight( int val ){ height = val; }
-      void Sethotspot_x( int val ){ hotspot_x = val; }
-      void Sethotspot_y( int val ){ hotspot_y = val; }
-      void Setlinktype( std::string val ){ link_type = val; }
+      void Setwidth( const int val ){ width = val; }
+      void Setheight( const int val ){ height = val; }
+      void Sethotspot_x( const int val ){ hotspot_x = val; }
+      void Sethotspot_y( const int val ){ hotspot_y = val; }
+      void Setlinktype( const std::string val ){ link_type = val; }
       //
    private:
       //
@@ -105,7 +105,7 @@ class BaseElement {
       // enthält nur den Element-Typ:
       std::string Type = "BaseElement";
    public:
-      BaseElement(std::string s) {
+      BaseElement(const std::string s) {
                        Type = s;
                        //std::cerr << "         constructor BaseElement - Typ: " << Type << "\n";
                        }
@@ -377,11 +377,11 @@ class ElmtPolygon : public BaseElement,
                        }
       bool ReadFromPugiNode(pugi::xml_node&);
       void WriteToPugiNode(pugi::xml_node&, const size_t&);
-      void InsertXat(uint64_t, double);
-      void InsertYat(uint64_t, double);
-      void InsertXYat(uint64_t, double, double);
-      void AddPoint(double, double);
-      void AddPoint(uint64_t, double, double);
+      void InsertXat(const uint64_t, const double);
+      void InsertYat(const uint64_t, const double);
+      void InsertXYat(const uint64_t, const double, const double);
+      void AddPoint(const double, const double);
+      void AddPoint(const uint64_t, const double, const double);
       double GetMaxX() {
           double MaxX = -1e99;
           for (const auto &i : polygon)
@@ -583,7 +583,7 @@ class ElmtArc : public BaseElement,
       double GetMaxX() { return MaxX; }
       double GetMinY() { return MinY; }
       double GetMaxY() { return MaxY; }
-      void SetData(double, double, double, double, double, double);
+      void SetData(const double, const double, const double, const double, const double, const double);
       void SetStart(const double val) { start = val; Normalize(); }
       void SetAngle(const double val) { angle = val; Normalize(); }
       void Normalize();
@@ -661,13 +661,16 @@ class RectMinMax {
       double yMax = 0.0;
    public:
       RectMinMax();                  // default-constructor
-      RectMinMax(double, double);    // constructor with value
+      RectMinMax(const double,
+                 const double);      // constructor with value
       RectMinMax(const RectMinMax&); // copy-constructor
-      void addx(double);             // add a new x-value
-      void addy(double);             // add a new y-value
-      void add(double, double);      // add new values
+      void addx(const double);       // add a new x-value
+      void addy(const double);       // add a new y-value
+      void add(const double,
+               const double);        // add new values
       void clear(void);              // clear min/max and set to 0
-      void clear(double, double);    // clear min/max and set new values
+      void clear(const double,
+                 const double);      // clear min/max and set new values
       void clear(const RectMinMax&); // clear with value
       double xmin(void);             // returns minimum x-value
       double xmax(void);             // returns maximum x-value

@@ -143,7 +143,7 @@ void RemoveLeadingZeros(std::string& s)
 // ###     Implementation of function "TextToEntity"        ###
 // ############################################################
 //
-std::string TextToEntity(std::string& s){
+std::string TextToEntity(const std::string& s){
     std::string result = "";
     for (size_t i = 0; i<s.length(); i++)
     {

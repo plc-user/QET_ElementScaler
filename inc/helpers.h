@@ -53,7 +53,7 @@ void RemoveLeadingZeros(std::string& s);
 //
 // --- function-prototype for converting text to text with HTML-entities -------
 //
-std::string TextToEntity(std::string& s);
+std::string TextToEntity(const std::string& s);
 
 //
 // Funktionen, die vorher auch schon da waren

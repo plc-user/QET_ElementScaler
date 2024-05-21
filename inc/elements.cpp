@@ -713,7 +713,7 @@ bool ElmtPolygon::CheckIndex(void){
    return true;
 }
 // ---
-void ElmtPolygon::InsertXat(uint64_t idx, double val)
+void ElmtPolygon::InsertXat(const uint64_t idx, const double val)
 {
     if (_DEBUG_) std::cerr << " insert X-val ("<<val<<") with index " << idx << "\n";
     if (polygon.size() == 0) {
@@ -750,7 +750,7 @@ void ElmtPolygon::InsertXat(uint64_t idx, double val)
     }
 }
 //
-void ElmtPolygon::InsertYat(uint64_t idx, double val)
+void ElmtPolygon::InsertYat(const uint64_t idx, const double val)
 {
     if (_DEBUG_) std::cerr << " insert Y-val ("<<val<<") with index " << idx << "\n";
     if (polygon.size() == 0) {
@@ -787,7 +787,7 @@ void ElmtPolygon::InsertYat(uint64_t idx, double val)
     }
 }
 //
-void ElmtPolygon::InsertXYat(uint64_t idx, double xval, double yval)
+void ElmtPolygon::InsertXYat(const uint64_t idx, const double xval, const double yval)
 {
     if (_DEBUG_) std::cerr << " insert XY-val ("<<xval<<"|"<<yval<<") with index " << idx << "\n";
     if (polygon.size() == 0) {
@@ -825,7 +825,7 @@ void ElmtPolygon::InsertXYat(uint64_t idx, double xval, double yval)
     }
 }
 //
-void ElmtPolygon::AddPoint(double x, double y)
+void ElmtPolygon::AddPoint(const double x, const double y)
 {
     // der Index vom angefügten Punkt muß größer sein, als der vom letzten Punkt (Tuple-Position "0")
     uint64_t idx = 1;
@@ -837,7 +837,7 @@ void ElmtPolygon::AddPoint(double x, double y)
               << " Y = " << std::get<2>(polygon[polygon.size()-1]) << "\n";
 }
 //
-void ElmtPolygon::AddPoint(uint64_t idx, double x, double y)
+void ElmtPolygon::AddPoint(const uint64_t idx, const double x, const double y)
 {
     InsertXYat(idx, x, y);
 }
@@ -1325,7 +1325,7 @@ RectMinMax::RectMinMax(){
     yMin = 0.0;
     yMax = 0.0;
 }
-RectMinMax::RectMinMax(double x, double y){
+RectMinMax::RectMinMax(const double x, const double y){
     xMin = x;
     xMax = x;
     yMin = y;
@@ -1337,15 +1337,15 @@ RectMinMax::RectMinMax(const RectMinMax& r){
     yMin = r.yMin;
     yMax = r.yMax;
 }
-void RectMinMax::addx(double x){
+void RectMinMax::addx(const double x){
     if (x < xMin) { xMin = x; }
     if (x > xMax) { xMax = x; }
 }
-void RectMinMax::addy(double y){
+void RectMinMax::addy(const double y){
     if (y < yMin) { yMin = y; }
     if (y > yMax) { yMax = y; }
 }
-void RectMinMax::add(double x, double y){
+void RectMinMax::add(const double x, const double y){
     if (x < xMin) { xMin = x; }
     if (x > xMax) { xMax = x; }
     if (y < yMin) { yMin = y; }
@@ -1358,7 +1358,7 @@ void RectMinMax::clear(void){
     yMin = 0.0;
     yMax = 0.0;
 }
-void RectMinMax::clear(double x, double y){
+void RectMinMax::clear(const double x, const double y){
     xMin = x;
     xMax = x;
     yMin = y;

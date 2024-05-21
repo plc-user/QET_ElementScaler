@@ -85,8 +85,8 @@ static double scaleY = 1.0;
 int parseCommandline(int argc, char *argv[]);
 void PrintHelp(const std::string &s, const std::string &v);
 bool CheckUUIDs(void);
-void ProcessElement(pugi::xml_node);
-std::string ToSVG(pugi::xml_node node);
+void ProcessElement(pugi::xml_node&);
+std::string ToSVG(pugi::xml_node&);
 std::string CheckForDoubleString(std::string &sArg);
 
 
@@ -349,7 +349,7 @@ bool CheckUUIDs(void) {
 
 
 /******************************************************************************/
-void ProcessElement(pugi::xml_node doc) {
+void ProcessElement(pugi::xml_node& doc) {
     RectMinMax ElmtMinMax; // for Re-Calc of DefinitionLine!
 
     // create or renew element's uuid:
@@ -540,7 +540,7 @@ void ProcessElement(pugi::xml_node doc) {
 
 
 /******************************************************************************/
-std::string ToSVG(pugi::xml_node node) {
+std::string ToSVG(pugi::xml_node& node) {
     std::string s = "";
     s += "<svg xmlns=\"http://www.w3.org/2000/svg\"\n";
     s += "     xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n";
