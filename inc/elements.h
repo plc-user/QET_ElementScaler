@@ -407,7 +407,7 @@ class ElmtPolygon : public BaseElement,
           return MinY;
           }
       void Clear(){ polygon.clear(); closed = true; }
-      bool CheckIndex(void);
+      bool CheckIndex(const std::string);
       virtual void Write(void) {
                          for(const auto &i : polygon)
                              std::cout<<std::get<0>(i)<<" - "<<std::get<1>(i)<<" - "<<std::get<2>(i)<<"\n";

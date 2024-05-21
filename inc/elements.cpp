@@ -667,7 +667,7 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node& node)
         }
     } // for (pugi::xml_attribute ...
     // Check the Polygon:
-    return CheckIndex();
+    return CheckIndex("Polygon");
 }
 // ---
 void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
@@ -694,9 +694,9 @@ void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
     }
 }
 // ---
-bool ElmtPolygon::CheckIndex(void){
+bool ElmtPolygon::CheckIndex(const std::string sType){
    if (polygon.size() <= 1 ) {
-     std::cerr << "Polygon: not enough points!\n";
+     std::cerr << sType << ": not enough points!\n";
      return false;
    }
    if ( !(std::get<0>(polygon[polygon.size()-1]) == polygon.size()) ) {
@@ -1085,7 +1085,7 @@ bool ElmtLine::ReadFromPugiNode(pugi::xml_node& node)
 
     InsertXYat(1, node.attribute("x1").as_double(), node.attribute("y1").as_double());
     InsertXYat(2, node.attribute("x2").as_double(), node.attribute("y2").as_double());
-    return CheckIndex();
+    return CheckIndex("Line");
 }
 // ---
 void ElmtLine::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
