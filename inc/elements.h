@@ -59,7 +59,7 @@ void RotPoint90(double&, double&);
 //--- START - definition of definition-line of Elements ------------------------
 //
 class DefinitionLine {
-   protected:
+   private:
       // enthält nur den Element-Typ:
       std::string Type = "DefinitionLine";
       std::string version = "0.100.0";
@@ -84,7 +84,7 @@ class DefinitionLine {
       void Sethotspot_y( const int val ){ hotspot_y = val; }
       void Setlinktype( const std::string val ){ link_type = val; }
       //
-   private:
+   protected:
       //
 };
 //
