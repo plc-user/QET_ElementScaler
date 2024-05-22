@@ -55,6 +55,13 @@ void RemoveLeadingZeros(std::string& s);
 //
 std::string TextToEntity(const std::string& s);
 
+
+//
+// --- does the string contain a double- or int-value? -------------------------
+//
+void CheckForDoubleString(std::string& s);
+
+
 //
 // Funktionen, die vorher auch schon da waren
 //

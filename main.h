@@ -33,7 +33,6 @@
 #include <string>       // we handle strings here
 #include <getopt.h>     // for Commandline-Parameters
 #include <filesystem>   // for exe-filename
-#include <regex>        // for "double"-Check
 #include <list>         // for list of UUIDs
 
 #define _DEBUG_ 0
@@ -87,7 +86,6 @@ void PrintHelp(const std::string &s, const std::string &v);
 bool CheckUUIDs(void);
 void ProcessElement(pugi::xml_node);
 std::string ToSVG(pugi::xml_node);
-std::string CheckForDoubleString(std::string& sArg);
 
 
 
@@ -173,7 +171,7 @@ int parseCommandline(int argc, char *argv[]) {
                 break;
             case 'd':
                 sTmp = std::string(optarg);
-                sTmp = CheckForDoubleString(sTmp);
+                CheckForDoubleString(sTmp);
                 if ((sTmp == "WontWork") || (stoi(std::string(optarg)) < 0)) {
                     std::cerr << "could not convert \"" << optarg << "\" to positive number!" << std::endl;
                     xStopWithError = true;
@@ -208,7 +206,7 @@ int parseCommandline(int argc, char *argv[]) {
             case 'F':
                 xScaleElement = true;
                 sTmp = std::string(optarg);
-                sTmp = CheckForDoubleString(sTmp);
+                CheckForDoubleString(sTmp);
                 if (sTmp == "WontWork"){
                     std::cerr << "could not convert \"" << optarg << "\" to float!" << std::endl;
                     xStopWithError = true;
@@ -225,7 +223,7 @@ int parseCommandline(int argc, char *argv[]) {
             case 'x':
                 xScaleElement = true;
                 sTmp = std::string(optarg);
-                sTmp = CheckForDoubleString(sTmp);
+                CheckForDoubleString(sTmp);
                 if (sTmp == "WontWork"){
                     std::cerr << "could not convert \"" << optarg << "\" to float!" << std::endl;
                     xStopWithError = true;
@@ -241,7 +239,7 @@ int parseCommandline(int argc, char *argv[]) {
             case 'y':
                 xScaleElement = true;
                 sTmp = std::string(optarg);
-                sTmp = CheckForDoubleString(sTmp);
+                CheckForDoubleString(sTmp);
                 if (sTmp == "WontWork"){
                     std::cerr << "could not convert \"" << optarg << "\" to float!" << std::endl;
                     xStopWithError = true;
@@ -631,37 +629,6 @@ std::string ToSVG(pugi::xml_node node) {
     return s;
 }
 /******************************************************************************/
-
-
-/******************************************************************************/
-std::string CheckForDoubleString(std::string &sArg){
-// regular expression for a valid floating point number with digit(s) before and after the separator:
-// [\-\+]?\d+[\.\,]*\d+
-// alternatively, integers are also valid:
-// [\-\+]?\d+
-// everything else shall be invalid!
-// Source: https://regex101.com/
-        for (size_t i=0; i<sArg.length(); i++) {
-            if (sArg[i]== ',')  // allow comma as decimal separator
-                sArg[i] = '.';
-        }
-        const std::regex doubleRegEx ( R"rgx([\-\+]?\d+[\.\,]*\d+)rgx" );
-        const std::regex intRegEx    ( R"rgx([\-\+]?\d+)rgx" );
-        std::smatch sm;
-        if(regex_match(sArg, sm, intRegEx) || regex_match(sArg, sm, doubleRegEx))
-        {   // valid "double"- or "int"-value
-            if (_DEBUG_)
-                std::cerr << "can be converted to float: " << sm.str(0) << std::endl;
-            return sArg;
-        } else {
-            // string is NOT convertable to double
-            if (_DEBUG_)
-                std::cerr << "can not convert \"" << sArg << "\" to float!" << std::endl;
-            return "WontWork";
-        }
-}
-/******************************************************************************/
-
 
 
 #endif  //#ifndef MAIN_H

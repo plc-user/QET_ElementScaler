@@ -29,6 +29,7 @@
 #include <cmath>        // for sqrt, atan2, isnan(), ...
 #include <iomanip>      // for IO-Operations
 #include <sstream>      // for String-Streams
+#include <regex>        // for "double"-Check
 
 
 const char cDecSep = '.';     // Decimal-Separator for values in output-file
@@ -208,4 +209,41 @@ const std::string CreateUUID(const bool UpCase) {
 // ############################################################
 // ###       END -  we build a (random?) UUID               ###
 // ############################################################
+//
+
+
+//
+// ##############################################################
+// ###     does the string contain a double- or int-value     ###
+// ##############################################################
+//
+void CheckForDoubleString(std::string& sArg){
+// regular expression for a valid floating point number with digit(s) before and after the separator:
+// [\-\+]?\d+[\.\,]*\d+
+// alternatively, integers are also valid:
+// [\-\+]?\d+
+// everything else shall be invalid!
+// Source: https://regex101.com/
+        for (size_t i=0; i<sArg.length(); i++) {
+            if (sArg[i]== ',')  // allow comma as decimal separator
+                sArg[i] = '.';
+        }
+        const std::regex doubleRegEx ( R"rgx([\-\+]?\d+[\.\,]*\d+)rgx" );
+        const std::regex intRegEx    ( R"rgx([\-\+]?\d+)rgx" );
+        std::smatch sm;
+        if(regex_match(sArg, sm, intRegEx) || regex_match(sArg, sm, doubleRegEx))
+        {   // valid "double"- or "int"-value
+            if (_DEBUG_)
+                std::cerr << "can be converted to float: " << sm.str(0) << std::endl;
+        } else {
+            // string is NOT convertable to double
+            if (_DEBUG_)
+                std::cerr << "can not convert \"" << sArg << "\" to float!" << std::endl;
+            sArg = "WontWork";
+        }
+}
+//
+// ##############################################################
+// ###  END: does the string contain a double- or int-value   ###
+// ##############################################################
 //
