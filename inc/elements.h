@@ -60,7 +60,6 @@ void RotPoint90(double&, double&);
 //
 class DefinitionLine {
    private:
-      // enthält nur den Element-Typ:
       std::string Type = "DefinitionLine";
       std::string version = "0.100.0";
       std::string link_type = "thumbnail";
@@ -83,7 +82,6 @@ class DefinitionLine {
       void Sethotspot_x( const int val ){ hotspot_x = val; }
       void Sethotspot_y( const int val ){ hotspot_y = val; }
       void Setlinktype( const std::string val ){ link_type = val; }
-      //
    protected:
       //
 };
@@ -288,7 +286,7 @@ class ElmtDynText : public BaseElement,
 
 
 //
-//--- definition of class "ElmtText" -----------------------------------------
+//--- definition of class "ElmtText" -------------------------------------------
 //
 class ElmtText : public BaseElement,
                  public BasePosition
