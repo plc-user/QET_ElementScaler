@@ -172,13 +172,13 @@ int parseCommandline(int argc, char *argv[]) {
             case 'd':
                 sTmp = std::string(optarg);
                 CheckForDoubleString(sTmp);
-                if ((sTmp == "WontWork") || (stoi(std::string(optarg)) < 0)) {
-                    std::cerr << "could not convert \"" << optarg << "\" to positive number!" << std::endl;
+                if ((sTmp == "WontWork") || (stod(std::string(sTmp)) < 0.0)) {
+                    std::cerr << "could not convert \"" << optarg << "\" to valid number!" << std::endl;
                     xStopWithError = true;
                 } else {
+                    decimals = size_t(std::floor(stod(std::string(optarg))));
                     if (_DEBUG_)
-                        std::cerr << "set number of decimals to " << optarg << "\n";
-                    decimals = stoi(std::string(optarg));
+                        std::cerr << "set number of decimals to " << decimals << "\n";
                     MinLineLength = 1.5;
                     for (uint8_t i=0; i < decimals; i++) { MinLineLength /= 10.0; }
                 }
