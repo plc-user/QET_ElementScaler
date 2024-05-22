@@ -1033,15 +1033,22 @@ void ElmtRect::ReadFromPugiNode(pugi::xml_node& node)
 // ---
 void ElmtRect::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {
-    node.attribute("x").set_value(FormatValue(x, decimals).c_str());
-    node.attribute("y").set_value(FormatValue(y, decimals).c_str());
-    node.attribute("rx").set_value(FormatValue(rx, decimals).c_str());
-    node.attribute("ry").set_value(FormatValue(ry, decimals).c_str());
-    node.attribute("width").set_value(FormatValue(width, decimals).c_str());
-    node.attribute("height").set_value(FormatValue(height, decimals).c_str());
-    node.attribute("antialias").set_value(antialias);
-    node.attribute("style").set_value(style.c_str());
-
+    node.remove_attribute("x");
+    node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    node.remove_attribute("y");
+    node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    node.remove_attribute("width");
+    node.append_attribute("width").set_value(FormatValue(width, decimals).c_str());
+    node.remove_attribute("height");
+    node.append_attribute("height").set_value(FormatValue(height, decimals).c_str());
+    node.remove_attribute("rx");
+    node.append_attribute("rx").set_value(FormatValue(rx, decimals).c_str());
+    node.remove_attribute("ry");
+    node.append_attribute("ry").set_value(FormatValue(ry, decimals).c_str());
+    node.remove_attribute("style");
+    node.append_attribute("style").set_value(style.c_str());
+    node.remove_attribute("antialias");
+    node.append_attribute("antialias").set_value(antialias);
 }
 // ---
 void ElmtRect::Rot90(void)
