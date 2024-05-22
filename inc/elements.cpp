@@ -1096,13 +1096,27 @@ bool ElmtLine::ReadFromPugiNode(pugi::xml_node& node)
 }
 // ---
 void ElmtLine::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
-{   // Noch nicht komplett implementiert
-    node.attribute("x1").set_value(FormatValue(std::get<1>(polygon[0]), decimals).c_str());
-    node.attribute("x2").set_value(FormatValue(std::get<1>(polygon[1]), decimals).c_str());
-    node.attribute("y1").set_value(FormatValue(std::get<2>(polygon[0]), decimals).c_str());
-    node.attribute("y2").set_value(FormatValue(std::get<2>(polygon[1]), decimals).c_str());
-    node.attribute("length1").set_value(FormatValue(length1, decimals).c_str());
-    node.attribute("length2").set_value(FormatValue(length2, decimals).c_str());
+{   // sort attributes
+    node.remove_attribute("x1");
+    node.append_attribute("x1").set_value(FormatValue(std::get<1>(polygon[0]), decimals).c_str());
+    node.remove_attribute("y1");
+    node.append_attribute("y1").set_value(FormatValue(std::get<2>(polygon[0]), decimals).c_str());
+    node.remove_attribute("x2");
+    node.append_attribute("x2").set_value(FormatValue(std::get<1>(polygon[1]), decimals).c_str());
+    node.remove_attribute("y2");
+    node.append_attribute("y2").set_value(FormatValue(std::get<2>(polygon[1]), decimals).c_str());
+    node.remove_attribute("end1");
+    node.append_attribute("end1").set_value(end1.c_str());
+    node.remove_attribute("end2");
+    node.append_attribute("end2").set_value(end2.c_str());
+    node.remove_attribute("length1");
+    node.append_attribute("length1").set_value(FormatValue(length1, decimals).c_str());
+    node.remove_attribute("lenght2");
+    node.append_attribute("length2").set_value(FormatValue(length2, decimals).c_str());
+    node.remove_attribute("style");
+    node.append_attribute("style").set_value(style.c_str());
+    node.remove_attribute("antialias");
+    node.append_attribute("antialias").set_value(antialias);
 }
 // ---
 std::string ElmtLine::AsSVGstring(const size_t& decimals)
