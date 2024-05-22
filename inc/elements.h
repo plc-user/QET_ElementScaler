@@ -430,12 +430,12 @@ class ElmtPolygon : public BaseElement,
 //
 class ElmtLine : public ElmtPolygon {
    protected:
+       //
+   private:
       double length1 = 0.0;
       double length2 = 0.0;
       std::string end1 = "none";
       std::string end2 = "none";
-   private:
-
    public:
       ElmtLine() : ElmtPolygon("line") {
                        //std::cerr << " default-constructor ElmtLine - Typ: " << Type << "\n";
@@ -518,31 +518,31 @@ class ElmtRect : public BaseElement,
                  public BaseSize,
                  public BaseStyle
 {
-   protected:
-      double rx      = 0.0;
-      double ry      = 0.0;
-   private:
-
-   public:
-      ElmtRect() : BaseElement("rect") {
+    protected:
+        //
+    private:
+        double rx      = 0.0;
+        double ry      = 0.0;
+    public:
+        ElmtRect() : BaseElement("rect") {
                        //std::cerr << " default-constructor ElmtRect - Typ: " << Type << "\n";
                        }
-      void Clear(void) { BasePosition::Clear(); BaseSize::Clear(); rx = 0.0; ry = 0.0; }
-      void ReadFromPugiNode(pugi::xml_node&);
-      void WriteToPugiNode(pugi::xml_node&, const size_t&);
-      double GetRx(void)      { return rx; }
-      double GetRy(void)      { return ry; }
-      void SetRx(const double val)      { rx = val; }
-      void SetRy(const double val)      { ry = val; }
-      void Flip(void)   { y = (-1) * y - height; }
-      void Mirror(void) { x = (-1) * x - width; }
-      void Rot90();  // rotate clockwise by 90°
-      void Scale(const double factX=1.0, const double factY=1.0) {
+        void Clear(void) { BasePosition::Clear(); BaseSize::Clear(); rx = 0.0; ry = 0.0; }
+        void ReadFromPugiNode(pugi::xml_node&);
+        void WriteToPugiNode(pugi::xml_node&, const size_t&);
+        double GetRx(void)      { return rx; }
+        double GetRy(void)      { return ry; }
+        void SetRx(const double val)      { rx = val; }
+        void SetRy(const double val)      { ry = val; }
+        void Flip(void)   { y = (-1) * y - height; }
+        void Mirror(void) { x = (-1) * x - width; }
+        void Rot90();  // rotate clockwise by 90°
+        void Scale(const double factX=1.0, const double factY=1.0) {
                        x     *= factX;      y *= factY;
                        rx    *= factX;     ry *= factY;
                        width *= factX; height *= factY;
                        }
-      std::string AsSVGstring(const size_t&);
+        std::string AsSVGstring(const size_t&);
 };
 //
 //--- END - definition of class "ElmtRect" -------------------------------------
@@ -559,9 +559,10 @@ class ElmtArc : public BaseElement,
                 public BaseStyle
 {
    protected:
+       //
+   private:
       double angle  = 0.0;
       double start  = 0.0;
-   private:
       double MinX =  1e99;
       double MaxX = -1e99;
       double MinY =  1e99;
@@ -611,8 +612,9 @@ class ElmtTerminal : public BaseElement,
                      public BasePosition
 {
    // fügt ... hinzu
-   private:
    protected:
+       //
+   private:
       std::string orientation = "n";
       std::string type        = "Generic";
       std::string name        = "";
