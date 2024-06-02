@@ -1114,7 +1114,7 @@ void ElmtLine::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
     node.append_attribute("end2").set_value(end2.c_str());
     node.remove_attribute("length1");
     node.append_attribute("length1").set_value(FormatValue(length1, decimals).c_str());
-    node.remove_attribute("lenght2");
+    node.remove_attribute("length2");
     node.append_attribute("length2").set_value(FormatValue(length2, decimals).c_str());
     node.remove_attribute("style");
     node.append_attribute("style").set_value(style.c_str());
