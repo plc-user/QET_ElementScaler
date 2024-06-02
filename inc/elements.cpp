@@ -187,6 +187,10 @@ void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)
     rotate    = node.attribute("rotate").as_bool(); // scheint eine Rotation um 0° zu sein!
     if (node.attribute("rotation"))
         rotation  = node.attribute("rotation").as_double();
+    if (node.attribute("Halignment"))
+        Halignment= node.attribute("Halignment").as_string();
+    if (node.attribute("Valignment"))
+        Valignment= node.attribute("Valignment").as_string();
     if (node.attribute("font_size"))
         size      = node.attribute("font_size").as_double();
     if (node.attribute("size"))
@@ -239,39 +243,64 @@ void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)
 // ---
 void ElmtDynText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {
-    // Attribute löschen und in umgekehrter Reihenfolge VORNE wieder einfügen:
+    // Attribute löschen und wieder anfügen zum sortieren
+    node.remove_attribute("x");
+    node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    node.remove_attribute("y");
+    node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    if (node.attribute("z")) {
+        node.remove_attribute("z");
+        node.append_attribute("z").set_value(FormatValue(z, 0).c_str());
+    }
     if (node.attribute("text_width")) {
         node.remove_attribute("text_width");
         if ( text_width < 0.0 ) { text_width = -1.0; }
-        node.prepend_attribute("text_width").set_value(FormatValue(text_width, 0).c_str());
+        node.append_attribute("text_width").set_value(FormatValue(text_width, 0).c_str());
+    }
+    if (node.attribute("Halignment")) {
+        node.remove_attribute("Halignment");
+        node.append_attribute("Halignment").set_value(Halignment.c_str());
+    }
+    if (node.attribute("Valignment")) {
+        node.remove_attribute("Valignment");
+        node.append_attribute("Valignment").set_value(Valignment.c_str());
+    }
+    if (node.attribute("rotate")) {
+        node.remove_attribute("rotate");
+        node.append_attribute("rotate").set_value(rotate);
+    }
+    if (node.attribute("rotation")) {
+        node.remove_attribute("rotation");
+        node.append_attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
     }
     if (node.attribute("text_from")) {
         node.remove_attribute("text_from");
-        node.prepend_attribute("text_from").set_value(text_from.c_str());
+        node.append_attribute("text_from").set_value(text_from.c_str());
     }
-    if (node.attribute("z")) {
-        node.remove_attribute("z");
-        node.prepend_attribute("z").set_value(FormatValue(z, 0).c_str());
+    if (node.attribute("size")) {
+        node.remove_attribute("size");
+        node.append_attribute("size").set_value(FormatValue(size, 0).c_str());
     }
-    node.remove_attribute("y");
-    node.prepend_attribute("y").set_value(FormatValue(y, decimals).c_str());
-    node.remove_attribute("x");
-    node.prepend_attribute("x").set_value(FormatValue(x, decimals).c_str());
-    // Reihenfolge wie vorher:
-    if (node.attribute("size"))
-        node.attribute("size").set_value(FormatValue(size, 0).c_str());
-    if (node.attribute("font_size"))
-        node.attribute("font_size").set_value(FormatValue(size, 0).c_str());
-    if (node.attribute("rotation"))
-        node.attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
-    if (node.attribute("text")) // noch nötig??
-        node.attribute("text").set_value(text.c_str());
-    if (node.attribute("uuid"))
-        node.attribute("uuid").set_value(uuid.c_str());
-    if (node.attribute("font"))
-        node.attribute("font").set_value(font.c_str());
-    if (node.attribute("color"))
-        node.attribute("color").set_value(color.c_str());
+    if (node.attribute("font_size")) {
+        node.remove_attribute("font_size");
+        node.append_attribute("font_size").set_value(FormatValue(size, 0).c_str());
+    }
+    if (node.attribute("text")) { // noch nötig??
+        node.remove_attribute("text");
+        node.append_attribute("text").set_value(text.c_str());
+    }
+    if (node.attribute("uuid")) {
+        node.remove_attribute("uuid");
+        node.append_attribute("uuid").set_value(uuid.c_str());
+    }
+    if (node.attribute("font")) {
+        node.remove_attribute("font");
+        node.append_attribute("font").set_value(font.c_str());
+    }
+    if (node.attribute("color")) {
+        node.remove_attribute("color");
+        node.append_attribute("color").set_value(color.c_str());
+    }
     // nun die Unter-Elemente:
     if (node.child("text"))
         node.child("text").child_value(text.c_str());
