@@ -87,9 +87,9 @@ bool CheckUUIDs(void);
 void ProcessElement(pugi::xml_node);
 std::string ToSVG(pugi::xml_node);
 
-
-
 // the possible Commandlineparameters:
+static const char cOptions[] = "f:hioF:x:y:d:";
+
 static struct option long_options[]={
     {"file",required_argument,nullptr,'f'},
     {"help",no_argument,nullptr,'h'},
@@ -117,7 +117,7 @@ int parseCommandline(int argc, char *argv[]) {
     int c;
     int option_index = 12345;
     std::string sTmp = "";
-    while ((c=getopt_long(argc,argv,"f:hioF:x:y:d:",long_options,&option_index))!=-1) {
+    while ((c=getopt_long(argc,argv,cOptions,long_options,&option_index))!=-1) {
         if (_DEBUG_) std::cerr << "long-opt-name: " << long_options[option_index].name << std::endl;
         switch(c) {
             case 0:
