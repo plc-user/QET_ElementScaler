@@ -700,21 +700,8 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node& node)
 }
 // ---
 void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
-{   // wir sortieren die Attribute:
-    if (node.attribute("antialias")) {
-        node.remove_attribute("antialias");
-        node.prepend_attribute("antialias").set_value(antialias);
-    }
-    if (node.attribute("closed"))
-        node.remove_attribute("closed");
-    // "closed" ist nur drin, wenn "false":
-    if (closed == false)
-        node.prepend_attribute("closed").set_value(closed);
-    if (node.attribute("style")) {
-        node.remove_attribute("style");
-        node.prepend_attribute("style").set_value(style.c_str());
-    }
-    // und nun die Polygon-Punkte hinten dran:
+{   // wir sortieren die Attribute
+    // zuerst sind die Polygon-Punkte dran:
     for (const auto &i : polygon) {
         std::string s = "";
         s = "x" + std::to_string(std::get<0>(i));
@@ -723,6 +710,22 @@ void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
         s = "y" + std::to_string(std::get<0>(i));
         node.remove_attribute(s.c_str());   // to sort the polygon-points...
         node.append_attribute(s.c_str()).set_value(FormatValue(std::get<2>(i), decimals).c_str());
+    }
+    // dann die sonstigen Eigenschaften des Polygons:
+    if (node.attribute("closed"))
+        node.remove_attribute("closed");
+    // "closed" ist nur drin, wenn "false":
+    if (closed == false)
+        node.append_attribute("closed").set_value(closed);
+    // antialias kommt dazu?
+    if (node.attribute("antialias")) {
+        node.remove_attribute("antialias");
+        node.append_attribute("antialias").set_value(antialias);
+    }
+    // einen Style hat das Polygon auch:
+    if (node.attribute("style")) {
+        node.remove_attribute("style");
+        node.append_attribute("style").set_value(style.c_str());
     }
 }
 // ---
