@@ -35,6 +35,10 @@ QET_ElementScaler [options] &lt;file&gt; <br>
    --factorx VALUE  factor for x-values (x, rx, width, ...)
    -y VALUE         or
    --factory VALUE  factor for y-values (y, ry, height, ...)
+   -X VALUE         or
+   --movex VALUE    move in x-direction after scaling
+   -Y VALUE         or
+   --movey VALUE    move in y-direction after scaling
    -f FILENAME      or
    --file FILENAME  the file that will be used 
    -d VALUE         or
