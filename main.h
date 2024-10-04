@@ -420,7 +420,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) rect.Mirror();
             if (xRotate90) rect.Rot90();
             rect.Scale(scaleX, scaleY);
-            if (xMoveElement) rect.Move(moveX, moveY, 0.0);
+            if (xMoveElement) rect.Move(moveX, moveY);
             rect.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(rect.GetX());
             ElmtMinMax.addx(rect.GetX()+rect.GetWidth());
@@ -435,7 +435,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) arc.Mirror();
             if (xRotate90) arc.Rot90();
             arc.Scale(scaleX, scaleY);
-            if (xMoveElement) arc.Move(moveX, moveY, 0.0);
+            if (xMoveElement) arc.Move(moveX, moveY);
             arc.Normalize();
             arc.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(arc.GetMinX());
@@ -451,7 +451,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) elli.Mirror();
             if (xRotate90) elli.Rot90();
             elli.Scale(scaleX, scaleY);
-            if (xMoveElement) elli.Move(moveX, moveY, 0.0);
+            if (xMoveElement) elli.Move(moveX, moveY);
             elli.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(elli.GetX());
             ElmtMinMax.addx(elli.GetX()+elli.GetWidth());
@@ -466,7 +466,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) text.Mirror();
             if (xRotate90) text.Rot90();
             text.Scale(scaleX, scaleY);
-            if (xMoveElement) text.Move(moveX, moveY, 0.0);
+            if (xMoveElement) text.Move(moveX, moveY);
             text.WriteToPugiNode(node, decimals);
             if (!((text.GetText() == "") || (text.GetText() == "_"))) {
                 ElmtMinMax.addx(text.GetX()-text.GetSize());
@@ -482,7 +482,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) term.Mirror();
             if (xRotate90) term.Rot90();
             term.Scale(scaleX, scaleY);
-            if (xMoveElement) term.Move(moveX, moveY, 0.0);
+            if (xMoveElement) term.Move(moveX, moveY);
             if (node.attribute("uuid")) {
                 lsUUIDsTerminals.push_back(node.attribute("uuid").as_string());
             }
@@ -499,7 +499,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) dyntext.Mirror();
             if (xRotate90) dyntext.Rot90();
             dyntext.Scale(scaleX, scaleY);
-            if (xMoveElement) dyntext.Move(moveX, moveY, 0.0);
+            if (xMoveElement) dyntext.Move(moveX, moveY);
             if (node.attribute("uuid")) {
                 lsUUIDsDynTexts.push_back(node.attribute("uuid").as_string());
             }
