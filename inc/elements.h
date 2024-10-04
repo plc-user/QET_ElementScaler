@@ -682,16 +682,7 @@ class RectMinMax {
       double height(void);           // returns (ymax - ymin)
       double diagonal(void);         // returns length of diagonal
       double angle(void);            // returns angle of diagonal
-      friend std::ostream& operator << (std::ostream&, const RectMinMax&); // Standardoutput-operator
 };
-// for outputting the whole bunch:
-inline std::ostream& operator << (std::ostream& strm, const RectMinMax& r)
-{
-	strm << "x:(" << r.xMin << " ... " << r.xMax << ")"
-         << " | "
-         << "y:(" << r.yMin << " ... " << r.yMax << ")";
-	return strm;
-}
 //
 //--- END - definition of class "RectMinMax" -----------------------------------
 //
