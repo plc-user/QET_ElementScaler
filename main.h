@@ -59,6 +59,7 @@ static bool xCreateSVG          = false;
 static bool xCreateELMT         = true;
 static bool xStopWithError      = false;
 static bool xScaleElement       = true;
+static bool xMoveElement        = false;
 static bool xRemoveAllTerminals = false;
 static bool xOverwriteOriginal  = false;
 static bool xFlipHor            = false;
@@ -78,6 +79,9 @@ static double MinLineLength = 0.015;  //
 static double scaleX = 1.0;
 static double scaleY = 1.0;
 
+static double moveX = 0.0;
+static double moveY = 0.0;
+
 //
 // --- function-prototypes -----------------------------------------------------
 //
@@ -88,7 +92,7 @@ void ProcessElement(pugi::xml_node);
 std::string ToSVG(pugi::xml_node);
 
 // the possible Commandlineparameters:
-static const char cOptions[] = "f:hioF:x:y:d:";
+static const char cOptions[] = "f:hioF:x:y:X:Y:d:";
 
 static struct option long_options[]={
     {"file",required_argument,nullptr,'f'},
@@ -98,6 +102,8 @@ static struct option long_options[]={
     {"factor",required_argument,nullptr,'F'},
     {"factorx",required_argument,nullptr,'x'},
     {"factory",required_argument,nullptr,'y'},
+    {"movex",required_argument,nullptr,'X'},
+    {"movey",required_argument,nullptr,'Y'},
     {"decimals",required_argument,nullptr,'d'},
     {"RemoveAllTerminals",no_argument,nullptr,1000}, // "long-opt" only!!!
     {"FlipHorizontal",no_argument,nullptr,1001}, // "long-opt" only!!!
@@ -252,6 +258,38 @@ int parseCommandline(int argc, char *argv[]) {
                     }
                 }
                 break;
+            case 'X':
+                xMoveElement = true;
+                sTmp = std::string(optarg);
+                CheckForDoubleString(sTmp);
+                if (sTmp == "WontWork"){
+                    std::cerr << "could not convert \"" << optarg << "\" to float!" << std::endl;
+                    xStopWithError = true;
+                } else {
+                    if (_DEBUG_) std::cerr << "MoveX: " << sTmp << std::endl;
+                    moveX = stod(sTmp);
+                    if (std::abs(moveX) < 0.01) {
+                        std::cerr << "delta-value too small: " << sTmp << std::endl;
+                        xStopWithError = true;
+                    }
+                }
+                break;
+            case 'Y':
+                xMoveElement = true;
+                sTmp = std::string(optarg);
+                CheckForDoubleString(sTmp);
+                if (sTmp == "WontWork"){
+                    std::cerr << "could not convert \"" << optarg << "\" to float!" << std::endl;
+                    xStopWithError = true;
+                } else {
+                    if (_DEBUG_) std::cerr << "MoveY: " << sTmp << std::endl;
+                    moveY = stod(sTmp);
+                    if (std::abs(moveY) < 0.01) {
+                        std::cerr << "delta-value too small: " << sTmp << std::endl;
+                        xStopWithError = true;
+                    }
+                }
+                break;
             case '?':
                 std::cerr << " * * * there were non-handled option(s)!"<< std::endl;
                 xStopWithError = true;
@@ -296,6 +334,10 @@ void PrintHelp(const std::string &s, const std::string &v){
     << "   --factorx VALUE  factor for x-values (x, rx, width, ...)             \n"
     << "   -y VALUE         or                                                  \n"
     << "   --factory VALUE  factor for y-values (y, ry, height, ...)            \n"
+    << "   -X VALUE         or                                                  \n"
+    << "   --movex VALUE    move in x-direction after scaling                   \n"
+    << "   -Y VALUE         or                                                  \n"
+    << "   --movey VALUE    move in y-direction after scaling                   \n"
     << "   -f FILENAME      or                                                  \n"
     << "   --file FILENAME  the file that will be used                          \n"
     << "   -d VALUE         or                                                  \n"
@@ -378,6 +420,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) rect.Mirror();
             if (xRotate90) rect.Rot90();
             rect.Scale(scaleX, scaleY);
+            if (xMoveElement) rect.Move(moveX, moveY, 0.0);
             rect.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(rect.GetX());
             ElmtMinMax.addx(rect.GetX()+rect.GetWidth());
@@ -392,6 +435,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) arc.Mirror();
             if (xRotate90) arc.Rot90();
             arc.Scale(scaleX, scaleY);
+            if (xMoveElement) arc.Move(moveX, moveY, 0.0);
             arc.Normalize();
             arc.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(arc.GetMinX());
@@ -407,6 +451,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) elli.Mirror();
             if (xRotate90) elli.Rot90();
             elli.Scale(scaleX, scaleY);
+            if (xMoveElement) elli.Move(moveX, moveY, 0.0);
             elli.WriteToPugiNode(node, decimals);
             ElmtMinMax.addx(elli.GetX());
             ElmtMinMax.addx(elli.GetX()+elli.GetWidth());
@@ -421,6 +466,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) text.Mirror();
             if (xRotate90) text.Rot90();
             text.Scale(scaleX, scaleY);
+            if (xMoveElement) text.Move(moveX, moveY, 0.0);
             text.WriteToPugiNode(node, decimals);
             if (!((text.GetText() == "") || (text.GetText() == "_"))) {
                 ElmtMinMax.addx(text.GetX()-text.GetSize());
@@ -436,6 +482,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) term.Mirror();
             if (xRotate90) term.Rot90();
             term.Scale(scaleX, scaleY);
+            if (xMoveElement) term.Move(moveX, moveY, 0.0);
             if (node.attribute("uuid")) {
                 lsUUIDsTerminals.push_back(node.attribute("uuid").as_string());
             }
@@ -452,6 +499,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xFlipVert) dyntext.Mirror();
             if (xRotate90) dyntext.Rot90();
             dyntext.Scale(scaleX, scaleY);
+            if (xMoveElement) dyntext.Move(moveX, moveY, 0.0);
             if (node.attribute("uuid")) {
                 lsUUIDsDynTexts.push_back(node.attribute("uuid").as_string());
             }
@@ -470,6 +518,7 @@ void ProcessElement(pugi::xml_node doc) {
                 if (xFlipVert) line.Mirror();
                 if (xRotate90) line.Rot90();
                 line.Scale(scaleX, scaleY);
+                if (xMoveElement) line.Move(moveX, moveY);
                 line.CleanUp(node, MinLineLength);
                 line.WriteToPugiNode(node, decimals);
             }
@@ -490,6 +539,7 @@ void ProcessElement(pugi::xml_node doc) {
                 if (xFlipVert) poly.Mirror();
                 if (xRotate90) poly.Rot90();
                 poly.Scale(scaleX, scaleY);
+                if (xMoveElement) poly.Move(moveX, moveY);
                 poly.CleanUp(node, MinLineLength);
                 poly.WriteToPugiNode(node, decimals);
             }

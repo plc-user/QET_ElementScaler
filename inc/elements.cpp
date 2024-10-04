@@ -906,6 +906,14 @@ void ElmtPolygon::Scale(const double factX, const double factY)
     }
 }
 // ---
+void ElmtPolygon::Move(const double dx, const double dy)
+{   // add the delta-values to all X- and Y-values
+    for (uint64_t i=0; i<polygon.size(); i++) {
+        std::get<1>(polygon[i]) = std::get<1>(polygon[i]) + dx;
+        std::get<2>(polygon[i]) = std::get<2>(polygon[i]) + dy;
+    }
+}
+// ---
 std::string ElmtPolygon::AsSVGstring(const size_t& decimals)
 {
     if (polygon.size() == 0) return "<polygon />";

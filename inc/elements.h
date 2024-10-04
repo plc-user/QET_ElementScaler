@@ -182,6 +182,7 @@ class BasePosition {
       void SetX(const double val) { x = val; }
       void SetY(const double val) { y = val; }
       void SetZ(const double val) { z = val; }
+      void Move(const double dx, const double dy, const double dz) { x += dx; y += dy; z += dz;}
 };
 //
 //--- END - definition of class "BasePosition" ---------------------------------
@@ -414,6 +415,7 @@ class ElmtPolygon : public BaseElement,
       void Flip(void);   // vertikal
       void Mirror(void); // horizontal
       void Rot90(void);  // rotate clockwise by 90°
+      void Move(const double dx, const double dy);  // move by dx, dy
       void Scale(const double factX=1.0, const double factY=1.0);
       void CleanUp(pugi::xml_node, const double);
 };
