@@ -731,17 +731,17 @@ void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 // ---
 bool ElmtPolygon::CheckIndex(const std::string sType){
    if (polygon.size() <= 1 ) {
-     std::cerr << sType << ": not enough points!\n";
+     std::cerr << "Remove " << sType << " with one or less points!\n";
      return false;
    }
    if ( !(std::get<0>(polygon[polygon.size()-1]) == polygon.size()) ) {
-     std::cerr << "max. index not equal size\n";
+     std::cerr << sType << ": max. index not equal size\n";
      return false;
    }
    for (uint64_t i=0; i<(polygon.size()-1); i++) {
      if ( (std::isnan(std::get<1>(polygon[i])))  ||
           (std::isnan(std::get<2>(polygon[i]))) ) {
-       std::cerr << "Value missing at index: "<<i<<"\n";
+       std::cerr << sType << ": Value missing at index: "<<i<<"\n";
        return false;
      }
    }
