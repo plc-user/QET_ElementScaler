@@ -18,9 +18,9 @@ CompileOptions="-Wall -std=c++17 -O2"
 
 # compile
 g++ $CompileOptions  -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
-g++ $CompileOptions  -c inc/helpers.cpp -o obj/inc/helpers.o
-g++ $CompileOptions  -c inc/elements.cpp -o obj/inc/elements.o
-g++ $CompileOptions  -c main.cpp -o obj/main.o
+g++ $CompileOptions  -c inc/helpers.cpp         -o obj/inc/helpers.o
+g++ $CompileOptions  -c inc/elements.cpp        -o obj/inc/elements.o
+g++ $CompileOptions  -c main.cpp                -o obj/main.o
 
 # link:
 g++  -o QET_ElementScaler \
