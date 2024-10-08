@@ -34,8 +34,6 @@
 
 #include "pugixml/pugixml.hpp"
 
-#define _DEBUG_ 0
-
 
 //
 // --- function-prototypes for ... ---------------------------------------------

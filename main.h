@@ -35,8 +35,6 @@
 #include <filesystem>   // for exe-filename
 #include <list>         // for list of UUIDs
 
-#define _DEBUG_ 0
-
 // ============================================================================
 // global variables
 // ============================================================================
@@ -521,12 +519,12 @@ void ProcessElement(pugi::xml_node doc) {
                 if (xMoveElement) line.Move(moveX, moveY);
                 line.CleanUp(node, MinLineLength);
                 line.WriteToPugiNode(node, decimals);
-            }
-            if (line.CheckIndex("Line") == true) {
-                ElmtMinMax.addx(line.GetMinX());
-                ElmtMinMax.addx(line.GetMaxX());
-                ElmtMinMax.addy(line.GetMinY());
-                ElmtMinMax.addy(line.GetMaxY());
+                if (line.CheckIndex(node.name()) == true) {
+                    ElmtMinMax.addx(line.GetMinX());
+                    ElmtMinMax.addx(line.GetMaxX());
+                    ElmtMinMax.addy(line.GetMinY());
+                    ElmtMinMax.addy(line.GetMaxY());
+                }
             } else {
                 // Invalid line will be ignored and deleted later!
                 node.set_name("LINE_NodeToDelete");
@@ -542,12 +540,12 @@ void ProcessElement(pugi::xml_node doc) {
                 if (xMoveElement) poly.Move(moveX, moveY);
                 poly.CleanUp(node, MinLineLength);
                 poly.WriteToPugiNode(node, decimals);
-            }
-            if (poly.CheckIndex("Polygon") == true) {
-                ElmtMinMax.addx(poly.GetMinX());
-                ElmtMinMax.addx(poly.GetMaxX());
-                ElmtMinMax.addy(poly.GetMinY());
-                ElmtMinMax.addy(poly.GetMaxY());
+                if (poly.CheckIndex(node.name()) == true) {
+                    ElmtMinMax.addx(poly.GetMinX());
+                    ElmtMinMax.addx(poly.GetMaxX());
+                    ElmtMinMax.addy(poly.GetMinY());
+                    ElmtMinMax.addy(poly.GetMaxY());
+                }
             } else {
                 // Invalid polygon will be ignored and deleted later!
                 node.set_name("POLYGON_NodeToDelete");

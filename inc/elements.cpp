@@ -696,7 +696,7 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node& node)
         }
     } // for (pugi::xml_attribute ...
     // Check the Polygon:
-    return CheckIndex("Polygon");
+    return CheckIndex(node.name());
 }
 // ---
 void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
@@ -735,13 +735,13 @@ bool ElmtPolygon::CheckIndex(const std::string sType){
      return false;
    }
    if ( !(std::get<0>(polygon[polygon.size()-1]) == polygon.size()) ) {
-     std::cerr << sType << ": max. index not equal size\n";
+     std::cerr << "Remove " << sType << ": indexing not correct (point missing)\n";
      return false;
    }
    for (uint64_t i=0; i<(polygon.size()-1); i++) {
      if ( (std::isnan(std::get<1>(polygon[i])))  ||
           (std::isnan(std::get<2>(polygon[i]))) ) {
-       std::cerr << sType << ": Value missing at index: "<<i<<"\n";
+       std::cerr << "Remove " << sType << ": Value missing at index: "<< i+1 <<"\n";
        return false;
      }
    }
@@ -1132,10 +1132,15 @@ bool ElmtLine::ReadFromPugiNode(pugi::xml_node& node)
     end2      = node.attribute("end2").as_string();
     antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
-
+    // Gibt es die Attribute überhaupt???
+    if ((node.attribute("x1") && node.attribute("x2") &&
+         node.attribute("y1") && node.attribute("y2"))   == false) {
+        std::cerr << "Remove incomplete " << node.name() << "\n";
+        return false;
+        }
     InsertXYat(1, node.attribute("x1").as_double(), node.attribute("y1").as_double());
     InsertXYat(2, node.attribute("x2").as_double(), node.attribute("y2").as_double());
-    return CheckIndex("Line");
+    return CheckIndex(node.name());
 }
 // ---
 void ElmtLine::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
