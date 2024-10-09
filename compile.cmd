@@ -14,10 +14,10 @@ del QET_ElementScaler.exe > nul 2> nul
 rem compile with GCC in "path"
 @echo on
 
-g++.exe -Wall -std=c++17 -fexceptions -O2 -Iinclude -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
-g++.exe -Wall -std=c++17 -fexceptions -O2 -Iinclude -c inc/helpers.cpp -o obj/inc/helpers.o
-g++.exe -Wall -std=c++17 -fexceptions -O2 -Iinclude -c inc/elements.cpp -o obj/inc/elements.o
-g++.exe -Wall -std=c++17 -fexceptions -O2 -Iinclude -c main.cpp -o obj/main.o
+g++.exe -Wall -std=c++17 -O2 -Iinclude -c inc/pugixml/pugixml.cpp -o obj/inc/pugixml/pugixml.o
+g++.exe -Wall -std=c++17 -O2 -Iinclude -c inc/helpers.cpp         -o obj/inc/helpers.o
+g++.exe -Wall -std=c++17 -O2 -Iinclude -c inc/elements.cpp        -o obj/inc/elements.o
+g++.exe -Wall -std=c++17 -O2 -Iinclude -c main.cpp                -o obj/main.o
 
 
 rem link it all:
