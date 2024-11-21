@@ -597,10 +597,9 @@ void ElmtArc::DetermineMinMax(){
     // x = a ⋅ cos(t)
     // y = b ⋅ sin(t)
     // with t = 0 .. 2*pi = ([0 .. 360]/360)*2*pi
-    const double pi = 3.141592653589793116; // also in <cmath> as M_PI
     for (int i = (int)round(start); i <= (int)round((start + angle)); i++){
-        double xx = x + (width / 2.0) * (1 + cos(i / 360.0 * 2.0 * pi));
-        double yy = y + (height / 2.0) * (1 - sin(i / 360.0 * 2.0 * pi));
+        double xx = x + (width / 2.0) * (1 + cos(toRad<double>(i)));
+        double yy = y + (height / 2.0) * (1 - sin(toRad<double>(i)));
         MinX = std::min(MinX, xx);
         MaxX = std::max(MaxX, xx);
         MinY = std::min(MinY, yy);
@@ -638,20 +637,19 @@ void ElmtArc::Rot90(void)
 // ---
 std::string ElmtArc::AsSVGstring(const size_t& decimals)
 {
-    const double pi = 3.141592653589793116; // also in <cmath> as M_PI
     std::string s = "<path d=\"M ";
     // Punkte berechnen und in String einfügen...
     // Startpunkt:
-    double sx = x + (width / 2.0) * (1 + cos(start / 360.0 * 2.0 * pi));
-    double sy = y + (height / 2.0) * (1 - sin(start / 360.0 * 2.0 * pi));
+    double sx = x + (width / 2.0) * (1 + cos(toRad<double>(start)));
+    double sy = y + (height / 2.0) * (1 - sin(toRad<double>(start)));
     s += FormatValue(sx, decimals) + " " + FormatValue(sy, decimals);
     // Angaben für RadiusX, RadiusY, Rotation, Weg und Drehsinn:
     s += " A " + FormatValue(width/2, decimals) + " " + FormatValue(height/2, decimals) + " 0 ";
     ((angle <= 180.0) ? (s += "0") : (s += "1"));
     s += " 0 ";
     // Endpunkt:
-    double ex = x + (width / 2.0) * (1 + cos((start+angle) / 360.0 * 2.0 * pi));
-    double ey = y + (height / 2.0) * (1 - sin((start+angle) / 360.0 * 2.0 * pi));
+    double ex = x + (width / 2.0) * (1 + cos(toRad<double>(start+angle)));
+    double ey = y + (height / 2.0) * (1 - sin(toRad<double>(start+angle)));
     s += FormatValue(ex, decimals) + " " + FormatValue(ey, decimals) + "\" ";
     //
     s += StyleAsSVGstring(decimals);
@@ -1466,8 +1464,9 @@ double RectMinMax::diagonal(void){
 double RectMinMax::angle(void){
     double dx = (xMax - xMin);
     double dy = (yMax - yMin);
-    const double pi = 3.14159265359;
-    return (atan2(dy, dx) * 180 / pi);
+    //const double pi = 3.14159265359;
+    //return (atan2(dy, dx) * 180 / pi);
+    return toDeg<double>(atan2(dy, dx));
 }
 //
 //--- END - implementation of class "RectMinMax" -------------------------------

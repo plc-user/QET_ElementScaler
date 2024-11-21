@@ -109,5 +109,25 @@ const std::string toHex(const T inVal, const bool upCase=false, const bool withP
     return (withPrefix ? "0x" : "") + s;
 }
 
+//
+// mal muss man Winkel in Radiant, mal in Grad (Degree) angeben:
+//
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+template<class T>
+inline T toRad(T d)
+{
+    return static_cast<T>((d * M_PI) / 180.0);
+}
+
+template<class T>
+inline T toDeg(T r)
+{
+    return static_cast<T>((r / M_PI) * 180.0);
+}
+
 
 #endif  //#ifndef HELPERS_H
