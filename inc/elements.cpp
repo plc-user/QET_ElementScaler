@@ -1464,8 +1464,6 @@ double RectMinMax::diagonal(void){
 double RectMinMax::angle(void){
     double dx = (xMax - xMin);
     double dy = (yMax - yMin);
-    //const double pi = 3.14159265359;
-    //return (atan2(dy, dx) * 180 / pi);
     return toDeg<double>(atan2(dy, dx));
 }
 //
