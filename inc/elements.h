@@ -446,9 +446,8 @@ class ElmtLine : public ElmtPolygon {
                         pow((std::get<1>(polygon[1])-(std::get<1>(polygon[0]))), 2)) );
           }
       double GetAngle(void) {
-          const double pi = 3.14159265359;
-          return (atan2((std::get<2>(polygon[1])-(std::get<2>(polygon[0]))),
-                        (std::get<1>(polygon[1])-(std::get<1>(polygon[0])))) * 180 / pi);
+          return toDeg<double>(atan2((std::get<2>(polygon[1])-(std::get<2>(polygon[0]))),
+                                     (std::get<1>(polygon[1])-(std::get<1>(polygon[0]))) ) );
           }
       void SetLength1(const double val) { length1 = val; }
       void SetLength2(const double val) { length2 = val; }
