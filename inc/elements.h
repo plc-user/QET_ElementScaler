@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 plc-user
+ * Copyright (c) 2022-2025 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -31,6 +31,7 @@
 #include <cmath>        // sqrt, ...
 #include <vector>       // für Polygone
 #include <tuple>        // einzelne Punkte des Polygons
+#include <map>          // die Namen des Elements
 
 #include "pugixml/pugixml.hpp"
 
@@ -85,6 +86,28 @@ class DefinitionLine {
 };
 //
 //--- END - definition of definition-line of Elements --------------------------
+//
+
+
+
+//
+//--- START - definition of name-list of Elements ------------------------
+//
+class NamesList {
+    private:
+      std::map<std::string, std::string> names;
+      //
+    public:
+      void ReadFromPugiNode(pugi::xml_node);
+      void WriteToPugiNode(pugi::xml_node);
+      void AddName(const std::string& lang, const std::string& name) { names.insert({lang, name}); };
+      void Clear(void) { names.clear(); };
+      //
+    protected:
+      //
+};
+//
+//--- END - definition of name-list of Elements --------------------------
 //
 
 

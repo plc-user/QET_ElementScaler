@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 plc-user
+ * Copyright (c) 2022-2025 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -86,6 +86,35 @@ void DefinitionLine::WriteToPugiNode(pugi::xml_node node)
 }
 //
 //--- END - implementation of class "DefinitionLine" ---------------------------
+//
+
+
+
+//
+//--- implementation of class "NamesList" ---------------------------------
+//
+void NamesList::ReadFromPugiNode(pugi::xml_node node)
+{
+    node = node.first_child();
+    for (; node; node = node.next_sibling()){
+        std::string lang = node.attribute("lang").as_string();
+        std::string name = node.child_value();
+        AddName(lang, name);
+        // keine sort-Funktion: Das macht die std::map automatisch!
+    }
+}
+void NamesList::WriteToPugiNode(pugi::xml_node node)
+{
+    // erstmal alle Namen löschen:
+    while(node.remove_child("name"));
+    // und jetzt kommen die Namen sortiert wieder rein:
+    for (const auto& [key, value] : names) {
+        node.append_child("name").text().set(value.c_str());
+        node.last_child().append_attribute("lang").set_value(key.c_str());
+    }
+}
+//
+//--- END - implementation of class "NamesList" ---------------------------
 //
 
 

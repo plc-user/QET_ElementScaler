@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 plc-user
+ * Copyright (c) 2022-2025 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -39,7 +39,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0beta20";
+const std::string sVersion = "v0.5.0beta21";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -405,6 +405,10 @@ void ProcessElement(pugi::xml_node doc) {
         doc.child("definition").attribute("link_type").set_value("thumbnail");
         while(doc.child("definition").child("description").remove_child("terminal"));
         }
+    // wir lesen die Bauteil-Namen, um nach Sprache zu sortieren
+    NamesList Namen;
+    Namen.ReadFromPugiNode(doc.child("definition").child("names"));
+    Namen.WriteToPugiNode(doc.child("definition").child("names"));
     // in einer Schleife die Elemente bearbeiten:
     pugi::xml_node node = doc.child("definition").child("description").first_child();
     // ... in a loop all parts

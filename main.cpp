@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 plc-user
+ * Copyright (c) 2022-2025 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,19 +29,7 @@
 // Scalable Vector-Graphics.
 //
 // usage:
-// QET_ElementScaler [options] <file>
-//
-// compiles with C++17 enabled on
-// - Debian/GNU Linux (unstable)
-// - ReactOS (0.4.15-dev-6811)
-// - win
-// - ???
-// (see compile.sh and/or compile.cmd)
-//
-// Change(s) for 0.5.0beta1
-// - most of the source code has been rewritten
-// - added ability to export SVG-data
-// - adjusted order of commandline-parameters: see --help
+// see README.md
 //
 // +----------------------------------------------------------+
 // | This software uses pugixml library (https://pugixml.org) |
