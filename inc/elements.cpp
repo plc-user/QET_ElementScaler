@@ -109,8 +109,8 @@ void NamesList::WriteToPugiNode(pugi::xml_node node)
     while(node.remove_child("name"));
     // und jetzt kommen die Namen sortiert wieder rein:
     for (const auto& [key, value] : names) {
-        node.append_child("name").text().set(value.c_str());
-        node.last_child().append_attribute("lang").set_value(key.c_str());
+        node.append_child("name").append_attribute("lang").set_value(key.c_str());
+        node.last_child().text().set(value.c_str());
     }
 }
 //
