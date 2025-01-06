@@ -3,9 +3,11 @@
 QET_ElementScaler is a commandline-tool to scale QElectroTech-Elements with constant factor(s) and save the changed data to a renamed file.
 With the optional parameter &quot;-o&quot; or &quot;--stdout&quot; the changed data is written to stdout and no new file is created.
 
+Additionally: A &quot;qet_directory&quot; file can be specified, in which the localized names of the directory are then output sorted by language abbreviation. The given file is checked internally to see which of the two types it is: No additional specification of the type is required.
+
 As a gimmick, you can convert QET-Elements to SVG! (see options below)<br>
 
-It compiles with C++17 activated on Debian/GNU Linux (stable and unstable), ReactOS (0.4.15-dev), win, ...<br>
+It compiles with C++17 activated on Debian/GNU Linux (stable, testing and unstable), ReactOS, win, ...<br>
 The ReactOS-Build can also be used with Win in a cmd-window.<br>
 
 QET_ElementScaler can process one file at a time.
@@ -70,8 +72,11 @@ QET_ElementScaler -i -F 2.0  &lt;  ElementToScale.elmt  &gt;  ScaledElement.elmt
 or use a pipe like this <br>
 cat  ElementToScale.elmt  |  QET_ElementScaler -i -F 2.0  |  OtherSoftwareBinary <br>
  <br>
-another example:<br>
+example with different factors: <br>
 QET_ElementScaler -i -x 2 -y 3  &lt;  ElementToScale.elmt  &gt;  ScaledElement.elmt <br>
+ <br>
+sort names in qet_directory - file: <br>
+QET_ElementScaler --OverwriteOriginal qet_directory <br>
  <br>
  <br>
 
