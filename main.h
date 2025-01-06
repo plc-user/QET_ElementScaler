@@ -50,6 +50,8 @@ static std::string ElementFileScaled = "SampleFile.SCALED.elmt";
 static pugi::xml_node node;
 
 // some Bits for control
+static bool xIsElementFile      = false;
+static bool xIsDirectoryFile    = false;
 static bool xPrintHelp          = false;
 static bool xReadFromStdIn      = false;
 static bool xPrintToStdOut      = false;
@@ -86,6 +88,7 @@ static double moveY = 0.0;
 int parseCommandline(int argc, char *argv[]);
 void PrintHelp(const std::string &s, const std::string &v);
 bool CheckUUIDs(void);
+void ProcessDirFile(pugi::xml_node);
 void ProcessElement(pugi::xml_node);
 std::string ToSVG(pugi::xml_node);
 
@@ -381,6 +384,17 @@ bool CheckUUIDs(void) {
         std::cerr << " * * UUIDs of terminals are not unique: Create new ones! * *\n";
     }
     return (xDynTextsUUIDsUnique && xTerminalsUUIDsUnique);
+}
+/******************************************************************************/
+
+
+
+/******************************************************************************/
+void ProcessDirFile(pugi::xml_node doc) {
+    NamesList Namen;
+    Namen.ReadFromPugiNode(doc.child("qet-directory").child("names"));
+    Namen.WriteToPugiNode(doc.child("qet-directory").child("names"));
+    //
 }
 /******************************************************************************/
 

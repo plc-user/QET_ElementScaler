@@ -95,7 +95,10 @@ int main(int argc, char **argv)
     if (doc.child("definition").child("description")) {
         xIsElementFile = true;
     }
-    if (!(xIsElementFile)) {
+    if (doc.child("qet-directory").child("names")) {
+        xIsDirectoryFile = true;
+    }
+    if (!(xIsElementFile || xIsDirectoryFile)) {
         // no file-format we can handle here -> QUIT with message
         std::cerr << "cannot handle \"" << ElementFile << "\": wrong file-content! " << std::endl;
         return -2;
@@ -106,13 +109,21 @@ int main(int argc, char **argv)
     if (xOverwriteOriginal == true){
         std::cerr << "will overwrite original file!" << std::endl;
     } else {
-        ElementFileScaled.insert(ElementFileScaled.length()-5, ".SCALED");
+        (xIsElementFile ? ElementFileScaled.insert(ElementFileScaled.length()-5, ".SCALED") : ElementFileScaled += ".SCALED" );
     }
     if (_DEBUG_) std::cerr << ElementFileScaled << std::endl;
 
+    // Process "qet_directory"
+    if (xIsDirectoryFile) {
+        xCreateSVG = false;
+        xCreateELMT = true; // for xml-output we use the same function for "element" and "qet_directory"
+        ProcessDirFile(doc);
+    }
 
     // Process the Element-file: scale, flip, etc...
-    ProcessElement(doc);
+    if (xIsElementFile) {
+        ProcessElement(doc);
+    }
 
 
     if (xCreateSVG == true) {
