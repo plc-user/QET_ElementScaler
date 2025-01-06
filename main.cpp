@@ -91,6 +91,15 @@ int main(int argc, char **argv)
         if (_DEBUG_) std::cerr << "Element-File loaded successfully.\n";
     }
 
+    // xml-file was successfully loaded, let's check, what kind of data we have...
+    if (doc.child("definition").child("description")) {
+        xIsElementFile = true;
+    }
+    if (!(xIsElementFile)) {
+        // no file-format we can handle here -> QUIT with message
+        std::cerr << "cannot handle \"" << ElementFile << "\": wrong file-content! " << std::endl;
+        return -2;
+    }
 
     // build the filename for the scaled element:
     ElementFileScaled = ElementFile;
