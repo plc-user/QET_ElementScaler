@@ -93,12 +93,12 @@ int main(int argc, char **argv)
 
     // xml-file was successfully loaded, let's check, what kind of data we have...
     if (doc.child("definition").child("description")) {
-        xIsElementFile = true;
-    }
-    if (doc.child("qet-directory").child("names")) {
-        xIsDirectoryFile = true;
-    }
-    if (!(xIsElementFile || xIsDirectoryFile)) {
+        xIsElmtFile = true;
+    } else if (doc.child("qet-directory").child("names")) {
+        xIsDirFile  = true;
+        xCreateSVG  = false; // cannot create SVG from directory-file
+        xCreateELMT = true;  // use the same xml-output-function for "element" and "qet_directory"
+    } else {
         // no file-format we can handle here -> QUIT with message
         std::cerr << "cannot handle \"" << ElementFile << "\": wrong file-content! " << std::endl;
         return -2;
@@ -109,22 +109,19 @@ int main(int argc, char **argv)
     if (xOverwriteOriginal == true){
         std::cerr << "will overwrite original file!" << std::endl;
     } else {
-        (xIsElementFile ? ElementFileScaled.insert(ElementFileScaled.length()-5, ".SCALED") : ElementFileScaled += ".SCALED" );
+        (xIsElmtFile ? ElementFileScaled.insert(ElementFileScaled.length()-5, ".SCALED") : ElementFileScaled += ".SCALED" );
     }
     if (_DEBUG_) std::cerr << ElementFileScaled << std::endl;
 
     // Process "qet_directory"
-    if (xIsDirectoryFile) {
-        xCreateSVG = false;
-        xCreateELMT = true; // for xml-output we use the same function for "element" and "qet_directory"
+    if (xIsDirFile) {
         ProcessDirFile(doc);
     }
 
     // Process the Element-file: scale, flip, etc...
-    if (xIsElementFile) {
+    if (xIsElmtFile) {
         ProcessElement(doc);
     }
-
 
     if (xCreateSVG == true) {
       // SVG-Daten erstellen
@@ -132,8 +129,7 @@ int main(int argc, char **argv)
       if (xPrintToStdOut == true) {
         // zur Standard-Ausgabe:
         std::cout << s << "\n\n";
-      }
-      else {
+      } else {
         // Dateinamen erstellen und SVG speichern
         SVGFile = ElementFile+".svg";
         std::ofstream out;
@@ -144,9 +140,8 @@ int main(int argc, char **argv)
       return 0;
     }
 
-
     if (xCreateELMT == true) {
-        if (xPrintToStdOut==true){
+        if (xPrintToStdOut==true) {
             if (_DEBUG_) std::cerr << "XML auf stdout ------------------------------------------------------" << std::endl;
             doc.save(std::cout, "    ", pugi::format_default | pugi::format_no_declaration);
             // no result from "doc.save" when sending XML to cout ...
@@ -154,7 +149,7 @@ int main(int argc, char **argv)
             return 0;
         } else {
             // we try to save the new XML:
-            if (doc.save_file(ElementFileScaled.c_str(), "    ", pugi::format_default | pugi::format_no_declaration) == true){
+            if (doc.save_file(ElementFileScaled.c_str(), "    ", pugi::format_default | pugi::format_no_declaration) == true) {
                 if (_DEBUG_) std::cerr << "file \"" << ElementFileScaled << "\" saved successfully!" << std::endl;
                 return 0;
             } else {

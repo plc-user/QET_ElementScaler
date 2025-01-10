@@ -39,7 +39,7 @@
 // global variables
 // ============================================================================
 
-const std::string sVersion = "v0.5.0";
+const std::string sVersion = "v0.5.1beta1";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -50,8 +50,8 @@ static std::string ElementFileScaled = "SampleFile.SCALED.elmt";
 static pugi::xml_node node;
 
 // some Bits for control
-static bool xIsElementFile      = false;
-static bool xIsDirectoryFile    = false;
+static bool xIsElmtFile         = false;
+static bool xIsDirFile          = false;
 static bool xPrintHelp          = false;
 static bool xReadFromStdIn      = false;
 static bool xPrintToStdOut      = false;
