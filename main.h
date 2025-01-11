@@ -408,10 +408,10 @@ void ProcessElement(pugi::xml_node doc) {
     if (!(doc.child("definition").child("uuid"))) {
         if (_DEBUG_) std::cerr << "Erstelle Element-UUID!\n" ;
         doc.child("definition").prepend_child("uuid");
-        doc.child("definition").child("uuid").append_attribute("uuid").set_value(("{" + CreateUUID(false) + "}").c_str());
+        doc.child("definition").child("uuid").append_attribute("uuid").set_value(("{" + CreateUUID(false) + "}"));
     } else {
         if (_DEBUG_) std::cerr << "Aktualisiere vorhandene Element-UUID!\n" ;
-        doc.child("definition").child("uuid").attribute("uuid").set_value(("{" + CreateUUID(false) + "}").c_str());
+        doc.child("definition").child("uuid").attribute("uuid").set_value(("{" + CreateUUID(false) + "}"));
     }
     // wenn die Anschlüsse alle weg sollen...
     if (xRemoveAllTerminals==true) {
@@ -581,11 +581,11 @@ void ProcessElement(pugi::xml_node doc) {
         {
             if (((std::string(node.name())) == "terminal") && (xTerminalsUUIDsUnique == false)) {
                 std::string uuid = "{" + CreateUUID(false) + "}";
-                node.attribute("uuid").set_value(uuid.c_str());
+                node.attribute("uuid").set_value(uuid);
             }
             if (((std::string(node.name())) == "dynamic_text") && (xDynTextsUUIDsUnique == false)) {
                 std::string uuid = "{" + CreateUUID(false) + "}";
-                node.attribute("uuid").set_value(uuid.c_str());
+                node.attribute("uuid").set_value(uuid);
             }
         }
     }
