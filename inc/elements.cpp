@@ -29,7 +29,6 @@
 #include <cmath>        // for sqrt, atan2, isnan(), ...
 #include <iomanip>      // for IO-Operations
 #include <string>       // for string-handling
-#include <map>          // for Color-Map
 #include <sstream>      // for String-Streams
 
 
