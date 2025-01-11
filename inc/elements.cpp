@@ -885,23 +885,6 @@ void ElmtPolygon::InsertXYat(const uint64_t idx, const double xval, const double
         } // for (uint64...
     }
 }
-//
-void ElmtPolygon::AddPoint(const double x, const double y)
-{
-    // der Index vom angefügten Punkt muß größer sein, als der vom letzten Punkt (Tuple-Position "0")
-    uint64_t idx = 1;
-    if (polygon.size() > 0) { idx = std::get<0>(polygon[polygon.size()-1]) + 1; }
-    polygon.push_back(std::make_tuple(idx, x, y));
-    if (_DEBUG_) std::cerr // << "Anzahl Punkte: " << polygon.size() << "\n"
-              << "letzte Werte: \n i: " << std::get<0>(polygon[polygon.size()-1]) << "\n"
-              << " X = " << std::get<1>(polygon[polygon.size()-1]) << "\n"
-              << " Y = " << std::get<2>(polygon[polygon.size()-1]) << "\n";
-}
-//
-void ElmtPolygon::AddPoint(const uint64_t idx, const double x, const double y)
-{
-    InsertXYat(idx, x, y);
-}
 // ---
 void ElmtPolygon::Flip(void)
 {// vertikale Spiegelung = Flip

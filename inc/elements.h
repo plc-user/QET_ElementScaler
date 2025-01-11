@@ -401,8 +401,6 @@ class ElmtPolygon : public BaseElement,
       void InsertXat(const uint64_t, const double);
       void InsertYat(const uint64_t, const double);
       void InsertXYat(const uint64_t, const double, const double);
-      void AddPoint(const double, const double);
-      void AddPoint(const uint64_t, const double, const double);
       double GetMaxX() {
           double MaxX = -1e99;
           for (const auto &i : polygon)
