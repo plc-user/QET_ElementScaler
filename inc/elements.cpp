@@ -69,19 +69,19 @@ void DefinitionLine::ReCalc(RectMinMax XYMinMax) {
 void DefinitionLine::WriteToPugiNode(pugi::xml_node node)
 {   // sort attributes:
     node.remove_attribute("version");
-    node.append_attribute("version").set_value(version.c_str());
+    node.append_attribute("version").set_value(version);
     node.remove_attribute("type");
-    node.append_attribute("type").set_value(type.c_str());
+    node.append_attribute("type").set_value(type);
     node.remove_attribute("link_type");
-    node.append_attribute("link_type").set_value(link_type.c_str());
+    node.append_attribute("link_type").set_value(link_type);
     node.remove_attribute("width");
-    node.append_attribute("width").set_value(std::to_string(width).c_str());
+    node.append_attribute("width").set_value(std::to_string(width));
     node.remove_attribute("height");
-    node.append_attribute("height").set_value(std::to_string(height).c_str());
+    node.append_attribute("height").set_value(std::to_string(height));
     node.remove_attribute("hotspot_x");
-    node.append_attribute("hotspot_x").set_value(std::to_string(hotspot_x).c_str());
+    node.append_attribute("hotspot_x").set_value(std::to_string(hotspot_x));
     node.remove_attribute("hotspot_y");
-    node.append_attribute("hotspot_y").set_value(std::to_string(hotspot_y).c_str());
+    node.append_attribute("hotspot_y").set_value(std::to_string(hotspot_y));
 }
 //
 //--- END - implementation of class "DefinitionLine" ---------------------------
@@ -108,8 +108,8 @@ void NamesList::WriteToPugiNode(pugi::xml_node node)
     while(node.remove_child("name"));
     // und jetzt kommen die Namen sortiert wieder rein:
     for (const auto& [key, value] : names) {
-        node.append_child("name").append_attribute("lang").set_value(key.c_str());
-        node.last_child().text().set(value.c_str());
+        node.append_child("name").append_attribute("lang").set_value(key);
+        node.last_child().text().set(value);
     }
 }
 //
@@ -241,7 +241,7 @@ void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)
             uuid  = "{" + CreateUUID(false) + "}";
     } else {
         uuid      = "{" + CreateUUID(false) + "}";
-        node.append_attribute("uuid").set_value(uuid.c_str());
+        node.append_attribute("uuid").set_value(uuid);
     }
     if (node.attribute("keep_visual_rotation"))
         keep_visual_rotation
@@ -273,25 +273,25 @@ void ElmtDynText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {
     // Attribute löschen und wieder anfügen zum sortieren
     node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    node.append_attribute("x").set_value(FormatValue(x, decimals));
     node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    node.append_attribute("y").set_value(FormatValue(y, decimals));
     if (node.attribute("z")) {
         node.remove_attribute("z");
-        node.append_attribute("z").set_value(FormatValue(z, 0).c_str());
+        node.append_attribute("z").set_value(FormatValue(z, 0));
     }
     if (node.attribute("text_width")) {
         node.remove_attribute("text_width");
         if ( text_width < 0.0 ) { text_width = -1.0; }
-        node.append_attribute("text_width").set_value(FormatValue(text_width, 0).c_str());
+        node.append_attribute("text_width").set_value(FormatValue(text_width, 0));
     }
     if (node.attribute("Halignment")) {
         node.remove_attribute("Halignment");
-        node.append_attribute("Halignment").set_value(Halignment.c_str());
+        node.append_attribute("Halignment").set_value(Halignment);
     }
     if (node.attribute("Valignment")) {
         node.remove_attribute("Valignment");
-        node.append_attribute("Valignment").set_value(Valignment.c_str());
+        node.append_attribute("Valignment").set_value(Valignment);
     }
     if (node.attribute("rotate")) {
         node.remove_attribute("rotate");
@@ -299,35 +299,35 @@ void ElmtDynText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
     }
     if (node.attribute("rotation")) {
         node.remove_attribute("rotation");
-        node.append_attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
+        node.append_attribute("rotation").set_value(FormatValue(rotation, 0));
     }
     if (node.attribute("text_from")) {
         node.remove_attribute("text_from");
-        node.append_attribute("text_from").set_value(text_from.c_str());
+        node.append_attribute("text_from").set_value(text_from);
     }
     if (node.attribute("size")) {
         node.remove_attribute("size");
-        node.append_attribute("size").set_value(FormatValue(size, 0).c_str());
+        node.append_attribute("size").set_value(FormatValue(size, 0));
     }
     if (node.attribute("font_size")) {
         node.remove_attribute("font_size");
-        node.append_attribute("font_size").set_value(FormatValue(size, 0).c_str());
+        node.append_attribute("font_size").set_value(FormatValue(size, 0));
     }
     if (node.attribute("text")) { // noch nötig??
         node.remove_attribute("text");
-        node.append_attribute("text").set_value(text.c_str());
+        node.append_attribute("text").set_value(text);
     }
     if (node.attribute("uuid")) {
         node.remove_attribute("uuid");
-        node.append_attribute("uuid").set_value(uuid.c_str());
+        node.append_attribute("uuid").set_value(uuid);
     }
     if (node.attribute("font")) {
         node.remove_attribute("font");
-        node.append_attribute("font").set_value(font.c_str());
+        node.append_attribute("font").set_value(font);
     }
     if (node.attribute("color")) {
         node.remove_attribute("color");
-        node.append_attribute("color").set_value(color.c_str());
+        node.append_attribute("color").set_value(color);
     }
     // nun die Unter-Elemente:
     if (node.child("text"))
@@ -456,26 +456,26 @@ void ElmtText::ReadFromPugiNode(pugi::xml_node& node)
 void ElmtText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes by removing and re-adding
     node.remove_attribute("text");
-    node.prepend_attribute("text").set_value(text.c_str());
+    node.prepend_attribute("text").set_value(text);
     node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    node.append_attribute("x").set_value(FormatValue(x, decimals));
     node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    node.append_attribute("y").set_value(FormatValue(y, decimals));
     if (node.attribute("size")) {
         node.remove_attribute("size");
-        node.append_attribute("size").set_value(FormatValue(size, 0).c_str());
+        node.append_attribute("size").set_value(FormatValue(size, 0));
     }
     if (node.attribute("rotation")) {
         node.remove_attribute("rotation");
-        node.append_attribute("rotation").set_value(FormatValue(rotation, 0).c_str());
+        node.append_attribute("rotation").set_value(FormatValue(rotation, 0));
     }
     if (node.attribute("font")) {
         node.remove_attribute("font");
-        node.append_attribute("font").set_value(font.c_str());
+        node.append_attribute("font").set_value(font);
     }
     if (node.attribute("color")) {
         node.remove_attribute("color");
-        node.append_attribute("color").set_value(color.c_str());
+        node.append_attribute("color").set_value(color);
     }
 }
 // ---
@@ -638,19 +638,19 @@ void ElmtArc::DetermineMinMax(){
 void ElmtArc::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes:
     node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    node.append_attribute("x").set_value(FormatValue(x, decimals));
     node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    node.append_attribute("y").set_value(FormatValue(y, decimals));
     node.remove_attribute("width");
-    node.append_attribute("width").set_value(FormatValue(width, decimals).c_str());
+    node.append_attribute("width").set_value(FormatValue(width, decimals));
     node.remove_attribute("height");
-    node.append_attribute("height").set_value(FormatValue(height, decimals).c_str());
+    node.append_attribute("height").set_value(FormatValue(height, decimals));
     node.remove_attribute("start");
-    node.append_attribute("start").set_value(FormatValue(start, 0).c_str());
+    node.append_attribute("start").set_value(FormatValue(start, 0));
     node.remove_attribute("angle");
-    node.append_attribute("angle").set_value(FormatValue(angle, 0).c_str());
+    node.append_attribute("angle").set_value(FormatValue(angle, 0));
     node.remove_attribute("style");
-    node.append_attribute("style").set_value(style.c_str());
+    node.append_attribute("style").set_value(style);
     node.remove_attribute("antialias");
     node.append_attribute("antialias").set_value(antialias);
 }
@@ -731,11 +731,11 @@ void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
     for (const auto &i : polygon) {
         std::string s = "";
         s = "x" + std::to_string(std::get<0>(i));
-        node.remove_attribute(s.c_str());   // to sort the polygon-points...
-        node.append_attribute(s.c_str()).set_value(FormatValue(std::get<1>(i), decimals).c_str());
+        node.remove_attribute(s);   // to sort the polygon-points...
+        node.append_attribute(s).set_value(FormatValue(std::get<1>(i), decimals));
         s = "y" + std::to_string(std::get<0>(i));
-        node.remove_attribute(s.c_str());   // to sort the polygon-points...
-        node.append_attribute(s.c_str()).set_value(FormatValue(std::get<2>(i), decimals).c_str());
+        node.remove_attribute(s);   // to sort the polygon-points...
+        node.append_attribute(s).set_value(FormatValue(std::get<2>(i), decimals));
     }
     // dann die sonstigen Eigenschaften des Polygons:
     if (node.attribute("closed"))
@@ -751,7 +751,7 @@ void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
     // einen Style hat das Polygon auch:
     if (node.attribute("style")) {
         node.remove_attribute("style");
-        node.append_attribute("style").set_value(style.c_str());
+        node.append_attribute("style").set_value(style);
     }
 }
 // ---
@@ -952,9 +952,9 @@ void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
         if ((diffx <= epsilon) && (diffy <= epsilon)) {
             // letzten Punkt aus dem Pugi-Node löschen
             std::string s = "x" + std::to_string(polygon.size());
-            node.remove_attribute(s.c_str());   // to get rid of double points
+            node.remove_attribute(s);   // to get rid of double points
             s = "y" + std::to_string(polygon.size());
-            node.remove_attribute(s.c_str());   // to get rid of double points
+            node.remove_attribute(s);   // to get rid of double points
             // den Punkt i+1 aus vector entfernen:
             polygon.erase(polygon.begin() + i+1);
             xDeletedPoint = true;
@@ -966,9 +966,9 @@ void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
     if ((diffx <= epsilon) && (diffy <= epsilon)) {
         // letzten Punkt aus dem Pugi-Node löschen
         std::string s = "x" + std::to_string(polygon.size());
-        node.remove_attribute(s.c_str());   // to get rid of double points
+        node.remove_attribute(s);   // to get rid of double points
         s = "y" + std::to_string(polygon.size());
-        node.remove_attribute(s.c_str());   // to get rid of double points
+        node.remove_attribute(s);   // to get rid of double points
         // den Punkt i+1 aus vector entfernen:
         polygon.erase(polygon.end());
         // nun ist aber das Polygon geschlossen:
@@ -1018,23 +1018,23 @@ void ElmtEllipse::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes:
     if (node.attribute("x")){
         node.remove_attribute("x");
-        node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+        node.append_attribute("x").set_value(FormatValue(x, decimals));
     }
     if (node.attribute("y")){
         node.remove_attribute("y");
-        node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+        node.append_attribute("y").set_value(FormatValue(y, decimals));
     }
     if (node.attribute("width")){
         node.remove_attribute("width");
-        node.append_attribute("width").set_value(FormatValue(width, decimals).c_str());
+        node.append_attribute("width").set_value(FormatValue(width, decimals));
     }
     if (node.attribute("height")){
         node.remove_attribute("height");
-        node.append_attribute("height").set_value(FormatValue(height, decimals).c_str());
+        node.append_attribute("height").set_value(FormatValue(height, decimals));
     }
     if (node.attribute("style")){
         node.remove_attribute("style");
-        node.append_attribute("style").set_value(style.c_str());
+        node.append_attribute("style").set_value(style);
     }
     if (node.attribute("antialias")){
         node.remove_attribute("antialias");
@@ -1086,19 +1086,19 @@ void ElmtRect::ReadFromPugiNode(pugi::xml_node& node)
 void ElmtRect::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {
     node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, decimals).c_str());
+    node.append_attribute("x").set_value(FormatValue(x, decimals));
     node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, decimals).c_str());
+    node.append_attribute("y").set_value(FormatValue(y, decimals));
     node.remove_attribute("width");
-    node.append_attribute("width").set_value(FormatValue(width, decimals).c_str());
+    node.append_attribute("width").set_value(FormatValue(width, decimals));
     node.remove_attribute("height");
-    node.append_attribute("height").set_value(FormatValue(height, decimals).c_str());
+    node.append_attribute("height").set_value(FormatValue(height, decimals));
     node.remove_attribute("rx");
-    node.append_attribute("rx").set_value(FormatValue(rx, decimals).c_str());
+    node.append_attribute("rx").set_value(FormatValue(rx, decimals));
     node.remove_attribute("ry");
-    node.append_attribute("ry").set_value(FormatValue(ry, decimals).c_str());
+    node.append_attribute("ry").set_value(FormatValue(ry, decimals));
     node.remove_attribute("style");
-    node.append_attribute("style").set_value(style.c_str());
+    node.append_attribute("style").set_value(style);
     node.remove_attribute("antialias");
     node.append_attribute("antialias").set_value(antialias);
 }
@@ -1155,23 +1155,23 @@ bool ElmtLine::ReadFromPugiNode(pugi::xml_node& node)
 void ElmtLine::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes
     node.remove_attribute("x1");
-    node.append_attribute("x1").set_value(FormatValue(std::get<1>(polygon[0]), decimals).c_str());
+    node.append_attribute("x1").set_value(FormatValue(std::get<1>(polygon[0]), decimals));
     node.remove_attribute("y1");
-    node.append_attribute("y1").set_value(FormatValue(std::get<2>(polygon[0]), decimals).c_str());
+    node.append_attribute("y1").set_value(FormatValue(std::get<2>(polygon[0]), decimals));
     node.remove_attribute("x2");
-    node.append_attribute("x2").set_value(FormatValue(std::get<1>(polygon[1]), decimals).c_str());
+    node.append_attribute("x2").set_value(FormatValue(std::get<1>(polygon[1]), decimals));
     node.remove_attribute("y2");
-    node.append_attribute("y2").set_value(FormatValue(std::get<2>(polygon[1]), decimals).c_str());
+    node.append_attribute("y2").set_value(FormatValue(std::get<2>(polygon[1]), decimals));
     node.remove_attribute("end1");
-    node.append_attribute("end1").set_value(end1.c_str());
+    node.append_attribute("end1").set_value(end1);
     node.remove_attribute("end2");
-    node.append_attribute("end2").set_value(end2.c_str());
+    node.append_attribute("end2").set_value(end2);
     node.remove_attribute("length1");
-    node.append_attribute("length1").set_value(FormatValue(length1, decimals).c_str());
+    node.append_attribute("length1").set_value(FormatValue(length1, decimals));
     node.remove_attribute("length2");
-    node.append_attribute("length2").set_value(FormatValue(length2, decimals).c_str());
+    node.append_attribute("length2").set_value(FormatValue(length2, decimals));
     node.remove_attribute("style");
-    node.append_attribute("style").set_value(style.c_str());
+    node.append_attribute("style").set_value(style);
     node.remove_attribute("antialias");
     node.append_attribute("antialias").set_value(antialias);
 }
@@ -1314,7 +1314,7 @@ void ElmtTerminal::ReadFromPugiNode(pugi::xml_node& node)
     if (uuid.length() != 38) {
         uuid  = "{" + CreateUUID(false) + "}";
         node.remove_attribute("uuid");
-        node.prepend_attribute("uuid").set_value(uuid.c_str());
+        node.prepend_attribute("uuid").set_value(uuid);
     }
 }
 // ---
@@ -1323,25 +1323,25 @@ void ElmtTerminal::WriteToPugiNode(pugi::xml_node& node)
     // to achieve a constant order we need to remove and append attributes
     if (node.attribute("uuid")) {
         node.remove_attribute("uuid");
-        node.prepend_attribute("uuid").set_value(uuid.c_str());
+        node.prepend_attribute("uuid").set_value(uuid);
         } else {
-        node.prepend_attribute("uuid").set_value(("{" + CreateUUID(false) + "}").c_str());
+        node.prepend_attribute("uuid").set_value(("{" + CreateUUID(false) + "}"));
         }
     if (node.attribute("name")) {
         node.remove_attribute("name");
-        node.append_attribute("name").set_value(name.c_str());
+        node.append_attribute("name").set_value(name);
         } else {
         node.append_attribute("name").set_value("");
         }
     node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, 0).c_str());
+    node.append_attribute("x").set_value(FormatValue(x, 0));
     node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, 0).c_str());
+    node.append_attribute("y").set_value(FormatValue(y, 0));
     node.remove_attribute("orientation");
-    node.append_attribute("orientation").set_value(orientation.c_str());
+    node.append_attribute("orientation").set_value(orientation);
     if (node.attribute("type")) {
         node.remove_attribute("type");
-        node.append_attribute("type").set_value(type.c_str());
+        node.append_attribute("type").set_value(type);
         } else {
         node.append_attribute("type").set_value("Generic");
         }
