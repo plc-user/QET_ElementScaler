@@ -756,7 +756,8 @@ void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 }
 // ---
 bool ElmtPolygon::CheckIndex(const std::string sType){
-   if (polygon.size() <= 1 ) {
+   // Polygon soll mindestens zwei Punkte haben!
+   if (polygon.size() < 2) {
      std::cerr << "Remove " << sType << " with one or less points!\n";
      return false;
    }

@@ -542,7 +542,7 @@ void ProcessElement(pugi::xml_node doc) {
                     ElmtMinMax.addx(line.GetMaxX());
                     ElmtMinMax.addy(line.GetMinY());
                     ElmtMinMax.addy(line.GetMaxY());
-                }
+                } else { node.set_name("LINE_NodeToDelete"); }
             } else {
                 // Invalid line will be ignored and deleted later!
                 node.set_name("LINE_NodeToDelete");
@@ -563,7 +563,7 @@ void ProcessElement(pugi::xml_node doc) {
                     ElmtMinMax.addx(poly.GetMaxX());
                     ElmtMinMax.addy(poly.GetMinY());
                     ElmtMinMax.addy(poly.GetMaxY());
-                }
+                } else { node.set_name("POLYGON_NodeToDelete"); }
             } else {
                 // Invalid polygon will be ignored and deleted later!
                 node.set_name("POLYGON_NodeToDelete");
