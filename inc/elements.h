@@ -30,7 +30,6 @@
 #include <cstdint>      // int8_t, ...
 #include <cmath>        // sqrt, ...
 #include <vector>       // für Polygone
-#include <tuple>        // einzelne Punkte des Polygons
 #include <map>          // die Namen des Elements
 
 #include "pugixml/pugixml.hpp"
@@ -53,6 +52,20 @@ void RotPoint90(double&, double&);
 //
 // für die Verwaltung von grafischen Elementen:
 //
+
+
+
+struct PolyPoint
+{   // a single point of a Polygon
+    uint64_t i = 0;         // index
+    double   x = sqrt(-1);  // x-value preset with "nan"
+    double   y = sqrt(-1);  // y-value preset with "nan"
+    //
+    PolyPoint();
+    PolyPoint(const uint64_t n, const double inx, const double iny) : i(n), x(inx), y(iny) {}
+};
+
+
 
 //
 //--- START - definition of definition-line of Elements ------------------------
@@ -180,6 +193,7 @@ class BaseStyle {
 class BasePosition {
    // enthält nur die X-Y-Z-Position:
    private:
+      //
    protected:
       double x = 0.0;
       double y = 0.0;
@@ -216,6 +230,7 @@ class BasePosition {
 class BaseSize {
    // enthält nur die Breite und Höhe:
    private:
+      //
    protected:
       double width = 0.0;
       double height = 0.0;
@@ -385,10 +400,10 @@ class ElmtPolygon : public BaseElement,
                     public BaseStyle
 {
    protected:
-      std::vector<std::tuple<uint64_t, double, double>> polygon;
+      std::vector<PolyPoint> polygon;
       bool closed = true;
    private:
-
+      //
    public:
       ElmtPolygon() : BaseElement("polygon") {
                        //std::cerr << " default-constructor ElmtPolygon - Typ: " << Type << "\n";
@@ -398,38 +413,35 @@ class ElmtPolygon : public BaseElement,
                        }
       bool ReadFromPugiNode(pugi::xml_node&);
       void WriteToPugiNode(pugi::xml_node&, const size_t&);
-      void InsertXat(const uint64_t, const double);
-      void InsertYat(const uint64_t, const double);
-      void InsertXYat(const uint64_t, const double, const double);
       double GetMaxX() {
           double MaxX = -1e99;
-          for (const auto &i : polygon)
-              MaxX = std::max(MaxX, std::get<1>(i));
+          for (const auto &pt : polygon)
+              MaxX = std::max(MaxX, pt.x);
           return MaxX;
           }
       double GetMinX() {
           double MinX = 1e99;
-          for (const auto &i : polygon)
-              MinX = std::min(MinX, std::get<1>(i));
+          for (const auto &pt : polygon)
+              MinX = std::min(MinX, pt.x);
           return MinX;
           }
       double GetMaxY() {
           double MaxY = -1e99;
-          for (const auto &i : polygon)
-              MaxY = std::max(MaxY, std::get<2>(i));
+          for (const auto &pt : polygon)
+              MaxY = std::max(MaxY, pt.y);
           return MaxY;
           }
       double GetMinY() {
           double MinY = 1e99;
-          for (const auto &i : polygon)
-              MinY = std::min(MinY, std::get<2>(i));
+          for (const auto &pt : polygon)
+              MinY = std::min(MinY, pt.y);
           return MinY;
           }
       void Clear(){ polygon.clear(); closed = true; }
       bool CheckIndex(const std::string);
       virtual void Write(void) {
-                         for(const auto &i : polygon)
-                             std::cout<<std::get<0>(i)<<" - "<<std::get<1>(i)<<" - "<<std::get<2>(i)<<"\n";
+                         for(const auto &pt : polygon)
+                             std::cout << pt.i << " - " << pt.x << " - " << pt.y << "\n";
                          }
       std::string AsSVGstring(const size_t&);
       void Flip(void);   // vertikal
@@ -463,12 +475,10 @@ class ElmtLine : public ElmtPolygon {
       bool ReadFromPugiNode(pugi::xml_node&);
       void WriteToPugiNode(pugi::xml_node&, const size_t&);
       double GetLength(void) {
-          return (sqrt( pow((std::get<2>(polygon[1])-(std::get<2>(polygon[0]))), 2) +
-                        pow((std::get<1>(polygon[1])-(std::get<1>(polygon[0]))), 2)) );
+          return (sqrt( pow((polygon[1].y-polygon[0].y), 2) + pow((polygon[1].x-polygon[0].x), 2)) );
           }
       double GetAngle(void) {
-          return toDeg<double>(atan2((std::get<2>(polygon[1])-(std::get<2>(polygon[0]))),
-                                     (std::get<1>(polygon[1])-(std::get<1>(polygon[0]))) ) );
+          return toDeg<double>(atan2((polygon[1].y-polygon[0].y), (polygon[1].x-polygon[0].x)));
           }
       void SetLength1(const double val) { length1 = val; }
       void SetLength2(const double val) { length2 = val; }

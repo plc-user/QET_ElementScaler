@@ -26,7 +26,6 @@
 #include "helpers.h"
 #include "elements.h"
 
-#include <cmath>        // for sqrt, atan2, isnan(), ...
 #include <iomanip>      // for IO-Operations
 #include <string>       // for string-handling
 #include <sstream>      // for String-Streams
@@ -698,6 +697,11 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node& node)
         closed    = node.attribute("closed").as_bool();
     antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
+    // insert values in map to automatically sort:
+    std::map<uint64_t, double> valX;
+    std::map<uint64_t, double> valY;
+    uint64_t maxIX = 0; // max. Index for X
+    uint64_t maxIY = 0; // max. Index for Y
     // walk through the attributes to read all points:
     for (pugi::xml_attribute attr: node.attributes()) {
         if (attr.name()[0]=='x') {
@@ -706,7 +710,8 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node& node)
             if (((std::string)attr.as_string() == "nan") || (!(std::isfinite(attr.as_double())))) {
                 std::cerr << " * * * Polygon-Point with invalid value!\n";
             } else {
-                InsertXat(std::stoi(str), attr.as_double());
+                if ((uint64_t)std::stoi(str) > maxIX) { maxIX = std::stoi(str); }
+                valX[std::stoi(str)] = attr.as_double();
             }
             if (_DEBUG_) Write();
         }
@@ -716,11 +721,27 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node& node)
             if (((std::string)attr.as_string() == "nan") || (!(std::isfinite(attr.as_double())))) {
                 std::cerr << " * * * Polygon-Point with invalid value!\n";
             } else {
-                InsertYat(std::stoi(str), attr.as_double());
+                if ((uint64_t)std::stoi(str) > maxIY) { maxIY = std::stoi(str); }
+                valY[std::stoi(str)] = attr.as_double();
             }
             if (_DEBUG_) Write();
         }
     } // for (pugi::xml_attribute ...
+    if (    (valX.size() == valY.size())     // beide maps müssen gleich groß sein
+         && (valX.size() >= 2)               // Polygon muss mehr als einen Punkt haben
+         && (valX.find(valX.size())->first == maxIX)  // höchster Index und Größe stimmen überein
+         && (valY.find(valY.size())->first == maxIY)  // höchster Index und Größe stimmen überein
+        )
+    {
+        // umkopieren in vector of PolyPoint:
+        for (uint64_t i=0; i<valX.size(); i++) {
+            polygon.push_back(PolyPoint(i+1, valX.at(i+1), valY.at(i+1)));
+        }
+        return true;
+    } else {
+        std::cerr << "Polygon not konsistent! \n";
+        return false;
+    }
     // Check the Polygon:
     return CheckIndex(node.name());
 }
@@ -728,14 +749,14 @@ bool ElmtPolygon::ReadFromPugiNode(pugi::xml_node& node)
 void ElmtPolygon::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // wir sortieren die Attribute
     // zuerst sind die Polygon-Punkte dran:
-    for (const auto &i : polygon) {
+    for (const auto &pt : polygon) {
         std::string s = "";
-        s = "x" + std::to_string(std::get<0>(i));
+        s = "x" + std::to_string(pt.i);
         node.remove_attribute(s);   // to sort the polygon-points...
-        node.append_attribute(s).set_value(FormatValue(std::get<1>(i), decimals));
-        s = "y" + std::to_string(std::get<0>(i));
+        node.append_attribute(s).set_value(FormatValue(pt.x, decimals));
+        s = "y" + std::to_string(pt.i);
         node.remove_attribute(s);   // to sort the polygon-points...
-        node.append_attribute(s).set_value(FormatValue(std::get<2>(i), decimals));
+        node.append_attribute(s).set_value(FormatValue(pt.y, decimals));
     }
     // dann die sonstigen Eigenschaften des Polygons:
     if (node.attribute("closed"))
@@ -761,13 +782,14 @@ bool ElmtPolygon::CheckIndex(const std::string sType){
      std::cerr << "Remove " << sType << " with one or less points!\n";
      return false;
    }
-   if ( !(std::get<0>(polygon[polygon.size()-1]) == polygon.size()) ) {
+   // Höchster Index ist gleich Anzahl Punkte?
+   if ( !((polygon[polygon.size()-1].i) == polygon.size())) {
      std::cerr << "Remove " << sType << ": indexing not correct (point missing)\n";
      return false;
    }
    for (uint64_t i=0; i<(polygon.size()-1); i++) {
-     if ( (std::isnan(std::get<1>(polygon[i])))  ||
-          (std::isnan(std::get<2>(polygon[i]))) ) {
+     if ( (std::isnan(polygon[i].x))  ||
+          (std::isnan(polygon[i].y)) ) {
        std::cerr << "Remove " << sType << ": Value missing at index: "<< i+1 <<"\n";
        return false;
      }
@@ -775,152 +797,40 @@ bool ElmtPolygon::CheckIndex(const std::string sType){
    return true;
 }
 // ---
-void ElmtPolygon::InsertXat(const uint64_t idx, const double val)
-{
-    if (_DEBUG_) std::cerr << " insert X-val ("<<val<<") with index " << idx << "\n";
-    if (polygon.size() == 0) {
-        // erster Punkt --> einfach hinten dran!
-        if (_DEBUG_) std::cerr << "erster Punkt vom Polygon! \n";
-        polygon.push_back(std::make_tuple(idx, val, sqrt(-1)));
-        return;
-    } else
-    if ( (idx > std::get<0>(polygon[polygon.size()-1])) ) {
-        // Index ist größer als vom obersten Punkt --> hinten dran!
-        if (_DEBUG_) std::cerr << "neuer hoechster Index - haenge hinten an \n";
-        polygon.push_back(std::make_tuple(idx, val, sqrt(-1)));
-        return;
-    } else
-    if (idx < std::get<0>(polygon[0])) {
-        if (_DEBUG_) std::cerr << "neuer niedrigster Index kommt nach vorne! \n";
-        polygon.insert(polygon.begin(), std::make_tuple(idx, val, sqrt(-1)));
-        return;
-    } else {
-        // Punkt muss irgendwo ersetzt bzw. eingefügt werden
-        for (uint64_t i=0; i<polygon.size(); i++) {
-            if (_DEBUG_) std::cerr << "pruefe Index " << idx << " an Stelle " << i << " \n";
-            if (idx == std::get<0>(polygon[i])) {
-                if (_DEBUG_) std::cerr << "Index vorhanden - an Stelle " << i << " ersetzen \n";
-                std::get<1>(polygon[i]) = val;
-                return;
-            } else
-            if (idx < std::get<0>(polygon[i+1])) {
-                if (_DEBUG_) std::cerr << "neuer Index - fuege an Stelle " << i+1 << " ein \n";
-                polygon.insert(polygon.begin()+i+1, std::make_tuple(idx, val, sqrt(-1)));
-                return;
-            }
-        } // for (uint64...
-    }
-}
-//
-void ElmtPolygon::InsertYat(const uint64_t idx, const double val)
-{
-    if (_DEBUG_) std::cerr << " insert Y-val ("<<val<<") with index " << idx << "\n";
-    if (polygon.size() == 0) {
-        // erster Punkt --> einfach hinten dran!
-        if (_DEBUG_) std::cerr << "erster Punkt vom Polygon! \n";
-        polygon.push_back(std::make_tuple(idx, sqrt(-1), val));
-        return;
-    } else
-    if ( (idx > std::get<0>(polygon[polygon.size()-1])) ) {
-        // Index ist größer als vom obersten Punkt --> hinten dran!
-        if (_DEBUG_) std::cerr << "neuer hoechster Index - haenge hinten an \n";
-        polygon.push_back(std::make_tuple(idx, sqrt(-1), val));
-        return;
-    } else
-    if (idx < std::get<0>(polygon[0])) {
-        if (_DEBUG_) std::cerr << "neuer niedrigster Index kommt nach vorne! \n";
-        polygon.insert(polygon.begin(), std::make_tuple(idx, sqrt(-1), val));
-        return;
-    } else {
-        // Punkt muss irgendwo ersetzt bzw. eingefügt werden
-        for (uint64_t i=0; i<polygon.size(); i++) {
-            if (_DEBUG_) std::cerr << "pruefe Index " << idx << " an Stelle " << i << " \n";
-            if (idx == std::get<0>(polygon[i])) {
-                if (_DEBUG_) std::cerr << "Index vorhanden - an Stelle " << i << " ersetzen \n";
-                std::get<2>(polygon[i]) = val;
-                return;
-            } else
-            if (idx < std::get<0>(polygon[i+1])) {
-                if (_DEBUG_) std::cerr << "neuer Index - fuege an Stelle " << i+1 << " ein \n";
-                polygon.insert(polygon.begin()+i+1, std::make_tuple(idx, sqrt(-1), val));
-                return;
-            }
-        } // for (uint64...
-    }
-}
-//
-void ElmtPolygon::InsertXYat(const uint64_t idx, const double xval, const double yval)
-{
-    if (_DEBUG_) std::cerr << " insert XY-val ("<<xval<<"|"<<yval<<") with index " << idx << "\n";
-    if (polygon.size() == 0) {
-        // erster Punkt --> einfach hinten dran!
-        if (_DEBUG_) std::cerr << "erster Punkt vom Polygon! \n";
-        polygon.push_back(std::make_tuple(idx, xval, yval));
-        return;
-    } else
-    if ( (idx > std::get<0>(polygon[polygon.size()-1])) ) {
-        // Index ist größer als vom obersten Punkt --> hinten dran!
-        if (_DEBUG_) std::cerr << "neuer hoechster Index - haenge hinten an \n";
-        polygon.push_back(std::make_tuple(idx, xval, yval));
-        return;
-    } else
-    if (idx < std::get<0>(polygon[0])) {
-        if (_DEBUG_) std::cerr << "neuer niedrigster Index kommt nach vorne! \n";
-        polygon.insert(polygon.begin(), std::make_tuple(idx, xval, yval));
-        return;
-    } else {
-        // Punkt muss irgendwo ersetzt bzw. eingefügt werden
-        for (uint64_t i=0; i<polygon.size(); i++) {
-            if (_DEBUG_) std::cerr << "pruefe Index " << idx << " an Stelle " << i << " \n";
-            if (idx == std::get<0>(polygon[i])) {
-                if (_DEBUG_) std::cerr << "Index vorhanden - an Stelle " << i << " ersetzen \n";
-                std::get<1>(polygon[i]) = xval;
-                std::get<2>(polygon[i]) = yval;
-                return;
-            } else
-            if (idx < std::get<0>(polygon[i+1])) {
-                if (_DEBUG_) std::cerr << "neuer Index - fuege an Stelle " << i+1 << " ein \n";
-                polygon.insert(polygon.begin()+i+1, std::make_tuple(idx, xval, yval));
-                return;
-            }
-        } // for (uint64...
-    }
-}
-// ---
 void ElmtPolygon::Flip(void)
 {// vertikale Spiegelung = Flip
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        std::get<2>(polygon[i]) = std::get<2>(polygon[i]) * (-1);
+    for (auto &pt : polygon) {
+        pt.y *= (-1);
     }
 }
 // ---
 void ElmtPolygon::Mirror(void)
 {// horizontale Spiegelung = Mirror
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        std::get<1>(polygon[i]) = std::get<1>(polygon[i]) * (-1);
+    for (auto &pt : polygon) {
+        pt.x *= (-1);
     }
 }
 // ---
 void ElmtPolygon::Rot90(void)
 {// drehen um 90° im Uhrzeigersinn
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        RotPoint90(std::get<1>(polygon[i]), std::get<2>(polygon[i]));
+    for (auto &pt : polygon) {
+        RotPoint90(pt.x, pt.y);
     }
 }
 // ---
 void ElmtPolygon::Scale(const double factX, const double factY)
 {
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        std::get<1>(polygon[i]) = std::get<1>(polygon[i]) * factX;
-        std::get<2>(polygon[i]) = std::get<2>(polygon[i]) * factY;
+    for (auto &pt: polygon) {
+        pt.x *= factX;
+        pt.y *= factY;
     }
 }
 // ---
 void ElmtPolygon::Move(const double dx, const double dy)
 {   // add the delta-values to all X- and Y-values
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        std::get<1>(polygon[i]) = std::get<1>(polygon[i]) + dx;
-        std::get<2>(polygon[i]) = std::get<2>(polygon[i]) + dy;
+    for (auto &pt: polygon) {
+        pt.x += dx;
+        pt.y += dy;
     }
 }
 // ---
@@ -930,9 +840,9 @@ std::string ElmtPolygon::AsSVGstring(const size_t& decimals)
     std::string s = "<polygon points=\"";
     if (closed == false) s = "<polyline points=\"";
     //
-    for (uint64_t i=0; i<polygon.size(); i++) {
-        s += FormatValue(std::get<1>(polygon[i]), decimals) + ",";
-        s += FormatValue(std::get<2>(polygon[i]), decimals) + " ";
+    for (auto &pt: polygon) {
+        s += FormatValue(pt.x, decimals) + ",";
+        s += FormatValue(pt.y, decimals) + " ";
     }
     s[s.length()-1] = '\"';
     s += " ";
@@ -948,8 +858,8 @@ void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
     bool xDeletedPoint = false;
     // das gesamte Polygon durchgehen:
     for (uint64_t i=(polygon.size()-2); i>0; i--) {
-        double diffx = std::abs(std::get<1>(polygon[i]) - std::get<1>(polygon[i+1]));
-        double diffy = std::abs(std::get<2>(polygon[i]) - std::get<2>(polygon[i+1]));
+        double diffx = std::abs((polygon[i].x) - (polygon[i+1].x));
+        double diffy = std::abs((polygon[i].y) - (polygon[i+1].y));
         if ((diffx <= epsilon) && (diffy <= epsilon)) {
             // letzten Punkt aus dem Pugi-Node löschen
             std::string s = "x" + std::to_string(polygon.size());
@@ -962,8 +872,8 @@ void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
         }
     }
     // und nun mal schauen, ob das Polygon durch Punkte geschlossen wurde:
-    double diffx = std::abs(std::get<1>(polygon[0]) - std::get<1>(polygon[polygon.size()-1]));
-    double diffy = std::abs(std::get<2>(polygon[0]) - std::get<2>(polygon[polygon.size()-1]));
+    double diffx = std::abs(polygon[0].x - polygon[polygon.size()-1].x);
+    double diffy = std::abs(polygon[0].y - polygon[polygon.size()-1].y);
     if ((diffx <= epsilon) && (diffy <= epsilon)) {
         // letzten Punkt aus dem Pugi-Node löschen
         std::string s = "x" + std::to_string(polygon.size());
@@ -979,7 +889,7 @@ void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
     // Polygon muss neu durchnummeriert werden?
     if (xDeletedPoint == true) {
         for (uint64_t i=0; i<polygon.size(); i++) {
-            std::get<0>(polygon[i]) = i + 1;
+            polygon[i].i = i + 1;
         }
     }
 }
@@ -1148,21 +1058,22 @@ bool ElmtLine::ReadFromPugiNode(pugi::xml_node& node)
         std::cerr << "Remove incomplete " << node.name() << "\n";
         return false;
         }
-    InsertXYat(1, node.attribute("x1").as_double(), node.attribute("y1").as_double());
-    InsertXYat(2, node.attribute("x2").as_double(), node.attribute("y2").as_double());
+    // die Daten in den Vector:
+    polygon.push_back(PolyPoint(1, node.attribute("x1").as_double(), node.attribute("y1").as_double()));
+    polygon.push_back(PolyPoint(2, node.attribute("x2").as_double(), node.attribute("y2").as_double()));
     return CheckIndex(node.name());
 }
 // ---
 void ElmtLine::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes
     node.remove_attribute("x1");
-    node.append_attribute("x1").set_value(FormatValue(std::get<1>(polygon[0]), decimals));
+    node.append_attribute("x1").set_value(FormatValue(polygon[0].x, decimals));
     node.remove_attribute("y1");
-    node.append_attribute("y1").set_value(FormatValue(std::get<2>(polygon[0]), decimals));
+    node.append_attribute("y1").set_value(FormatValue(polygon[0].y, decimals));
     node.remove_attribute("x2");
-    node.append_attribute("x2").set_value(FormatValue(std::get<1>(polygon[1]), decimals));
+    node.append_attribute("x2").set_value(FormatValue(polygon[1].x, decimals));
     node.remove_attribute("y2");
-    node.append_attribute("y2").set_value(FormatValue(std::get<2>(polygon[1]), decimals));
+    node.append_attribute("y2").set_value(FormatValue(polygon[1].y, decimals));
     node.remove_attribute("end1");
     node.append_attribute("end1").set_value(end1);
     node.remove_attribute("end2");
@@ -1186,8 +1097,8 @@ std::string ElmtLine::AsSVGstring(const size_t& decimals)
     // hier kommen die Linienattribute mit rein
     s += StyleAsSVGstring(decimals);
     // Anfang auf x1|y1 verschieben:
-    s += "transform=\"translate(" + FormatValue(std::get<1>(polygon[0]), decimals) + ","
-                                  + FormatValue(std::get<2>(polygon[0]), decimals) + ")";
+    s += "transform=\"translate(" + FormatValue(polygon[0].x, decimals) + ","
+                                  + FormatValue(polygon[0].y, decimals) + ")";
     // und falls die Linie eine Schräge ist, auch rotieren:
     if ( (GetAngle() > 0.05) || (GetAngle() < -0.05))
         s += " rotate(" + FormatValue(GetAngle(), decimals) + ")";
