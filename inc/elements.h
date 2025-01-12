@@ -104,7 +104,7 @@ class DefinitionLine {
 
 
 //
-//--- START - definition of name-list of Elements ------------------------
+//--- START - definition of name-list of Elements ------------------------------
 //
 class NamesList {
     private:
@@ -120,7 +120,7 @@ class NamesList {
       //
 };
 //
-//--- END - definition of name-list of Elements --------------------------
+//--- END - definition of name-list of Elements --------------------------------
 //
 
 
