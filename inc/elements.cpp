@@ -880,8 +880,8 @@ void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
         node.remove_attribute(s);   // to get rid of double points
         s = "y" + std::to_string(polygon.size());
         node.remove_attribute(s);   // to get rid of double points
-        // den Punkt i+1 aus vector entfernen:
-        polygon.erase(polygon.end());
+        // den letzten Punkt aus vector entfernen:
+        polygon.erase(--polygon.end());
         // nun ist aber das Polygon geschlossen:
         closed = true;
         xDeletedPoint = true;
