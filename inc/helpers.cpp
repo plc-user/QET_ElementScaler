@@ -28,6 +28,7 @@
 #include <random>       // for random values of uuid
 #include <cmath>        // for sqrt, atan2, isnan(), ...
 #include <iomanip>      // for IO-Operations
+#include <fstream>      // for file-reading
 #include <sstream>      // for String-Streams
 #include <regex>        // for "double"-Check
 
@@ -245,5 +246,93 @@ void CheckForDoubleString(std::string& sArg){
 //
 // ###############################################################
 // ###   END: does the string contain a double- or int-value   ###
+// ###############################################################
+//
+
+
+
+
+//
+// ###############################################################
+// ###            determine the terminal-geometry              ###
+// ###############################################################
+//
+void get_terminal_size(size_t& width, size_t& height) {
+// Quelle:
+// https://stackoverflow.com/questions/23369503/get-size-of-terminal-window-rows-columns
+#if defined(_WIN32)
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    width = (size_t)(csbi.srWindow.Right-csbi.srWindow.Left+1);
+    height = (size_t)(csbi.srWindow.Bottom-csbi.srWindow.Top+1);
+#elif defined(__linux__) || defined(__APPLE__)
+    struct winsize w;
+    ioctl(fileno(stdout), TIOCGWINSZ, &w);
+    width = (size_t)(w.ws_col);
+    height = (size_t)(w.ws_row);
+#endif // Windows/Linux
+}
+// ---
+size_t get_terminal_height(void) {
+// abgeleitet von: get_terminal_size
+#if defined(_WIN32)
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    return (size_t)(csbi.srWindow.Bottom-csbi.srWindow.Top+1);
+#elif defined(__linux__) || defined(__APPLE__)
+    struct winsize w;
+    ioctl(fileno(stdout), TIOCGWINSZ, &w);
+    return (size_t)(w.ws_row);
+#endif // Windows/Linux
+}
+// ---
+size_t get_terminal_width(void) {
+// abgeleitet von: get_terminal_size
+#if defined(_WIN32)
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    return (size_t)(csbi.srWindow.Right-csbi.srWindow.Left+1);
+#elif defined(__linux__) || defined(__APPLE__)
+    struct winsize w;
+    ioctl(fileno(stdout), TIOCGWINSZ, &w);
+    return (size_t)(w.ws_col);
+#endif // Windows/Linux
+}
+//
+// ###############################################################
+// ###          END: determine the terminal-geometry           ###
+// ###############################################################
+//
+
+
+
+//
+// ###############################################################
+// ###             read a piece from a text-file               ###
+// ###############################################################
+//
+// returns a string of "length" characters around "position"
+// the existence of "file" MUST be checked before!!!
+std::string ReadPieceOfFile(const std::string file, size_t pos, const size_t length) {
+    std::ifstream strm;
+    strm.open ( file );
+    strm.seekg (0, strm.end);
+    if (pos < (length/2)) {
+        pos = 0;
+    } else if (pos > ((size_t)strm.tellg() - (length/2) )) {
+        pos = (size_t)strm.tellg() - length;
+    } else {
+        pos -= (length/2);
+    }
+    strm.seekg (pos);
+    std::string buffer(length, '\0');
+    strm.read(&buffer[0], length);
+    if (buffer.length() > length) { buffer.resize(length); }
+    strm.close();
+    return buffer;
+}
+//
+// ###############################################################
+// ###          END: read a piece from a text-file             ###
 // ###############################################################
 //

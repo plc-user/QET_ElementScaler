@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 plc-user
+ * Copyright (c) 2022-2025 plc-user
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,6 +28,15 @@
 
 #include <iostream>     // for IO-Operations
 #include <cstdint>      // int8_t, ...
+
+// für die Terminal-Größe:
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
+#include <windows.h>
+#elif defined(__linux__) || defined(__APPLE__)
+#include <sys/ioctl.h>
+#endif // Windows/Linux
 
 #define _DEBUG_ 0
 
@@ -60,6 +69,20 @@ std::string TextToEntity(const std::string& s);
 // --- does the string contain a double- or int-value? -------------------------
 //
 void CheckForDoubleString(std::string& s);
+
+
+//
+// --- determine the geometry of the terminal ----------------------------------
+//
+void get_terminal_size(size_t&, size_t&);
+size_t get_terminal_height(void);
+size_t get_terminal_width(void);
+
+
+//
+// --- returns a string of "length" characters around "position" ---------------
+//
+std::string ReadPieceOfFile(const std::string file, size_t pos, const size_t length);
 
 
 //

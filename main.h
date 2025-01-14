@@ -34,12 +34,16 @@
 #include <getopt.h>     // for Commandline-Parameters
 #include <filesystem>   // for exe-filename
 #include <list>         // for list of UUIDs
+// project-includes
+#include "inc/pugixml/pugixml.hpp"
+#include "inc/helpers.h"
+#include "inc/elements.h"
 
 // =============================================================================
 // global variables
 // =============================================================================
 
-const std::string sVersion = "v0.5.1";
+const std::string sVersion = "v0.5.2";
 
 // the element-file to process:
 static std::string ElementFile       = "";

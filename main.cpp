@@ -37,10 +37,7 @@
 // +----------------------------------------------------------+
 //
 
-// own headers:
-#include "inc/pugixml/pugixml.hpp"
-#include "inc/helpers.h"
-#include "inc/elements.h"
+// own header(s):
 #include "main.h"
 
 
@@ -85,7 +82,10 @@ int main(int argc, char **argv)
     }
     // check the result of "doc.load"-Function
     if (!result){
-        std::cerr << "file \"" << ElementFile << "\" could not be loaded: " << result.description() << std::endl;
+        std::cerr << "File \"" << ElementFile << "\" could not be loaded: " << result.description() << std::endl;
+        std::cerr << "Check file up to byte-offset: " << result.offset << " -- content partly shown here:\n";
+        // try to read the corrupt part and output to stderr
+        std::cerr << "(...)" << ReadPieceOfFile(ElementFile, result.offset, (get_terminal_width()-10)) << "(...)\n\n";
         return -1;
     } else {
         if (_DEBUG_) std::cerr << "Element-File loaded successfully.\n";
