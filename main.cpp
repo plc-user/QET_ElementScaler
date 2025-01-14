@@ -82,13 +82,18 @@ int main(int argc, char **argv)
     }
     // check the result of "doc.load"-Function
     if (!result){
-        std::cerr << "File \"" << ElementFile << "\" could not be loaded: " << result.description() << std::endl;
-        std::cerr << "Check file up to byte-offset: " << result.offset << " -- content partly shown here:\n";
         // try to read the corrupt part and output to stderr
-        std::cerr << "(...)" << ReadPieceOfFile(ElementFile, result.offset, (get_terminal_width()-10)) << "(...)\n\n";
+        if (xPrintToStdOut == true) {
+            std::cerr << "Data could not be loaded: " << result.description() << std::endl;
+            std::cerr << "Check data up to byte-offset: " << result.offset << "\n";
+        } else {
+            std::cerr << "File \"" << ElementFile << "\" could not be loaded: " << result.description() << std::endl;
+            std::cerr << "Check file up to byte-offset: " << result.offset << " -- content partly shown here:\n";
+            std::cerr << "(...)" << ReadPieceOfFile(ElementFile, result.offset, (get_terminal_width()-10)) << "(...)\n\n";
+        }
         return -1;
     } else {
-        if (_DEBUG_) std::cerr << "Element-File loaded successfully.\n";
+        if (_DEBUG_) std::cerr << "Element-Data loaded successfully.\n";
     }
 
     // xml-file was successfully loaded, let's check, what kind of data we have...
@@ -109,7 +114,13 @@ int main(int argc, char **argv)
     if (xOverwriteOriginal == true){
         std::cerr << "will overwrite original file!" << std::endl;
     } else {
-        (xIsElmtFile ? ElementFileScaled.insert(ElementFileScaled.length()-5, ".SCALED") : ElementFileScaled += ".SCALED" );
+        if (xPrintToStdOut == false) {
+            if (xIsElmtFile == true) {
+                ElementFileScaled.insert(ElementFileScaled.length()-5, ".SCALED");
+            } else {
+                ElementFileScaled += ".SCALED";
+            }
+        }
     }
     if (_DEBUG_) std::cerr << ElementFileScaled << std::endl;
 

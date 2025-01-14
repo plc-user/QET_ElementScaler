@@ -43,7 +43,7 @@
 // global variables
 // =============================================================================
 
-const std::string sVersion = "v0.5.2";
+const std::string sVersion = "v0.5.2.1";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -198,6 +198,7 @@ int parseCommandline(int argc, char *argv[]) {
                 if (_DEBUG_)
                     std::cerr << "Read from STDIN\n";
                 xReadFromStdIn = true;
+                xPrintToStdOut = true;
                 break;
             case 'o':
                 if (_DEBUG_)
