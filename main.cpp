@@ -64,7 +64,7 @@ int main(int argc, char **argv)
     // load Element from stdin or XML-File
     pugi::xml_document doc;
     pugi::xml_parse_result result;
-    if (xReadFromStdIn){
+    if (xReadFromStdIn == true){
         result = doc.load(std::cin);
     } else {
         if ((ElementFile != "") && (std::filesystem::exists(ElementFile))) {
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     // check the result of "doc.load"-Function
     if (!result){
         // try to read the corrupt part and output to stderr
-        if (xPrintToStdOut == true) {
+        if (xReadFromStdIn == true) {
             std::cerr << "Data could not be loaded: " << result.description() << std::endl;
             std::cerr << "Check data up to byte-offset: " << result.offset << "\n";
         } else {
