@@ -103,6 +103,9 @@ int main(int argc, char **argv)
         xIsDirFile  = true;
         xCreateSVG  = false; // cannot create SVG from directory-file
         xCreateELMT = true;  // use the same xml-output-function for "element" and "qet_directory"
+    } else if (doc.child("titleblocktemplate")) {
+        std::cerr << "QElectroTech - titleblock-templates are not supported by QET_ElementScaler!\n";
+        return -2;
     } else if (doc.child("project").child("diagram") && doc.child("project").child("collection")) {
         std::cerr << "QElectroTech - project-files are not supported by QET_ElementScaler!\n";
         return -2;
