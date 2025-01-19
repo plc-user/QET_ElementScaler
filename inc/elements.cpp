@@ -292,6 +292,10 @@ void ElmtDynText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
         node.remove_attribute("Valignment");
         node.append_attribute("Valignment").set_value(Valignment);
     }
+    if (node.attribute("frame")) {
+        node.remove_attribute("frame");
+        node.append_attribute("frame").set_value(frame);
+    }
     if (node.attribute("rotate")) {
         node.remove_attribute("rotate");
         node.append_attribute("rotate").set_value(rotate);
