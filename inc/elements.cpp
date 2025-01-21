@@ -339,11 +339,11 @@ void ElmtDynText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
     }
     // nun die Unter-Elemente:
     if (node.child("text"))
-        node.child("text").child_value(text.c_str());
+        node.child("text").text().set(text);
     if (node.child("color"))
-        node.child("color").child_value(color.c_str());
+        node.child("color").text().set(color);
     if (node.child("info_name"))
-        node.child("info_name").child_value(info_name.c_str());
+        node.child("info_name").text().set(info_name);
 }
 // ---
 void ElmtDynText::Rot90(void){
