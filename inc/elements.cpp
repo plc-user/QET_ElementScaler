@@ -249,11 +249,13 @@ void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)
 
     // nun die Unter-Elemente:
     if (node.child("text"))
-        text      = node.child("text").child_value();
+        text           = node.child("text").child_value();
     if (node.child("color"))
-        color     = node.child("color").child_value();
+        color          = node.child("color").child_value();
     if (node.child("info_name"))
-        info_name = node.child("info_name").child_value();
+        info_name      = node.child("info_name").child_value();
+    if (node.child("composite_text"))
+        composite_text = node.child("composite_text").child_value();
 
     // ToDo: Schrift und Schriftgröße bearbeiten:
     if ( font.length() > 0) {
@@ -344,6 +346,8 @@ void ElmtDynText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
         node.child("color").text().set(color);
     if (node.child("info_name"))
         node.child("info_name").text().set(info_name);
+    if (node.child("composite_text"))
+        node.child("composite_text").text().set(composite_text);
 }
 // ---
 void ElmtDynText::Rot90(void){

@@ -286,6 +286,7 @@ class ElmtDynText : public BaseElement,
       std::string color = "#000000";
       std::string text = "_";
       std::string info_name = "";
+      std::string composite_text = "";
       std::string font = "Sans Serif,9,-1,5,50,0,0,0,0,0";
     public:
       ElmtDynText() : BaseElement("dynamic_text") {
@@ -297,6 +298,7 @@ class ElmtDynText : public BaseElement,
                          text_width = -1.0;
                          font = "";
                          info_name = "";
+                         composite_text = "";
                          size = 11.1; text = "_"; color = "#000000";
                          text_from = "ElementInfo";
                          SplitFontString();
