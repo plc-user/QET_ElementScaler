@@ -265,6 +265,32 @@ class BaseSize {
 //
 
 //
+//--- definition of class "ElmtInput" ------------------------------------------
+//
+class ElmtInput : public BaseElement,
+                  public BasePosition
+{   // only used to convert to Dynamic Text!!!
+    private:
+      bool   rotate   = true;
+      double rotation = 0.0;
+      double size     = 9.0;
+      std::string text = "_";
+      std::string tagg = "none";
+    protected:
+      //
+    public:
+      ElmtInput() : BaseElement("input") {
+                      //std::cerr << " default-constructor ElmtInput - Typ: " << Type << "\n";
+                    }
+      void ConvertToDynText(pugi::xml_node&);
+};
+//
+//--- END - definition of class "ElmtInput" ------------------------------------
+//
+
+
+
+//
 //--- definition of class "ElmtDynText" ----------------------------------------
 //
 class ElmtDynText : public BaseElement,

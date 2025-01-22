@@ -204,6 +204,92 @@ std::string BaseStyle::StyleAsSVGstring(const size_t& decimals)
 
 
 //
+//--- implementation of class "ElmtInput" --------------------------------------
+//
+void ElmtInput::ConvertToDynText(pugi::xml_node& node)
+/*
+in QElectroTech wird diese input-Zeile:
+<input x="0" y="0" rotation="0" rotate="true" size="3" text="Size  3" tagg="none"/>
+in diesen dynamic_text umgewandelt:
+<dynamic_text rotation="0" uuid="{4b25c058-4dd4-4e7c-a05b-2ebed344197a}" Halignment="AlignLeft" y="-7.5" text_from="UserText" Valignment="AlignTop" x="0" z="1" font="Sans Serif,3,-1,5,25,0,0,0,0,0" text_width="-1" keep_visual_rotation="false" frame="false">
+    <text>Size  3</text>
+DAS wollen wir hier auch machen!
+*/
+{
+    for (pugi::xml_attribute_iterator ait = node.attributes_begin(); ait != node.attributes_end(); ++ait)
+    {
+        if (_DEBUG_)
+            std::cerr << "  " << ait->name() << "=" << ait->value();
+        if ((std::string)ait->name() == "x") {
+            x = node.attribute("x").as_double();
+        }
+        if ((std::string)ait->name() == "y") {
+            y = node.attribute(ait->name()).as_double();
+        }
+        if ((std::string)ait->name() == "rotate") {
+            rotate = node.attribute(ait->name()).as_bool();
+        }
+        if ((std::string)ait->name() == "rotation") {
+            rotation = node.attribute(ait->name()).as_double();
+        }
+        if ((std::string)ait->name() == "size") {
+            size = node.attribute(ait->name()).as_double();
+        }
+        if ((std::string)ait->name() == "tagg") {
+            // wird zu: "text_from" und "info_name"
+            tagg = node.attribute(ait->name()).as_string();
+        }
+        if ((std::string)ait->name() == "text") {
+            text = node.attribute(ait->name()).as_string();
+        }
+    }
+    if (_DEBUG_)
+        std::cerr << "\n";
+    // die bekannten und eingelesenen Attribute löschen:
+    node.remove_attribute("x");
+    node.remove_attribute("y");
+    node.remove_attribute("rotate");
+    node.remove_attribute("rotation");
+    node.remove_attribute("size");
+    node.remove_attribute("tagg");
+    node.remove_attribute("text");
+    // die neue Position in Abhängigkeit des Rotationswinkels:
+    x = x + (7.0/8.0 * size + 39.0/8.0) * sin(toRad<double>(rotation));
+    y = y - (7.0/8.0 * size + 39.0/8.0) * cos(toRad<double>(rotation));
+    // nun setzen wir die neuen Attribute:
+    node.append_attribute("x").set_value(FormatValue(x, 2));
+    node.append_attribute("y").set_value(FormatValue(y, 2));
+    node.append_attribute("z").set_value("1");
+    node.append_attribute("rotation").set_value(FormatValue(rotation, 0));
+    node.append_attribute("font").set_value("Sans Serif," + FormatValue(size, 0) + ",-1,5,25,0,0,0,0,0");
+    node.append_attribute("uuid").set_value("{" + CreateUUID(false) + "}");
+    if (tagg == "label" ) {
+        node.append_attribute("text_from").set_value("ElementInfo");
+    } else {
+        node.append_attribute("text_from").set_value("UserText");
+    }
+    node.append_attribute("frame").set_value("false");
+    node.append_attribute("Valignment").set_value("AlignTop");
+    node.append_attribute("Halignment").set_value("AlignLeft");
+    node.append_attribute("text_width").set_value(-1);
+    node.append_attribute("keep_visual_rotation").set_value("false");
+    // nun die Unter-Elemente:
+    node.append_child("text").text().set(text);
+    if (tagg == "label" ) {
+        node.append_child("info_name").text().set("label");
+    } else {
+        // no child here
+    }
+    // zum Schluß den Node umbenennen:
+    node.set_name("dynamic_text");
+}
+//
+//--- END - implementation of class "ElmtDynText" ------------------------------
+//
+
+
+
+//
 //--- implementation of class "ElmtDynText" ------------------------------------
 //
 void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)

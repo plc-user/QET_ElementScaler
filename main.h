@@ -513,6 +513,10 @@ void ProcessElement(pugi::xml_node doc) {
             ElmtMinMax.addy(term.GetY()+5);
             ElmtMinMax.addy(term.GetY()-5);
         }
+        if ((std::string(node.name())) == "input") {
+            ElmtInput input;
+            input.ConvertToDynText(node);
+        }
         if ((std::string(node.name())) == "dynamic_text") {
             ElmtDynText dyntext;
             dyntext.ReadFromPugiNode(node);
