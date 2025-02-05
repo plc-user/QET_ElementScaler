@@ -43,7 +43,7 @@
 // global variables
 // =============================================================================
 
-const std::string sVersion = "v0.5.3beta1";
+const std::string sVersion = "v0.5.3";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -78,7 +78,7 @@ static bool xDynTextsUUIDsUnique = true;
 
 // max. Number of decimals:
 static size_t decimals = 2;    // number of decimals for floating-point values
-static double MinLineLength = 0.015;  //
+static double MinLineLength = 0.025;  //
 
 static double scaleX = 1.0;
 static double scaleY = 1.0;
@@ -323,7 +323,7 @@ int parseCommandline(int argc, char *argv[]) {
 /******************************************************************************/
 void PrintHelp(const std::string &s, const std::string &v){
     std::stringstream ss;
-    ss << std::filesystem::path(s).filename();
+    ss << std::filesystem::path(s).filename().stem();  // without extension
     std::string sExeName = ss.str();
     std::cout << std::endl
     << sExeName << " version " << v << " needs arguments!" << std::endl
@@ -428,7 +428,14 @@ void ProcessElement(pugi::xml_node doc) {
     NamesList Namen;
     Namen.ReadFromPugiNode(doc.child("definition").child("names"));
     Namen.WriteToPugiNode(doc.child("definition").child("names"));
-    // in einer Schleife die Elemente bearbeiten:
+    // wir lesen die Bauteil-Informationen, um nach Namen zu sortieren
+    ElementInfo EiList;
+    EiList.ReadFromPugiNode(doc.child("definition").child("elementInformations"));
+    EiList.WriteToPugiNode(doc.child("definition").child("elementInformations"));
+    // ein wenig Werbung in eigener Sache: Programmnamen hinzufügen:
+    AuthorInfo AInfo;
+    AInfo.UpdatePugiNode(doc.child("definition").child("informations"));
+    // in einer Schleife die Elemente bearbeiten - wir starten hier:
     pugi::xml_node node = doc.child("definition").child("description").first_child();
     // ... in a loop all parts
     for (; node; node = node.next_sibling())

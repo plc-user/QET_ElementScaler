@@ -29,7 +29,7 @@
 #include <iomanip>      // for IO-Operations
 #include <string>       // for string-handling
 #include <sstream>      // for String-Streams
-
+#include <algorithm>    // for std::sort
 
 //
 //--- implementation of class "DefinitionLine" ---------------------------------
@@ -95,8 +95,8 @@ void NamesList::ReadFromPugiNode(pugi::xml_node node)
 {
     node = node.first_child();
     for (; node; node = node.next_sibling()){
-        std::string lang = node.attribute("lang").as_string();
-        std::string name = node.child_value();
+        std::string lang = trim(node.attribute("lang").as_string());
+        std::string name = trim(node.child_value());
         AddName(lang, name);
         // keine sort-Funktion: Das macht die std::map automatisch!
     }
@@ -113,6 +113,69 @@ void NamesList::WriteToPugiNode(pugi::xml_node node)
 }
 //
 //--- END - implementation of class "NamesList" --------------------------------
+//
+
+
+
+//
+//--- implementation of class "ElementInfo" --------------------------------------
+//
+void ElementInfo::ReadFromPugiNode(pugi::xml_node node)
+{
+    node = node.first_child();
+    for (; node; node = node.next_sibling()){
+        std::string name = node.attribute("name").as_string();
+        std::string text = trim(node.child_value());
+        bool show        = node.attribute("show").as_bool();
+        AddInfo(EInfo{name, text, show});
+    }
+    // abschließend die Liste sortieren nach "name":
+    std::sort(info.begin(), info.end(),
+        [](const EInfo& v1, const EInfo& v2) {
+            return v1.name < v2.name;
+            }
+    );
+}
+void ElementInfo::WriteToPugiNode(pugi::xml_node node)
+{
+    const std::string nodeChild = "elementInformation";
+    // erstmal alle informationen löschen, wenn's sie gibt:
+    if (node.child(nodeChild))
+        while(node.remove_child(nodeChild));
+    // und jetzt kommen die Namen sortiert wieder rein:
+    for (const auto& [name, text, show] : info) {
+        if (text.empty()) continue; // do not save empty lines!
+        node.append_child(nodeChild).append_attribute("show").set_value((int)show);
+        node.last_child().append_attribute("name").set_value(name);
+        node.last_child().text().set(trim(text));
+    }
+}
+//
+//--- END - implementation of class "ElementInfo" --------------------------------
+//
+
+
+
+//
+//--- implementation of class Author-Information -------------------------------
+//
+void AuthorInfo::ReadFromPugiNode(pugi::xml_node node)
+{
+    author = trim(node.child_value());
+}
+void AuthorInfo::UpdatePugiNode(pugi::xml_node node)
+{
+    ReadFromPugiNode(node);
+    if (author.find("QET_ElementScaler") == std::string::npos)
+        author += "\nedited with \"QET_ElementScaler\"";
+    WriteToPugiNode(node);
+}
+void AuthorInfo::WriteToPugiNode(pugi::xml_node node)
+{
+    node.text().set(trim(author));
+}
+//
+//--- END - implementation of Author-Information -------------------------------
 //
 
 

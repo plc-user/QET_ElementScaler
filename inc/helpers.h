@@ -86,6 +86,13 @@ std::string ReadPieceOfFile(const std::string file, size_t pos, const size_t len
 
 
 //
+// --- "trim" remove leading and trailing whitespace from a std::string --------
+//
+std::string trim(const std::string& source);
+
+
+
+//
 // Funktionen, die vorher auch schon da waren
 //
 

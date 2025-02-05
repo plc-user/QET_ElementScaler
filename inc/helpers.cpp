@@ -258,7 +258,7 @@ void CheckForDoubleString(std::string& sArg){
 // ###############################################################
 //
 void get_terminal_size(size_t& width, size_t& height) {
-// Quelle:
+// Quelle (mit eigenen Ergänzungen):
 // https://stackoverflow.com/questions/23369503/get-size-of-terminal-window-rows-columns
 #if defined(_WIN32)
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -270,6 +270,9 @@ void get_terminal_size(size_t& width, size_t& height) {
     ioctl(fileno(stdout), TIOCGWINSZ, &w);
     width = (size_t)(w.ws_col);
     height = (size_t)(w.ws_row);
+#else
+    width = (size_t)(80);
+    height = (size_t)(24);
 #endif // Windows/Linux
 }
 // ---
@@ -283,6 +286,8 @@ size_t get_terminal_height(void) {
     struct winsize w;
     ioctl(fileno(stdout), TIOCGWINSZ, &w);
     return (size_t)(w.ws_row);
+#else
+    return (size_t)(24);
 #endif // Windows/Linux
 }
 // ---
@@ -296,6 +301,8 @@ size_t get_terminal_width(void) {
     struct winsize w;
     ioctl(fileno(stdout), TIOCGWINSZ, &w);
     return (size_t)(w.ws_col);
+#else
+    return (size_t)(80);
 #endif // Windows/Linux
 }
 //
@@ -334,5 +341,31 @@ std::string ReadPieceOfFile(const std::string file, size_t pos, const size_t len
 //
 // ###############################################################
 // ###          END: read a piece from a text-file             ###
+// ###############################################################
+//
+
+
+//
+// ###############################################################
+// ###            remove whitespace from string                ###
+// ###############################################################
+//
+std::string trim(const std::string& source) {
+    std::string s(source);
+    if (source.empty())
+        return s;
+    // delete leading whitespace
+    while (std::isspace(s[0])){
+        s.erase(0,1);
+    }
+    // delete trailing whitespace
+    while (std::isspace(s[s.length()-1])){
+        s.erase(s.length()-1,1);
+    }
+    return s;
+}
+//
+// ###############################################################
+// ###          END: remove whitespace from string             ###
 // ###############################################################
 //

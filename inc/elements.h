@@ -67,6 +67,18 @@ struct PolyPoint
 
 
 
+struct EInfo
+{   // a single entry for elementInformations
+    std::string name = "";
+    std::string text = "";
+    bool show        = false;
+    // functions:
+    EInfo();
+    EInfo(const std::string n, const std::string t, const bool s): name(n), text(t), show(s) {}
+};
+
+
+
 //
 //--- START - definition of definition-line of Elements ------------------------
 //
@@ -121,6 +133,50 @@ class NamesList {
 };
 //
 //--- END - definition of name-list of Elements --------------------------------
+//
+
+
+
+//
+//--- START - definition of informations-list of Elements ----------------------
+//
+class ElementInfo {
+    private:
+      std::vector<EInfo> info;
+      //
+    public:
+      void ReadFromPugiNode(pugi::xml_node);
+      void WriteToPugiNode(pugi::xml_node);
+      void AddInfo(const EInfo& ei) { info.push_back(ei); }
+      void AddInfo(const std::string& name, const std::string& text, const bool& show) { info.push_back(EInfo{name, text, show}); }
+      void Clear(void) { info.clear(); };
+      //
+    protected:
+      //
+};
+//
+//--- END - definition of informations-list of Elements ------------------------
+//
+
+
+
+//
+//--- START - definition of Author-Information ---------------------------------
+//
+class AuthorInfo {
+    private:
+      std::string author = "";
+      //
+    public:
+      void ReadFromPugiNode(pugi::xml_node);
+      void UpdatePugiNode(pugi::xml_node);
+      void WriteToPugiNode(pugi::xml_node);
+      //
+    protected:
+      //
+};
+//
+//--- END - definition of Author-Information -----------------------------------
 //
 
 

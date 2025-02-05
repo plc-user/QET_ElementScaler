@@ -157,22 +157,37 @@ int main(int argc, char **argv)
       return 0;
     }
 
+
+    // save XML to a string, to be able to "edit" raw data
+    std::string sXML;
+    std::stringstream ssxml;
+    doc.save(ssxml, "    ", pugi::format_default | pugi::format_no_declaration);
+    sXML = ssxml.str();
+    ssxml.clear();
+    // delete blanks at end of tags
+    std::string sOld = " />\n";
+    std::string sNew = "/>\n";
+    while (sXML.find(sOld) != std::string::npos) {
+        sXML.replace(sXML.find(sOld), sOld.size(), sNew);
+    }
+
     if (xCreateELMT == true) {
         if (xPrintToStdOut==true) {
             if (_DEBUG_) std::cerr << "XML auf stdout ------------------------------------------------------" << std::endl;
-            doc.save(std::cout, "    ", pugi::format_default | pugi::format_no_declaration);
-            // no result from "doc.save" when sending XML to cout ...
+            std::cout << sXML << "\n";
             if (_DEBUG_) std::cerr << "XML auf stdout ------------------------------------------------------" << std::endl;
-            return 0;
         } else {
-            // we try to save the new XML:
-            if (doc.save_file(ElementFileScaled.c_str(), "    ", pugi::format_default | pugi::format_no_declaration) == true) {
-                if (_DEBUG_) std::cerr << "file \"" << ElementFileScaled << "\" saved successfully!" << std::endl;
-                return 0;
+            // save string to file:
+            std::ofstream outFile(ElementFileScaled);
+            outFile << sXML;
+            if        ((outFile.rdstate() & std::ofstream::badbit) != 0) {
+                std::cerr << "file \"" << ElementFileScaled << "\" could not be saved!\n";
+            } else if ((outFile.rdstate() & std::ofstream::failbit) != 0) {
+                std::cerr << "saving \"" << ElementFileScaled << "\" failed!\n";
             } else {
-                std::cerr << "file \"" << ElementFileScaled << "\" could not be saved!" << std::endl;
-                return -1;
+                if (_DEBUG_) std::cerr << "file \"" << ElementFileScaled << "\" saved successfully!" << std::endl;
             }
+            outFile.close();
         }
     }
 
