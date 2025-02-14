@@ -544,7 +544,7 @@ std::string ElmtDynText::AsSVGstring(const size_t& decimals)
     s += "<text transform=\"translate(" ;
     s += FormatValue(posx, 1) + ", ";
     s += FormatValue(posy, 1) + ")";
-    if ((rotation < 0.05) || (rotation > 0.05)) {
+    if (std::abs(rotation) > 0.1) {
         s += " rotate(" + FormatValue(rotation, 1);
         s += " " + FormatValue(rotx, 1);
         s += " " + FormatValue(roty, 1);
@@ -1179,7 +1179,8 @@ void ElmtRect::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 void ElmtRect::Rot90(void)
 {
     RotPos90(x, y, width, height);
-    SwapWidhHeight();
+    std::swap(width, height);
+    std::swap(rx, ry);
 }
 // ---
 std::string ElmtRect::AsSVGstring(const size_t& decimals)
