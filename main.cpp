@@ -164,17 +164,15 @@ int main(int argc, char **argv)
     doc.save(ssxml, "    ", pugi::format_default | pugi::format_no_declaration);
     sXML = ssxml.str();
     ssxml.clear();
-    // delete blanks at end of tags
-    std::string sOld = " />\n";
-    std::string sNew = "/>\n";
-    while (sXML.find(sOld) != std::string::npos) {
-        sXML.replace(sXML.find(sOld), sOld.size(), sNew);
-    }
+
+    // replace some substrings so that xml looks the same as with QET
+    // NO technical reason, only for the look: "You said, nothing changed, but look here..."
+    ReplaceSubStrings(sXML);
 
     if (xCreateELMT == true) {
         if (xPrintToStdOut==true) {
             if (_DEBUG_) std::cerr << "XML auf stdout ------------------------------------------------------" << std::endl;
-            std::cout << sXML << "\n";
+            std::cout << sXML;
             if (_DEBUG_) std::cerr << "XML auf stdout ------------------------------------------------------" << std::endl;
         } else {
             // save string to file:

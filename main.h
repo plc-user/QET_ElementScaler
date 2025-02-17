@@ -43,7 +43,7 @@
 // global variables
 // =============================================================================
 
-const std::string sVersion = "v0.5.4beta1";
+const std::string sVersion = "v0.5.4beta2";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -712,5 +712,26 @@ std::string ToSVG(pugi::xml_node node) {
 }
 /******************************************************************************/
 
+
+
+/******************************************************************************/
+void ReplaceSubStrings(std::string& s){
+    // replace some substrings so that xml looks the same as with Qxml...
+    struct ErsatzText {
+        std::string sOld;
+        std::string sNew;
+    };
+    std::vector<ErsatzText> vsReplacements {
+            {{" />\n"},{"/>\n"}},
+            {{"<text/>"},{"<text></text>"}},
+    };
+    for (const ErsatzText &t: vsReplacements) {
+        //if (t.sOld.length()>4) std::cerr << "Texte: " << t.sOld << " | " << t.sNew << "\n";
+        while (s.find(t.sOld) != std::string::npos) {
+            s.replace(s.find(t.sOld), t.sOld.size(), t.sNew);
+        }
+    }
+}
+/******************************************************************************/
 
 #endif  //#ifndef MAIN_H
