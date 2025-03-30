@@ -428,6 +428,11 @@ void ProcessElement(pugi::xml_node doc) {
     NamesList Namen;
     Namen.ReadFromPugiNode(doc.child("definition").child("names"));
     Namen.WriteToPugiNode(doc.child("definition").child("names"));
+    // Gibt es eine leere Liste "kindInformations"? ---> löschen!
+    if (!(doc.child("definition").child("kindInformations").child("kindInformation"))) {
+        std::cerr << "no \"kindInformations\" --> remove node\n";
+        doc.child("definition").remove_child("kindInformations");
+    }
     // wir lesen die Bauteil-Informationen, um nach Namen zu sortieren
     ElementInfo EiList;
     EiList.ReadFromPugiNode(doc.child("definition").child("elementInformations"));
