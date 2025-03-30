@@ -149,6 +149,10 @@ void ElementInfo::WriteToPugiNode(pugi::xml_node node)
         node.last_child().append_attribute("name").set_value(name);
         node.last_child().text().set(trim(text));
     }
+    if (!node.child(nodeChild)) {
+        std::cerr << "no \"elementInformations\" --> remove node\n";
+        node.parent().remove_child("elementInformations");
+    }
 }
 //
 //--- END - implementation of class "ElementInfo" --------------------------------
@@ -274,7 +278,7 @@ void ElmtInput::ConvertToDynText(pugi::xml_node& node)
 in QElectroTech wird diese input-Zeile:
 <input x="0" y="0" rotation="0" rotate="true" size="3" text="Size  3" tagg="none"/>
 in diesen dynamic_text umgewandelt:
-<dynamic_text rotation="0" uuid="{4b25c058-4dd4-4e7c-a05b-2ebed344197a}" Halignment="AlignLeft" y="-7.5" text_from="UserText" Valignment="AlignTop" x="0" z="1" font="Sans Serif,3,-1,5,25,0,0,0,0,0" text_width="-1" keep_visual_rotation="false" frame="false">
+<dynamic_text rotation="0" uuid="{4b25c058-4dd4-4e7c-a05b-2ebed344197a}" Halignment="AlignLeft" y="-7.5" text_from="UserText" Valignment="AlignTop" x="0" z="1" font="Liberation Sans,3,-1,5,25,0,0,0,0,0,Regular" text_width="-1" keep_visual_rotation="false" frame="false">
     <text>Size  3</text>
 DAS wollen wir hier auch machen!
 */
@@ -324,7 +328,7 @@ DAS wollen wir hier auch machen!
     node.append_attribute("y").set_value(FormatValue(y, 2));
     node.append_attribute("z").set_value("1");
     node.append_attribute("rotation").set_value(FormatValue(rotation, 0));
-    node.append_attribute("font").set_value("Sans Serif," + FormatValue(size, 0) + ",-1,5,25,0,0,0,0,0");
+    node.append_attribute("font").set_value("Liberation Sans," + FormatValue(size, 0) + ",-1,5,25,0,0,0,0,0,Regular");
     node.append_attribute("uuid").set_value("{" + CreateUUID(false) + "}");
     if (tagg == "label" ) {
         node.append_attribute("text_from").set_value("ElementInfo");
@@ -413,7 +417,7 @@ void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)
       size = std::stod(vsFont[1]);
     } else {
       // altes Format im Element -> korrigieren!
-      font = "Sans Serif,9,-1,5,50,0,0,0,0,0";
+      font = "Liberation Sans,9,-1,5,50,0,0,0,0,0,Regular";
       SplitFontString();
       vsFont[1] = FormatValue(size, 0);
       CreateFontString();
@@ -607,7 +611,7 @@ void ElmtText::ReadFromPugiNode(pugi::xml_node& node)
       size = std::stod(vsFont[1]);
     } else {
       // altes Format im Element -> korrigieren!
-      font = "Sans Serif,9,-1,5,50,0,0,0,0,0";
+      font = "Liberation Sans,9,-1,5,50,0,0,0,0,0,Regular";
       SplitFontString();
       vsFont[1] = FormatValue(size, 0);
       CreateFontString();

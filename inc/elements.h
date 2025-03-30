@@ -369,7 +369,7 @@ class ElmtDynText : public BaseElement,
       std::string text = "_";
       std::string info_name = "";
       std::string composite_text = "";
-      std::string font = "Sans Serif,9,-1,5,50,0,0,0,0,0";
+      std::string font = "Liberation Sans,9,-1,5,50,0,0,0,0,0,Regular";
     public:
       ElmtDynText() : BaseElement("dynamic_text") {
                        //std::cerr << " default-constructor ElmtDynText - Typ: " << Type << "\n";
@@ -420,31 +420,53 @@ class ElmtText : public BaseElement,
       double rotation = 0.0;
       std::string color = "#000000";
       std::string text = "_";
-      std::string font = "Sans Serif,9,-1,5,50,0,0,0,0,0";
-                      //  |          | |  | |  | | | | |
-                      //  |          | |  | |  | | | | +---  ???
-                      //  |          | |  | |  | | | +-----  ???
-                      //  |          | |  | |  | | +-------  1 -> durchgestrichen
-                      //  |          | |  | |  | +---------  1 -> unterstrichen
-                      //  |          | |  | |  +-----------  1 -> kursiv
-                      //  |          | |  | +--------------  ???
-                      //  |          | |  +----------------  ???
-                      //  |          | +-------------------  ???
-                      //  |          +---------------------  Schriftgröße
-                      //  +--------------------------------  Schriftart
+      std::string font = "Liberation Sans,9,-1,5,50,0,0,0,0,0,Regular";
+                      //  |               | |  | |  | | | | | |
+                      //  |               | |  | |  | | | | | +--  Stil (Regular, italic, Bold,...), localized!!!
+                      //  |               | |  | |  | | | | +----  ???
+                      //  |               | |  | |  | | | +------  ???
+                      //  |               | |  | |  | | +--------  1 -> durchgestrichen
+                      //  |               | |  | |  | +----------  1 -> unterstrichen
+                      //  |               | |  | |  +------------  1 -> kursiv
+                      //  |               | |  | +---------------  Font weight: 0 .. 50: "normal" -- 75: "fett" ohne Breiten-Änderung
+                      //  |               | |  +-----------------  ???
+                      //  |               | +--------------------  Schriftgröße in Pixel    \  alternativ zu verwenden: ein Wert>0 der andere "-1"
+                      //  |               +----------------------  Schriftgröße in Punkten  /  20 pt = 27 px   --  QET: Angabe in pt
+                      //  +--------------------------------------  Schriftart
                       // "MS Shell Dlg 2,9,-1,5,50,0,0,0,0,0,Normál"
                       //  |              | |  | |  | | | | | |
-                      //  |              | |  | |  | | | | | +----  (Beschreibung Stil?)
+                      //  |              | |  | |  | | | | | +----  Stil (Regular, italic, Bold,...), localized!!!
                       //  |              | |  | |  | | | | +------  ???
                       //  |              | |  | |  | | | +--------  ???
                       //  |              | |  | |  | | +----------  1 -> durchgestrichen
                       //  |              | |  | |  | +------------  1 -> unterstrichen
                       //  |              | |  | |  +--------------  1 -> kursiv
-                      //  |              | |  | +-----------------  ???
+                      //  |              | |  | +-----------------  Font weight: 0 .. 50: "normal" -- 75: "fett" ohne Breiten-Änderung
                       //  |              | |  +-------------------  ???
-                      //  |              | +----------------------  ???
-                      //  |              +------------------------  Schriftgröße
+                      //  |              | +----------------------  Schriftgröße in Pixel    \  alternativ zu verwenden: ein Wert>0 der andere "-1"
+                      //  |              +------------------------  Schriftgröße in Punkten  /  20 pt = 27 px   --  QET: Angabe in pt
                       //  +---------------------------------------  Schriftart
+/*  Qt behauptet in der Doku, es seien 16 Einträge:
+    https://doc.qt.io/qt-5/qfont.html#toString
+    https://doc.qt.io/qt-6/qfont.html#toString
+     1 - Font family
+     2 - Point size
+     3 - Pixel size
+     4 - Style hint
+     5 - Font weight
+     6 - Font style
+     7 - Underline
+     8 - Strike out
+     9 - Fixed pitch
+    10 - Always 0
+    11 - Capitalization
+    12 - Letter spacing
+    13 - Word spacing
+    14 - Stretch
+    15 - Style strategy
+    16 - Font style (omitted when unavailable)
+*/
+
    public:
       ElmtText() : BaseElement("text") {
                        //std::cerr << " default-constructor ElmtText - Typ: " << Type << "\n";
