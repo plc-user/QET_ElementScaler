@@ -146,6 +146,9 @@ const std::string toHex(const T inVal, const bool upCase=false, const bool withP
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+//
+// ab C++20 gibt es "std::numbers::pi" in #include <numbers>
+//
 
 template<class T>
 inline T toRad(T d)
