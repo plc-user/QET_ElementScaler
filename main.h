@@ -429,7 +429,8 @@ void ProcessElement(pugi::xml_node doc) {
     Namen.ReadFromPugiNode(doc.child("definition").child("names"));
     Namen.WriteToPugiNode(doc.child("definition").child("names"));
     // Gibt es eine leere Liste "kindInformations"? ---> löschen!
-    if (!(doc.child("definition").child("kindInformations").child("kindInformation"))) {
+    if (  doc.child("definition").child("kindInformations") &&
+        !(doc.child("definition").child("kindInformations").child("kindInformation"))) {
         std::cerr << "no \"kindInformations\" --> remove node\n";
         doc.child("definition").remove_child("kindInformations");
     }
