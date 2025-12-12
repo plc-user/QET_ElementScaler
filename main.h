@@ -1,6 +1,10 @@
 /*
  * Copyright (c) 2022-2025 plc-user
  *
+ * It is NOT allowed to use this software or any of the
+ * associated files as sample data for the purposes of
+ * building machine learning models.
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -43,7 +47,7 @@
 // global variables
 // =============================================================================
 
-const std::string sVersion = "v0.5.4";
+const std::string sVersion = "v0.5.5beta1";
 
 // the element-file to process:
 static std::string ElementFile       = "";

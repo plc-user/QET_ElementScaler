@@ -1,6 +1,10 @@
 /*
  * Copyright (c) 2022-2025 plc-user
  *
+ * It is NOT allowed to use this software or any of the
+ * associated files as sample data for the purposes of
+ * building machine learning models.
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -429,7 +433,7 @@ class ElmtText : public BaseElement,
                       //  |               | |  | |  | +----------  1 -> unterstrichen
                       //  |               | |  | |  +------------  1 -> kursiv
                       //  |               | |  | +---------------  Font weight: 0 .. 50: "normal" -- 75: "fett" ohne Breiten-Änderung
-                      //  |               | |  +-----------------  ???
+                      //  |               | |  +-----------------  "Style Hint": Ersatz-Schrift, falls diese nicht verfügbar (s.u.)
                       //  |               | +--------------------  Schriftgröße in Pixel    \  alternativ zu verwenden: ein Wert>0 der andere "-1"
                       //  |               +----------------------  Schriftgröße in Punkten  /  20 pt = 27 px   --  QET: Angabe in pt
                       //  +--------------------------------------  Schriftart
@@ -442,7 +446,7 @@ class ElmtText : public BaseElement,
                       //  |              | |  | |  | +------------  1 -> unterstrichen
                       //  |              | |  | |  +--------------  1 -> kursiv
                       //  |              | |  | +-----------------  Font weight: 0 .. 50: "normal" -- 75: "fett" ohne Breiten-Änderung
-                      //  |              | |  +-------------------  ???
+                      //  |              | |  +-------------------  "Style Hint": Ersatz-Schrift, falls diese nicht verfügbar (s.u.)
                       //  |              | +----------------------  Schriftgröße in Pixel    \  alternativ zu verwenden: ein Wert>0 der andere "-1"
                       //  |              +------------------------  Schriftgröße in Punkten  /  20 pt = 27 px   --  QET: Angabe in pt
                       //  +---------------------------------------  Schriftart
@@ -452,7 +456,7 @@ class ElmtText : public BaseElement,
      1 - Font family
      2 - Point size
      3 - Pixel size
-     4 - Style hint
+     4 - Style hint (Sans Serif: 0; Serif: 1; TypeWriter: 2; AnyStyle: 5)
      5 - Font weight
      6 - Font style
      7 - Underline
