@@ -66,7 +66,7 @@ struct PolyPoint
     double   y = sqrt(-1);  // y-value preset with "nan"
     //
     PolyPoint();
-    PolyPoint(const uint64_t n, const double inx, const double iny) : i(n), x(inx), y(iny) {}
+    PolyPoint(const uint64_t& n, const double& inx, const double& iny) : i(n), x(inx), y(iny) {}
 };
 
 
@@ -78,44 +78,9 @@ struct EInfo
     bool show        = false;
     // functions:
     EInfo();
-    EInfo(const std::string n, const std::string t, const bool s): name(n), text(t), show(s) {}
+    EInfo(const std::string& n, const std::string& t, const bool& s): name(n), text(t), show(s) {}
 };
 
-
-
-//
-//--- START - definition of definition-line of Elements ------------------------
-//
-class DefinitionLine {
-   private:
-      std::string Type = "DefinitionLine";
-      std::string version = "0.100.0";
-      std::string link_type = "thumbnail";
-      std::string type = "element";
-      int width = 10;
-      int height = 12;
-      int hotspot_x = 5;
-      int hotspot_y = 6;
-   public:
-      void ReadFromPugiNode(pugi::xml_node);
-      void ReCalc(RectMinMax);
-      void WriteToPugiNode(pugi::xml_node);
-      int Getwidth(){ return width; }
-      int Getheight(){ return height; }
-      int Gethotspot_x(){ return hotspot_x; }
-      int Gethotspot_y(){ return hotspot_y; }
-      std::string Getlink_type() { return link_type; }
-      void Setwidth( const int val ){ width = val; }
-      void Setheight( const int val ){ height = val; }
-      void Sethotspot_x( const int val ){ hotspot_x = val; }
-      void Sethotspot_y( const int val ){ hotspot_y = val; }
-      void Setlinktype( const std::string val ){ link_type = val; }
-   protected:
-      //
-};
-//
-//--- END - definition of definition-line of Elements --------------------------
-//
 
 
 
@@ -197,7 +162,7 @@ class BaseElement {
       // enthält nur den Element-Typ:
       std::string Type = "BaseElement";
    public:
-      BaseElement(const std::string s) {
+      BaseElement(const std::string& s) {
                        Type = s;
                        //std::cerr << "         constructor BaseElement - Typ: " << Type << "\n";
                        }
@@ -239,8 +204,8 @@ class BaseStyle {
               else
                   return 1.0;
       }
-      void SetAntialias(const bool val) { antialias = val; }
-      void SetStyle(const std::string val) { style = val; }
+      void SetAntialias(const bool& val) { antialias = val; }
+      void SetStyle(const std::string& val) { style = val; }
       std::string StyleAsSVGstring(const size_t&);
 };
 //
@@ -257,28 +222,30 @@ class BasePosition {
    protected:
       double x = 0.0;
       double y = 0.0;
-      double z = 0.0; // vorerst nur bei dynamic_text verwendet
+      double z = 1.0; // vorerst nur bei dynamic_text verwendet
    public:
       BasePosition() {
                       // std::cerr << " default-constructor BasePosition\n";
                      }
-      BasePosition(const double valX, const double valY) {
+      BasePosition(const double& valX, const double& valY) {
                    x = valX; y = valY;
                    //std::cerr << "         constructor BasePosition with XY-values\n";
                    }
-      BasePosition(const double valX, const double valY, const double valZ) {
+      BasePosition(const double& valX, const double& valY, const double& valZ) {
                    x = valX; y = valY; z = valZ;
-                   //std::cerr << "         constructor BasePosition with xyz-values\n";
+                   //std::cerr << "         constructor BasePosition with XYZ-values\n";
                    }
       void Clear(void) { x = 0.0; y = 0.0; z = 0.0; }
       double GetX() { return x; }
       double GetY() { return y; }
       double GetZ() { return z; }
-      void SetX(const double val) { x = val; }
-      void SetY(const double val) { y = val; }
-      void SetZ(const double val) { z = val; }
-      void Move(const double dx, const double dy) { x += dx; y += dy; }
-      void Move(const double dx, const double dy, const double dz) { x += dx; y += dy; z += dz;}
+      void ReadPosition(pugi::xml_node&);
+      void WritePosition(pugi::xml_node&, const size_t&);
+      void SetX(const double& val) { x = val; }
+      void SetY(const double& val) { y = val; }
+      void SetZ(const double& val) { z = val; }
+      void Move(const double& dx, const double& dy) { x += dx; y += dy; }
+      void Move(const double& dx, const double& dy, const double& dz) { x += dx; y += dy; z += dz;}
 };
 //
 //--- END - definition of class "BasePosition" ---------------------------------
@@ -303,13 +270,15 @@ class BaseSize {
                    //std::cout << "         constructor BaseSize with values\n";
                    }
       void Clear(void) { width = 0.0; height = 0.0; }
-      double GetWidth()                { return width; }
-      double GetHeight()               { return height; }
-      void SetWidth(const double val)  { width = val; }
-      void SetHeight(const double val) { height = val; }
-      void SwapWidhHeight(void)        { double tmp = width;
-                                         width = height;
-                                         height = tmp;  }
+      double GetWidth()                 { return width; }
+      double GetHeight()                { return height; }
+      void ReadSize(pugi::xml_node&);
+      void WriteSize(pugi::xml_node&, const size_t&);
+      void SetWidth(const double& val)  { width = val; }
+      void SetHeight(const double& val) { height = val; }
+      void SwapWidhHeight(void)         { double tmp = width;
+                                          width = height;
+                                          height = tmp;  }
 };
 //
 //--- END - definition of class "BaseSize" -------------------------------------
@@ -322,6 +291,35 @@ class BaseSize {
 
 //
 //--- BEGIN - definition of derived Classes of Elements ------------------------
+//
+
+//
+//--- START - definition of definition-line of Elements ------------------------
+//
+class DefinitionLine : public BaseSize
+{
+   private:
+      std::string Type = "DefinitionLine";
+      std::string version = "0.100.0";
+      std::string link_type = "thumbnail";
+      std::string type = "element";
+      int hotspot_x = 5;
+      int hotspot_y = 6;
+   public:
+      void ReadFromPugiNode(pugi::xml_node);
+      void ReCalc(RectMinMax);
+      void WriteToPugiNode(pugi::xml_node);
+      int Gethotspot_x(){ return hotspot_x; }
+      int Gethotspot_y(){ return hotspot_y; }
+      std::string Getlink_type() { return link_type; }
+      void Sethotspot_x( const int& val ){ hotspot_x = val; }
+      void Sethotspot_y( const int& val ){ hotspot_y = val; }
+      void Setlinktype( const std::string& val ){ link_type = val; }
+   protected:
+      //
+};
+//
+//--- END - definition of definition-line of Elements --------------------------
 //
 
 //
@@ -398,7 +396,7 @@ class ElmtDynText : public BaseElement,
       void Flip(void)   { y = (-1) * y; }
       void Mirror(void) { x = (-1) * x; }
       void Rot90(void);  // rotate clockwise by 90°
-      void Scale(const double factX=1.0, const double factY=1.0) {
+      void Scale(const double& factX=1.0, const double& factY=1.0) {
                        x *= factX; y *= factY;
                        size *= std::min(factX, factY);
                        CreateFontString();
@@ -490,7 +488,7 @@ class ElmtText : public BaseElement,
       void Flip(void)   { y = (-1) * y; }
       void Mirror(void) { x = (-1) * x; }
       void Rot90(void);  // rotate clockwise by 90°
-      void Scale(const double factX=1.0, const double factY=1.0) {
+      void Scale(const double& factX=1.0, const double& factY=1.0) {
                        x *= factX; y *= factY;
                        size *= std::min(factX, factY);
                        CreateFontString();
@@ -557,9 +555,9 @@ class ElmtPolygon : public BaseElement,
       void Flip(void);   // vertikal
       void Mirror(void); // horizontal
       void Rot90(void);  // rotate clockwise by 90°
-      void Move(const double dx, const double dy);  // move by dx, dy
-      void Scale(const double factX=1.0, const double factY=1.0);
-      void CleanUp(pugi::xml_node, const double);
+      void Move(const double& dx, const double& dy);  // move by dx, dy
+      void Scale(const double& factX=1.0, const double& factY=1.0);
+      void CleanUp(pugi::xml_node&, const double&);
 };
 //
 //--- END - definition of class "Polygon" --------------------------------------
@@ -590,10 +588,10 @@ class ElmtLine : public ElmtPolygon {
       double GetAngle(void) {
           return toDeg<double>(atan2((polygon[1].y-polygon[0].y), (polygon[1].x-polygon[0].x)));
           }
-      void SetLength1(const double val) { length1 = val; }
-      void SetLength2(const double val) { length2 = val; }
-      void SetEnd1(const std::string val) { end1 = val; }
-      void SetEnd2(const std::string val) { end2 = val; }
+      void SetLength1(const double& val) { length1 = val; }
+      void SetLength2(const double& val) { length2 = val; }
+      void SetEnd1(const std::string& val) { end1 = val; }
+      void SetEnd2(const std::string& val) { end2 = val; }
       void Write(void) { ElmtPolygon::Write();
                          if (polygon.size() > 0) {
                            std::cout << length1 << " | " << length2 << "\n" << end1 << " | " << end2 << "\n";
@@ -602,7 +600,7 @@ class ElmtLine : public ElmtPolygon {
       //void Flip(void);   // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
       //void Mirror(void); // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
       //void Rot90(void);  // hier nix definiert: wird von übergeordneter Klasse "Polygon" übernommen!
-      void Scale(const double factX=1.0, const double factY=1.0) {
+      void Scale(const double& factX=1.0, const double& factY=1.0) {
                          ElmtPolygon::Scale(factX, factY);
                          length1 *= std::min(factX, factY); length1 = std::min(length1, 99.0);
                          length2 *= std::min(factX, factY); length2 = std::min(length2, 99.0);
@@ -637,7 +635,7 @@ class ElmtEllipse : public BaseElement,
       void Flip(void)   { y = (-1) * y - height; }
       void Mirror(void) { x = (-1) * x - width; }
       void Rot90();  // rotate clockwise by 90°
-      void Scale(const double factX=1.0, const double factY=1.0) {
+      void Scale(const double& factX=1.0, const double& factY=1.0) {
                        x     *= factX;      y *= factY;
                        width *= factX; height *= factY;
                        }
@@ -671,12 +669,12 @@ class ElmtRect : public BaseElement,
         void WriteToPugiNode(pugi::xml_node&, const size_t&);
         double GetRx(void)      { return rx; }
         double GetRy(void)      { return ry; }
-        void SetRx(const double val)      { rx = val; }
-        void SetRy(const double val)      { ry = val; }
+        void SetRx(const double& val)      { rx = val; }
+        void SetRy(const double& val)      { ry = val; }
         void Flip(void)   { y = (-1) * y - height; }
         void Mirror(void) { x = (-1) * x - width; }
         void Rot90();  // rotate clockwise by 90°
-        void Scale(const double factX=1.0, const double factY=1.0) {
+        void Scale(const double& factX=1.0, const double& factY=1.0) {
                        x     *= factX;      y *= factY;
                        rx    *= factX;     ry *= factY;
                        width *= factX; height *= factY;
@@ -723,15 +721,15 @@ class ElmtArc : public BaseElement,
       double GetMaxX() { return MaxX; }
       double GetMinY() { return MinY; }
       double GetMaxY() { return MaxY; }
-      void SetData(const double, const double, const double, const double, const double, const double);
-      void SetStart(const double val) { start = val; Normalize(); }
-      void SetAngle(const double val) { angle = val; Normalize(); }
+      void SetData(const double&, const double&, const double&, const double&, const double&, const double&);
+      void SetStart(const double& val) { start = val; Normalize(); }
+      void SetAngle(const double& val) { angle = val; Normalize(); }
       void Normalize();
       void coutData(){ std::cout << x << "|" << y << ", " << width << "|" << height << ", " << start << "|" << angle; }
       void Flip();   // vertikal
       void Mirror(); // horizontal
       void Rot90();  // rotate clockwise by 90°
-      void Scale(const double factX=1.0, const double factY=1.0) {
+      void Scale(const double& factX=1.0, const double& factY=1.0) {
                        x     *= factX;      y *= factY;
                        width *= factX; height *= factY;
                        DetermineMinMax();
@@ -770,10 +768,10 @@ class ElmtTerminal : public BaseElement,
       std::string GetType()        { return type; }
       std::string GetName()        { return name; }
       std::string GetUUID()        { return uuid; }
-      void SetOrientation(const std::string val) { orientation = val; }
-      void SetType(const std::string val)        { type = val; }
-      void SetName(const std::string val)        { name = val; }
-      void SetUUID(const std::string val)        { uuid = val; }
+      void SetOrientation(const std::string& val) { orientation = val; }
+      void SetType(const std::string& val)        { type = val; }
+      void SetName(const std::string& val)        { name = val; }
+      void SetUUID(const std::string& val)        { uuid = val; }
       std::string AsSVGstring(const size_t&);
       void Flip(void) { y *= (-1.0);
                         if (orientation == "n") orientation = "s";
@@ -802,16 +800,16 @@ class RectMinMax {
       double yMax = 0.0;
    public:
       RectMinMax();                  // default-constructor
-      RectMinMax(const double,
-                 const double);      // constructor with value
+      RectMinMax(const double&,
+                 const double&);     // constructor with value
       RectMinMax(const RectMinMax&); // copy-constructor
-      void addx(const double);       // add a new x-value
-      void addy(const double);       // add a new y-value
-      void add(const double,
-               const double);        // add new values
+      void addx(const double&);      // add a new x-value
+      void addy(const double&);      // add a new y-value
+      void add(const double&,
+               const double&);       // add new values
       void clear(void);              // clear min/max and set to 0
-      void clear(const double,
-                 const double);      // clear min/max and set new values
+      void clear(const double&,
+                 const double&);     // clear min/max and set new values
       void clear(const RectMinMax&); // clear with value
       double xmin(void);             // returns minimum x-value
       double xmax(void);             // returns maximum x-value

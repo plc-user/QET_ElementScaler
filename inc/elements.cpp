@@ -43,8 +43,7 @@ void DefinitionLine::ReadFromPugiNode(pugi::xml_node node)
     version   = node.attribute("version").as_string();
     link_type = node.attribute("link_type").as_string();
     type      = node.attribute("type").as_string();
-    width     = node.attribute("width").as_int();
-    height    = node.attribute("height").as_int();
+    ReadSize(node);
     hotspot_x = node.attribute("hotspot_x").as_int();
     hotspot_y = node.attribute("hotspot_y").as_int();
 }
@@ -77,10 +76,7 @@ void DefinitionLine::WriteToPugiNode(pugi::xml_node node)
     node.append_attribute("type").set_value(type);
     node.remove_attribute("link_type");
     node.append_attribute("link_type").set_value(link_type);
-    node.remove_attribute("width");
-    node.append_attribute("width").set_value(std::to_string(width));
-    node.remove_attribute("height");
-    node.append_attribute("height").set_value(std::to_string(height));
+    WriteSize(node, 0);
     node.remove_attribute("hotspot_x");
     node.append_attribute("hotspot_x").set_value(std::to_string(hotspot_x));
     node.remove_attribute("hotspot_y");
@@ -159,8 +155,77 @@ void ElementInfo::WriteToPugiNode(pugi::xml_node node)
     }
 }
 //
-//--- END - implementation of class "ElementInfo" --------------------------------
+//--- END - implementation of class "ElementInfo" ------------------------------
 //
+
+
+
+//
+//--- implementation of class BasePosition -------------------------------------
+//
+void BasePosition::ReadPosition(pugi::xml_node& node)
+{
+    x = node.attribute("x").as_double();
+    y = node.attribute("y").as_double();
+    if (node.attribute("z")) {
+        z = node.attribute("z").as_double();
+    }
+}
+void BasePosition::WritePosition(pugi::xml_node& node, const size_t& decimals)
+{
+    if (node.attribute("x")) {
+        node.remove_attribute("x");
+        node.append_attribute("x").set_value(FormatValue(x, decimals));
+    }
+    if (node.attribute("y")) {
+        node.remove_attribute("y");
+        node.append_attribute("y").set_value(FormatValue(y, decimals));
+    }
+    if (node.attribute("z")) {
+        node.remove_attribute("z");
+        node.append_attribute("z").set_value(FormatValue(z, 0));
+    }
+}
+//
+//--- END - implementation of class BasePosition -------------------------------
+//
+
+//
+//--- implementation of class BaseSize -----------------------------------------
+//
+void BaseSize::ReadSize(pugi::xml_node& node)
+{
+    if (node.attribute("width")) {
+        width  = node.attribute("width").as_double();
+    }
+    if (node.attribute("height")) {
+        height = node.attribute("height").as_double();
+    }
+    if (node.attribute("diameter")) {
+        // beim Element "circle" gibt's den Durchmesser
+        // --> umwandeln in "ellipse" mit "width"/"height"
+        width  = node.attribute("diameter").as_double();
+        height = width;
+        node.remove_attribute("diameter");
+        node.append_attribute("width").set_value(width);
+        node.append_attribute("height").set_value(width);
+    }
+}
+void BaseSize::WriteSize(pugi::xml_node& node, const size_t& dec)
+{
+    if (node.attribute("width")) {
+        node.remove_attribute("width");
+        node.append_attribute("width").set_value(FormatValue(width, dec));
+    }
+    if (node.attribute("height")) {
+        node.remove_attribute("height");
+        node.append_attribute("height").set_value(FormatValue(height, dec));
+    }
+}
+//
+//--- END - implementation of class BaseSize -----------------------------------
+//
+
 
 
 
@@ -365,9 +430,7 @@ DAS wollen wir hier auch machen!
 //
 void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)
 {
-    x         = node.attribute("x").as_double();
-    y         = node.attribute("y").as_double();
-    z         = node.attribute("z").as_double();
+    ReadPosition(node);
     if (node.attribute("rotate"))
         rotate    = node.attribute("rotate").as_bool(); // scheint eine Rotation um 0° zu sein!
     if (node.attribute("rotation"))
@@ -431,14 +494,7 @@ void ElmtDynText::ReadFromPugiNode(pugi::xml_node& node)
 void ElmtDynText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {
     // Attribute löschen und wieder anfügen zum sortieren
-    node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, decimals));
-    node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, decimals));
-    if (node.attribute("z")) {
-        node.remove_attribute("z");
-        node.append_attribute("z").set_value(FormatValue(z, 0));
-    }
+    WritePosition(node, decimals);
     if (node.attribute("text_width")) {
         node.remove_attribute("text_width");
         if ( text_width < 0.0 ) { text_width = -1.0; }
@@ -599,8 +655,7 @@ void ElmtDynText::CreateFontString(void)
 //
 void ElmtText::ReadFromPugiNode(pugi::xml_node& node)
 {
-    x         = node.attribute("x").as_double();
-    y         = node.attribute("y").as_double();
+    ReadPosition(node);
     size      = node.attribute("size").as_double();
     rotation  = node.attribute("rotation").as_double();
     text      = node.attribute("text").as_string();
@@ -626,10 +681,7 @@ void ElmtText::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes by removing and re-adding
     node.remove_attribute("text");
     node.prepend_attribute("text").set_value(text);
-    node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, decimals));
-    node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, decimals));
+    WritePosition(node, decimals);
     if (node.attribute("size")) {
         node.remove_attribute("size");
         node.append_attribute("size").set_value(FormatValue(size, 0));
@@ -757,9 +809,9 @@ void ElmtArc::Normalize(void)
     angle = iangle;
 }
 // ---
-void ElmtArc::SetData(double X, double Y,
-                  double Width, double Height,
-                  double Start, double Angle)
+void ElmtArc::SetData(const double& X, const double& Y,
+                  const double& Width, const double& Height,
+                  const double& Start, const double& Angle)
 {// Daten übernehmen und normalisieren:
     x = X;
     y = Y;
@@ -772,10 +824,8 @@ void ElmtArc::SetData(double X, double Y,
 //---
 void ElmtArc::ReadFromPugiNode(pugi::xml_node& node)
 {
-    x         = node.attribute("x").as_double();
-    y         = node.attribute("y").as_double();
-    width     = node.attribute("width").as_double();
-    height    = node.attribute("height").as_double();
+    ReadPosition(node);
+    ReadSize(node);
     start     = node.attribute("start").as_double();
     angle     = node.attribute("angle").as_double();
     antialias = node.attribute("antialias").as_bool();
@@ -806,14 +856,8 @@ void ElmtArc::DetermineMinMax(){
 // ---
 void ElmtArc::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes:
-    node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, decimals));
-    node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, decimals));
-    node.remove_attribute("width");
-    node.append_attribute("width").set_value(FormatValue(width, decimals));
-    node.remove_attribute("height");
-    node.append_attribute("height").set_value(FormatValue(height, decimals));
+    WritePosition(node, decimals);
+    WriteSize(node, decimals);
     node.remove_attribute("start");
     node.append_attribute("start").set_value(FormatValue(start, 0));
     node.remove_attribute("angle");
@@ -988,7 +1032,7 @@ void ElmtPolygon::Rot90(void)
     }
 }
 // ---
-void ElmtPolygon::Scale(const double factX, const double factY)
+void ElmtPolygon::Scale(const double& factX, const double& factY)
 {
     for (auto &pt: polygon) {
         pt.x *= factX;
@@ -996,7 +1040,7 @@ void ElmtPolygon::Scale(const double factX, const double factY)
     }
 }
 // ---
-void ElmtPolygon::Move(const double dx, const double dy)
+void ElmtPolygon::Move(const double& dx, const double& dy)
 {   // add the delta-values to all X- and Y-values
     for (auto &pt: polygon) {
         pt.x += dx;
@@ -1021,7 +1065,7 @@ std::string ElmtPolygon::AsSVGstring(const size_t& decimals)
     return s + "/>";
 }
 // ---
-void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
+void ElmtPolygon::CleanUp(pugi::xml_node& node, const double& epsilon)
 // prüfen, ob direkt aufeinander folgende Polygon-Punkte gleich sind -> den zweiten löschen!
 // und aus dem pugi-node den letzten Punkt löschen. Zum Schluß die Punkte neu durchnummerieren
 {
@@ -1076,43 +1120,16 @@ void ElmtPolygon::CleanUp(pugi::xml_node node, const double epsilon)
 //
 void ElmtEllipse::ReadFromPugiNode(pugi::xml_node& node)
 {
-    x         = node.attribute("x").as_double();
-    y         = node.attribute("y").as_double();
-    if (node.attribute("width"))
-        width     = node.attribute("width").as_double();
-    else
-        node.append_attribute("width");
-    if (node.attribute("height"))
-        height    = node.attribute("height").as_double();
-    else
-        node.append_attribute("height");
-    if (node.attribute("diameter")) {
-        width     = node.attribute("diameter").as_double();
-        height    = width;
-        node.remove_attribute("diameter");
-    }
+    ReadPosition(node);
+    ReadSize(node);
     antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
 }
 // ---
 void ElmtEllipse::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {   // sort attributes:
-    if (node.attribute("x")){
-        node.remove_attribute("x");
-        node.append_attribute("x").set_value(FormatValue(x, decimals));
-    }
-    if (node.attribute("y")){
-        node.remove_attribute("y");
-        node.append_attribute("y").set_value(FormatValue(y, decimals));
-    }
-    if (node.attribute("width")){
-        node.remove_attribute("width");
-        node.append_attribute("width").set_value(FormatValue(width, decimals));
-    }
-    if (node.attribute("height")){
-        node.remove_attribute("height");
-        node.append_attribute("height").set_value(FormatValue(height, decimals));
-    }
+    WritePosition(node, decimals);
+    WriteSize(node, decimals);
     if (node.attribute("style")){
         node.remove_attribute("style");
         node.append_attribute("style").set_value(style);
@@ -1154,26 +1171,18 @@ std::string ElmtEllipse::AsSVGstring(const size_t& decimals)
 //
 void ElmtRect::ReadFromPugiNode(pugi::xml_node& node)
 {
-    x         = node.attribute("x").as_double();
-    y         = node.attribute("y").as_double();
+    ReadPosition(node);
     rx        = node.attribute("rx").as_double();
     ry        = node.attribute("ry").as_double();
-    width     = node.attribute("width").as_double();
-    height    = node.attribute("height").as_double();
+    ReadSize(node);
     antialias = node.attribute("antialias").as_bool();
     style     = node.attribute("style").as_string();
 }
 // ---
 void ElmtRect::WriteToPugiNode(pugi::xml_node& node, const size_t& decimals)
 {
-    node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, decimals));
-    node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, decimals));
-    node.remove_attribute("width");
-    node.append_attribute("width").set_value(FormatValue(width, decimals));
-    node.remove_attribute("height");
-    node.append_attribute("height").set_value(FormatValue(height, decimals));
+    WritePosition(node, decimals);
+    WriteSize(node, decimals);
     node.remove_attribute("rx");
     node.append_attribute("rx").set_value(FormatValue(rx, decimals));
     node.remove_attribute("ry");
@@ -1387,8 +1396,7 @@ std::string ElmtLine::AsSVGstring(const size_t& decimals)
 //
 void ElmtTerminal::ReadFromPugiNode(pugi::xml_node& node)
 {
-    x           = node.attribute("x").as_double();
-    y           = node.attribute("y").as_double();
+    ReadPosition(node);
     orientation = node.attribute("orientation").as_string();
     type        = node.attribute("type").as_string();
     if (type.length() == 0) { type = "Generic"; }
@@ -1416,10 +1424,7 @@ void ElmtTerminal::WriteToPugiNode(pugi::xml_node& node)
         } else {
         node.append_attribute("name").set_value("");
         }
-    node.remove_attribute("x");
-    node.append_attribute("x").set_value(FormatValue(x, 0));
-    node.remove_attribute("y");
-    node.append_attribute("y").set_value(FormatValue(y, 0));
+    WritePosition(node, 0);
     node.remove_attribute("orientation");
     node.append_attribute("orientation").set_value(orientation);
     if (node.attribute("type")) {
@@ -1486,7 +1491,7 @@ RectMinMax::RectMinMax(){
     yMin = 0.0;
     yMax = 0.0;
 }
-RectMinMax::RectMinMax(const double x, const double y){
+RectMinMax::RectMinMax(const double& x, const double& y){
     xMin = x;
     xMax = x;
     yMin = y;
@@ -1498,15 +1503,15 @@ RectMinMax::RectMinMax(const RectMinMax& r){
     yMin = r.yMin;
     yMax = r.yMax;
 }
-void RectMinMax::addx(const double x){
+void RectMinMax::addx(const double& x){
     if (x < xMin) { xMin = x; }
     if (x > xMax) { xMax = x; }
 }
-void RectMinMax::addy(const double y){
+void RectMinMax::addy(const double& y){
     if (y < yMin) { yMin = y; }
     if (y > yMax) { yMax = y; }
 }
-void RectMinMax::add(const double x, const double y){
+void RectMinMax::add(const double& x, const double& y){
     if (x < xMin) { xMin = x; }
     if (x > xMax) { xMax = x; }
     if (y < yMin) { yMin = y; }
@@ -1519,7 +1524,7 @@ void RectMinMax::clear(void){
     yMin = 0.0;
     yMax = 0.0;
 }
-void RectMinMax::clear(const double x, const double y){
+void RectMinMax::clear(const double& x, const double& y){
     xMin = x;
     xMax = x;
     yMin = y;
@@ -1811,7 +1816,7 @@ bool MultiLineText(std::string text, std::vector<std::string> & vsText){
             vsText.push_back(text.substr(0, pos));
             text.erase(0, pos + delimiter.length());
         }
-        // der letzte teil muss auch mit:
+        // der letzte Teil muss auch mit:
         vsText.push_back(text);
         // Ja, der übergebene Text enthält Umbrüche!
         return true;

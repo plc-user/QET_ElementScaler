@@ -63,10 +63,19 @@ const std::string CreateUUID(bool UpCase=false);
 // der String bearbeitet (Übergabe als Referenz)
 void RemoveLeadingZeros(std::string& s);
 
+
 //
 // --- function-prototype for converting text to text with HTML-entities -------
 //
 std::string TextToEntity(const std::string& s);
+
+
+//
+// --- replace all occurences of substring in string ---------------------------
+//
+void replaceAll(      std::string& str,   // in-place - replacement!
+                const std::string& from,  // search this substring
+                const std::string& to);   // replace by this one
 
 
 //

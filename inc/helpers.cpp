@@ -176,6 +176,27 @@ std::string TextToEntity(const std::string& s){
 
 
 //
+// --- replace all occurences of substring in string ---------------------------
+//
+void replaceAll(      std::string& str,   // in-place - replacement!
+                const std::string& from,  // search this substring
+                const std::string& to)    // replace by this one
+{
+    auto pos = str.find(from, size_t{});
+    while (pos != std::string::npos) {
+        str.replace(pos, from.length(), to);
+        pos = str.find(from, pos + to.length());
+    }
+}
+//
+// --- END - replace all occurences of substring in string ---------------------
+//
+
+
+
+
+
+//
 // ###############################################################
 // ###               we build a (random?) UUID                 ###
 // ###############################################################

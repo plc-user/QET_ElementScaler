@@ -47,7 +47,7 @@
 // global variables
 // =============================================================================
 
-const std::string sVersion = "v0.5.5beta1";
+const std::string sVersion = "v0.5.5";
 
 // the element-file to process:
 static std::string ElementFile       = "";
@@ -73,6 +73,7 @@ static bool xOverwriteOriginal  = false;
 static bool xFlipHor            = false;
 static bool xFlipVert           = false;
 static bool xRotate90           = false;
+static bool xOnlyCleanMeta      = false;
 
 // to find out, if we need to renew UUIDs for "dynamic_text" or "terminal":
 static std::list <std::string> lsUUIDsDynTexts;
@@ -120,6 +121,7 @@ static struct option long_options[]={
     {"OverwriteOriginal",no_argument,nullptr,1003},  // "long-opt" only!!!
     {"toSVG",no_argument,nullptr,1004},  // "long-opt" only!!!
     {"Rot90",no_argument,nullptr,1005},  // "long-opt" only!!!
+    {"OnlyCleanMeta",no_argument,nullptr,1006},  // "long-opt" only!!!
     {0,0,0,0}
   };
 
@@ -182,6 +184,15 @@ int parseCommandline(int argc, char *argv[]) {
                     if (_DEBUG_)
                         std::cerr << "rotate element clockwise by 90 degree\n";
                     xRotate90 = true;
+                }
+                break;
+            case 1006:
+                if (std::string(long_options[option_index].name) == "OnlyCleanMeta"){
+                    if (_DEBUG_)
+                        std::cerr << "NO scaling or moving - sort names and delete empty information-nodes\n";
+                    xOnlyCleanMeta = true;
+                    xCreateSVG     = false; // SVG hat diese Daten nicht!
+                    xCreateELMT    = true;
                 }
                 break;
             case 'd':
@@ -366,6 +377,8 @@ void PrintHelp(const std::string &s, const std::string &v){
     << "                         (useful during creation of elements)           \n"
     << "  \"--Rot90\"              rotate element clockwise by 90 degree        \n"
     << "                         (useful during creation of elements)           \n"
+    << "  \"--OnlyCleanMeta\"      NO scaling or moving - sort names and        \n"
+    << "                         delete empty elementInformation                \n"
     << "  \"--OverwriteOriginal\"  the original file is replaced by scaled one  \n"
     << "                         (CAUTION: Be careful with this option!)        \n"
     << std::endl
@@ -419,8 +432,11 @@ void ProcessElement(pugi::xml_node doc) {
         doc.child("definition").prepend_child("uuid");
         doc.child("definition").child("uuid").append_attribute("uuid").set_value(("{" + CreateUUID(false) + "}"));
     } else {
-        if (_DEBUG_) std::cerr << "Aktualisiere vorhandene Element-UUID!\n" ;
-        doc.child("definition").child("uuid").attribute("uuid").set_value(("{" + CreateUUID(false) + "}"));
+        if (xOnlyCleanMeta == false) {
+            // wenn bei bestehenden Elementen nur die Texte sortiert werden, keine neue UUID: "Es ändert sich ja nix!"
+            if (_DEBUG_) std::cerr << "Aktualisiere vorhandene Element-UUID!\n" ;
+            doc.child("definition").child("uuid").attribute("uuid").set_value(("{" + CreateUUID(false) + "}"));
+        }
     }
     // wenn die Anschlüsse alle weg sollen...
     if (xRemoveAllTerminals==true) {
@@ -448,8 +464,8 @@ void ProcessElement(pugi::xml_node doc) {
     // in einer Schleife die Elemente bearbeiten - wir starten hier:
     pugi::xml_node node = doc.child("definition").child("description").first_child();
     // ... in a loop all parts
-    for (; node; node = node.next_sibling())
-    {
+    if (xOnlyCleanMeta == false)
+        for (; node; node = node.next_sibling()) {
         if ((std::string(node.name())) == "rect") {
             ElmtRect rect;
             rect.Clear();
@@ -618,11 +634,13 @@ void ProcessElement(pugi::xml_node doc) {
     // die Listen der UUIDs werden nicht mehr benötigt: leeren!
     lsUUIDsDynTexts.clear();
     lsUUIDsTerminals.clear();
-    // die definitionLine muss auf jeden Fall angepasst werden:
-    DefinitionLine defline;
-    defline.ReadFromPugiNode(doc.child("definition"));
-    defline.ReCalc(ElmtMinMax);
-    defline.WriteToPugiNode(doc.child("definition"));
+    // die definitionLine muss angepasst werden, wenn grafische Elemente verändert werden:
+    if (xOnlyCleanMeta == false) {
+        DefinitionLine defline;
+        defline.ReadFromPugiNode(doc.child("definition"));
+        defline.ReCalc(ElmtMinMax);
+        defline.WriteToPugiNode(doc.child("definition"));
+    }
 }
 /******************************************************************************/
 
@@ -639,8 +657,8 @@ std::string ToSVG(pugi::xml_node node) {
     DefinitionLine DefLine;
     DefLine.ReadFromPugiNode(node);
     // Daten für Abmessungen aus Definition-Line:
-    s += "     width=\"" + std::to_string(DefLine.Getwidth());
-    s += "\" height=\"" + std::to_string(DefLine.Getheight()) + "\">\n";
+    s += "     width=\"" + std::to_string(DefLine.GetWidth());
+    s += "\" height=\"" + std::to_string(DefLine.GetHeight()) + "\">\n";
     // hier die Definition von "terminal", falls im Element vorhanden:
     if (node.child("description").child("terminal")) {
         s += "  <defs>\n";
