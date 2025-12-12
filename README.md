@@ -60,6 +60,8 @@ QET_ElementScaler [options] &lt;file&gt; <br>
                          (useful during creation of elements) 
   "--Rot90"              rotate element clockwise by 90 degree
                          (useful during creation of elements)
+  "--OnlyCleanMeta"      NO scaling or moving - sort names and
+                         delete empty elementInformation
   "--OverwriteOriginal"  the original file is replaced by scaled one
                          (CAUTION: Be careful with this option!) 
 ```
