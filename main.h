@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 plc-user
+ * Copyright (c) 2022-2026 plc-user
  *
  * It is NOT allowed to use this software or any of the
  * associated files as sample data for the purposes of
@@ -47,7 +47,7 @@
 // global variables
 // =============================================================================
 
-const std::string sVersion = "v0.5.5";
+const std::string sVersion = "v0.5.6beta1";
 
 // the element-file to process:
 static std::string ElementFile       = "";
