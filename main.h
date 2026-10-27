@@ -37,6 +37,7 @@
 #include <string>       // we handle strings here
 #include <getopt.h>     // for Commandline-Parameters
 #include <filesystem>   // for exe-filename
+#include <algorithm>    // for std::transform
 #include <list>         // for list of UUIDs
 // project-includes
 #include "inc/pugixml/pugixml.hpp"

@@ -71,15 +71,14 @@ int main(int argc, char **argv)
     if (xReadFromStdIn == true){
         result = doc.load(std::cin);
     } else {
-        if ((ElementFile != "") && (std::filesystem::exists(ElementFile))) {
-          //ElementFile = argv[1];
-          result = doc.load_file(ElementFile.c_str());
-        } else
-        if ((argc>1)&&(std::filesystem::exists(argv[argc-1]))) {
-          ElementFile = argv[argc-1];
-          result = doc.load_file(ElementFile.c_str());
-        } else
-        {
+        if (ElementFile.empty() && (argc>1)) {
+            ElementFile = argv[argc-1];
+        }
+        if (!(ElementFile.empty()) &&
+            (std::filesystem::exists(ElementFile)) &&
+            (std::filesystem::is_regular_file(ElementFile))) {
+            result = doc.load_file(ElementFile.c_str());
+        } else {
             PrintHelp(argv[0], sVersion);
             return -1;
         }
@@ -100,17 +99,19 @@ int main(int argc, char **argv)
         if (_DEBUG_) std::cerr << "Element-Data loaded successfully.\n";
     }
 
-    // xml-file was successfully loaded, let's check, what kind of data we have...
-    if (doc.child("definition").child("description")) {
+    // xml-file was successfully loaded, let's check, what kind of file/data we have...
+    std::string sExt = std::filesystem::path(ElementFile).extension();
+    std::transform(sExt.begin(), sExt.end(), sExt.begin(), ::tolower);
+    if ((sExt == ".elmt") && doc.child("definition").child("description")) {
         xIsElmtFile = true;
-    } else if (doc.child("qet-directory").child("names")) {
+    } else if ((ElementFile == "qet_directory") && doc.child("qet-directory").child("names")) {
         xIsDirFile  = true;
         xCreateSVG  = false; // cannot create SVG from directory-file
         xCreateELMT = true;  // use the same xml-output-function for "element" and "qet_directory"
-    } else if (doc.child("titleblocktemplate")) {
+    } else if ((sExt == ".titleblock") && doc.child("titleblocktemplate")) {
         std::cerr << "QElectroTech - titleblock-templates are not supported by QET_ElementScaler!\n";
         return -2;
-    } else if (doc.child("project").child("diagram") && doc.child("project").child("collection")) {
+    } else if ((sExt == ".qet") && doc.child("project").child("diagram") && doc.child("project").child("collection")) {
         std::cerr << "QElectroTech - project-files are not supported by QET_ElementScaler!\n";
         return -2;
     } else {
@@ -126,8 +127,8 @@ int main(int argc, char **argv)
     } else {
         if (xPrintToStdOut == false) {
             if (xIsElmtFile == true) {
-                ElementFileScaled.insert(ElementFileScaled.length()-5, ".SCALED");
-            } else {
+                ElementFileScaled = std::filesystem::path(ElementFile).replace_extension(".SCALED.elmt");
+            } else if (xIsDirFile == true) {
                 ElementFileScaled += ".SCALED";
             }
         }
