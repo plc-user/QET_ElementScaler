@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     }
 
     // xml-file was successfully loaded, let's check, what kind of file/data we have...
-    std::string sExt = std::filesystem::path(ElementFile).extension();
+    std::string sExt = std::filesystem::path(ElementFile).extension().string();
     std::transform(sExt.begin(), sExt.end(), sExt.begin(), ::tolower);
     if ((sExt == ".elmt") && doc.child("definition").child("description")) {
         xIsElmtFile = true;
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
     } else {
         if (xPrintToStdOut == false) {
             if (xIsElmtFile == true) {
-                ElementFileScaled = std::filesystem::path(ElementFile).replace_extension(".SCALED.elmt");
+                ElementFileScaled = std::filesystem::path(ElementFile).replace_extension(".SCALED.elmt").string();
             } else if (xIsDirFile == true) {
                 ElementFileScaled += ".SCALED";
             }
