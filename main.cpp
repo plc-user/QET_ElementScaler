@@ -37,7 +37,7 @@
 //
 // +----------------------------------------------------------+
 // | This software uses pugixml library (https://pugixml.org) |
-// | pugixml is Copyright (C) 2006-2025 Arseny Kapoulkine.    |
+// | pugixml is Copyright (C) 2006-2026 Arseny Kapoulkine.    |
 // +----------------------------------------------------------+
 //
 
