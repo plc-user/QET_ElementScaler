@@ -50,7 +50,7 @@
 const std::string sVersion = "v0.5.6beta1";
 
 // the element-file to process:
-static std::string ElementFile       = "";
+static std::string ElementFile       ;
 static std::string SVGFile           = "SampleFile.svg";
 static std::string ElementFileScaled = "SampleFile.SCALED.elmt";
 
@@ -132,8 +132,8 @@ static struct option long_options[]={
 /******************************************************************************/
 int parseCommandline(int argc, char *argv[]) {
     int c;
-    int option_index = 12345;
-    std::string sTmp = "";
+    int option_index = 0;
+    std::string sTmp;
     while ((c=getopt_long(argc,argv,cOptions,long_options,&option_index))!=-1) {
         if (_DEBUG_) std::cerr << "long-opt-name: " << long_options[option_index].name << std::endl;
         switch(c) {
@@ -522,7 +522,7 @@ void ProcessElement(pugi::xml_node doc) {
             text.Scale(scaleX, scaleY);
             if (xMoveElement) text.Move(moveX, moveY);
             text.WriteToPugiNode(node, decimals);
-            if (!((text.GetText() == "") || (text.GetText() == "_"))) {
+            if (!((text.GetText().empty()) || (text.GetText() == "_"))) {
                 ElmtMinMax.addx(text.GetX()-text.GetSize());
                 ElmtMinMax.addx(text.GetX()+text.GetSize());
                 ElmtMinMax.addy(text.GetY()-text.GetSize());
@@ -562,7 +562,7 @@ void ProcessElement(pugi::xml_node doc) {
                 lsUUIDsDynTexts.push_back(node.attribute("uuid").as_string());
             }
             dyntext.WriteToPugiNode(node, decimals);
-            if (!((dyntext.GetText() == "") || (dyntext.GetText() == "_"))) {
+            if (!((dyntext.GetText().empty()) || (dyntext.GetText() == "_"))) {
                 ElmtMinMax.addx(dyntext.GetX()-dyntext.GetSize());
                 ElmtMinMax.addx(dyntext.GetX()+dyntext.GetSize());
                 ElmtMinMax.addy(dyntext.GetY()-dyntext.GetSize());
@@ -649,7 +649,7 @@ void ProcessElement(pugi::xml_node doc) {
 
 /******************************************************************************/
 std::string ToSVG(pugi::xml_node node) {
-    std::string s = "";
+    std::string s;
     s += "<svg xmlns=\"http://www.w3.org/2000/svg\"\n";
     s += "     xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n";
     node = node.child("definition");
