@@ -203,6 +203,10 @@ int parseCommandline(int argc, char *argv[]) {
                     xStopWithError = true;
                 } else {
                     decimals = size_t(std::floor(stod(std::string(optarg))));
+                    if (decimals > 6) {
+                        decimals = 6;
+                        std::cerr << "limited decimals to 6\n";
+                    }
                     if (_DEBUG_)
                         std::cerr << "set number of decimals to " << decimals << "\n";
                     MinLineLength = 1.5;
