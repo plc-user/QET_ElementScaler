@@ -795,18 +795,19 @@ void ElmtArc::Mirror(void)
 }
 // ---
 void ElmtArc::Normalize(void)
-{// Details: siehe QET_ElementScaler
-    int istart = (int)(round(start)) % 360;
-    int iangle = (int)(round(angle)) % 360;
-    if (istart < 0) {
-        istart = (istart + 360) % 360;
+{// Startwinkel und Bogenwinkel sollen immer positive Werte haben
+    constexpr double CIRCLE = 360.0;
+    while (start <     0.0) { start += CIRCLE; } // always positive start
+    while (start >= CIRCLE) { start -= CIRCLE; } // within 0 ... 360
+    if (angle < 0) {
+        start  = (start + angle + CIRCLE);
+        while (start <     0.0) { start += CIRCLE; }
+        while (start >= CIRCLE) { start -= CIRCLE; }
+        angle *= (-1.0);
     }
-    if (iangle < 0) {
-        istart  = (istart + iangle + 360) % 360;
-        iangle *= (-1);
-    }
-    start = istart;
-    angle = iangle;
+    // auf das nächste Vielfache von 0.5f runden
+    start = roundTo05(start);
+    angle = roundTo05(angle);
 }
 // ---
 void ElmtArc::SetData(const double& X, const double& Y,

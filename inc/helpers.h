@@ -32,6 +32,7 @@
 
 #include <iostream>     // for IO-Operations
 #include <cstdint>      // int8_t, ...
+#include <cmath>        // round, ...
 
 // für die Terminal-Größe:
 #if defined(_WIN32)
@@ -102,6 +103,16 @@ std::string ReadPieceOfFile(const std::string file, size_t pos, const size_t len
 // --- "trim" remove leading and trailing whitespace from a std::string --------
 //
 std::string trim(const std::string& source);
+
+
+
+//
+// --- Wert auf das nächste Vielfache von 0.5f runden --------------------------
+//
+inline double roundTo05(const double value)
+{
+    return std::round(value * 2.0f) / 2.0f;
+}
 
 
 
