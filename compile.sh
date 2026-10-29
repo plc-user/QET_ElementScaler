@@ -31,10 +31,8 @@ $Compiler -o QET_ElementScaler \
              obj/main.o  \
           -s
 
-# delete object-files again:
-rm obj/inc/pugixml/*.o  &> /dev/null
-rm obj/inc/*.o          &> /dev/null
-rm obj/*.o              &> /dev/null
+# delete object-files and -dir again:
+rm -r obj &> /dev/null
 
 echo "--------------------------------------------------------------------------------"
 echo ""
