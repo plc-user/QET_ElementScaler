@@ -73,8 +73,8 @@ struct PolyPoint
 
 struct EInfo
 {   // a single entry for elementInformations
-    std::string name = "";
-    std::string text = "";
+    std::string name;
+    std::string text;
     bool show        = false;
     // functions:
     EInfo();
@@ -133,7 +133,7 @@ class ElementInfo {
 //
 class AuthorInfo {
     private:
-      std::string author = "";
+      std::string author;
       //
     public:
       void ReadFromPugiNode(pugi::xml_node);
@@ -299,7 +299,7 @@ class DefinitionLine : public BaseSize
 {
    private:
       std::string Type = "DefinitionLine";
-      std::string version = "0.100.0";
+      std::string version = "0.200.1";     // preset value should never be used!
       std::string link_type = "thumbnail";
       std::string type = "element";
       int hotspot_x = 5;
@@ -358,7 +358,7 @@ class ElmtDynText : public BaseElement,
       bool rotate = true;
       bool frame = false;
       bool keep_visual_rotation = false;
-      std::string uuid = "";
+      std::string uuid;
       std::string text_from = "ElementInfo";
       std::string Valignment = "AlignTop";
       std::string Halignment = "AlignLeft";
@@ -368,8 +368,8 @@ class ElmtDynText : public BaseElement,
       double rotation = 0.0;
       std::string color = "#000000";
       std::string text = "_";
-      std::string info_name = "";
-      std::string composite_text = "";
+      std::string info_name;
+      std::string composite_text;
       std::string font = "Liberation Sans,9,-1,5,50,0,0,0,0,0,Regular";
     public:
       ElmtDynText() : BaseElement("dynamic_text") {
@@ -379,9 +379,9 @@ class ElmtDynText : public BaseElement,
                          BasePosition::Clear();
                          rotate = true; rotation = 0.0;
                          text_width = -1.0;
-                         font = "";
-                         info_name = "";
-                         composite_text = "";
+                         font.clear();
+                         info_name.clear();
+                         composite_text.clear();
                          size = 11.1; text = "_"; color = "#000000";
                          text_from = "ElementInfo";
                          SplitFontString();
@@ -474,7 +474,7 @@ class ElmtText : public BaseElement,
                        }
       void Clear(void) {
                          BasePosition::Clear(); rotation = 0.0;
-                         font = "";
+                         font.clear();
                          size = 11.1; text = "_"; color = "#000000";
                          SplitFontString();
                        }
@@ -753,13 +753,13 @@ class ElmtTerminal : public BaseElement,
    private:
       std::string orientation = "n";
       std::string type        = "Generic";
-      std::string name        = "";
+      std::string name        ;
       std::string uuid        = "{}";
    public:
       ElmtTerminal() : BaseElement("terminal") {
                        //std::cerr << " default-constructor Terminal - Typ: " << Type << "\n";
                        }
-      void Clear(void) { x = 0.0; y = 0.0; orientation = "n"; type = "Generic"; name = ""; uuid = ""; }
+      void Clear(void) { x = 0.0; y = 0.0; orientation = "n"; type = "Generic"; name.clear(); uuid.clear(); }
       void ReadFromPugiNode(pugi::xml_node&);
       void WriteToPugiNode(pugi::xml_node&);
       void CreateNewUUID(void) { uuid = "{" + CreateUUID(false) + "}"; }

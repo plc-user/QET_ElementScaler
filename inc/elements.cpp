@@ -275,7 +275,7 @@ std::string BaseStyle::StyleAsSVGstring(const size_t& decimals)
     // der letzte teil muss auch mit:
     vsStyleParts.push_back(text);
     // wir teilen den style-string auf und bestimmen die Werte:
-    std::string s = "";
+    std::string s;
     //
     for (const auto& str : vsStyleParts) {
         std::string val = str;
@@ -578,7 +578,7 @@ std::string ElmtDynText::AsSVGstring(const size_t& decimals)
     double posy;
     double rotx;
     double roty;
-    std::string s = "";
+    std::string s;
     // Position und Rotationspunkt berechnen:
     posx = ((x + (size/8.0)+4.05) - 0.5);
     posy = y + (7.0/5.0*size + 26.0/5.0) - 0.5;
@@ -717,7 +717,7 @@ std::string ElmtText::AsSVGstring(const size_t& decimals)
         std::vector<std::string> vsText;
         MultiLineText(text, vsText);
         // wir brauchen einen String für den Rückgabewert:
-        std::string s = "";
+        std::string s;
         s += "<text y=\"" + FormatValue(y, decimals) + "\" transform=\"rotate(";
         s += FormatValue(rotation, decimals) + " " + FormatValue(x, decimals) + " " + FormatValue(y, decimals) + ")\" ";
         s += "font-family=\"" + FontToFontFamily(vsFont[0]) + "\" ";

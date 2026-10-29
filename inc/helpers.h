@@ -142,7 +142,7 @@ const std::string toHex(const T inVal, const bool upCase=false, const bool withP
             default: return "";
         }
     // ab hier wird der Wert in HEX ausgegeben:
-    std::string s = "";
+    std::string s;
     for (int8_t i=(2*sizeof(inVal)-1); i>=0; i--) {
         if (upCase == true)
             { s += TAB[(val >> (4*i)) & static_cast<uint16_t>(0x0f)]; }

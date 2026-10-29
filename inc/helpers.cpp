@@ -45,8 +45,6 @@ struct DecSep : std::numpunct<char> {
 
 
 
-
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -150,7 +148,7 @@ void RemoveLeadingZeros(std::string& s)
 // ###############################################################
 //
 std::string TextToEntity(const std::string& s){
-    std::string result = "";
+    std::string result;
     for (size_t i = 0; i<s.length(); i++)
     {
         switch ((char)s[i]){
@@ -209,7 +207,7 @@ static unsigned int random_char() {
 }
 //
 static std::string generate_hex(const unsigned int len) {
-    std::string s = "";
+    std::string s;
     for (unsigned int i = 0; i < len; i++) {
         const uint8_t rc = random_char();
         s += toHex<uint8_t>(rc); // eigene Funktion ...
@@ -218,7 +216,7 @@ static std::string generate_hex(const unsigned int len) {
 }
 //
 const std::string CreateUUID(const bool UpCase) {
-    std::string uuid = "";
+    std::string uuid;
     uuid  =       generate_hex(4);
     uuid += '-' + generate_hex(2);
     uuid += '-' + generate_hex(2);
