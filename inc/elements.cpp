@@ -1775,7 +1775,7 @@ std::string FontToFontFamily (const std::string & s){
         }
     else if ( (!(s.find("Serif") == std::string::npos)) ||
               (!(s.find("Times") == std::string::npos)))  {
-        sFontFamily = "Liberation Serif, serif"; // "Times", "Times New Roman", "MS Serif"
+        sFontFamily = "'Liberation Serif', serif"; // "Times", "Times New Roman", "MS Serif"
         }
     else if ( (!(s.find("osifont") == std::string::npos)) )  {
         sFontFamily = "osifont, sans-serif"; // sog. "Normschrift" oder ohne Serifen
