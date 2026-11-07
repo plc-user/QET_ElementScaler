@@ -1765,24 +1765,27 @@ std::string ColorToValue (const std::string & Color){
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+// Generic CSS families only: a named family such as "MS Sans Serif" can
+// resolve to a bitmap font that Chrome cannot draw, and the text of the
+// SVG is then invisible there while Firefox shows it.
 std::string FontToFontFamily (const std::string & s){
     std::string sFontFamily;
     if      ( (!(s.find("Sans") == std::string::npos)) ||
               (!(s.find("Arial") == std::string::npos)) ||
               (!(s.find("MS Shell Dlg") == std::string::npos)) )  {
-        sFontFamily = "Sans Serif,MS Sans Serif"; // "Arial", "Tahoma", "MS Sans Serif"
+        sFontFamily = "sans-serif";
         }
     else if ( (!(s.find("Mono") == std::string::npos)) ||
               (!(s.find("Fixed") == std::string::npos)) ||
               (!(s.find("Courier") == std::string::npos)))  {
-        sFontFamily = "Monospace,Courier New"; // "Courier", "Courier New", "Fixedsys", "Console", "Terminal"
+        sFontFamily = "monospace";
         }
     else if ( (!(s.find("Serif") == std::string::npos)) ||
               (!(s.find("Times") == std::string::npos)))  {
-        sFontFamily = "Serif,MS Serif"; // "Times", "Times New Roman", "MS Serif"
+        sFontFamily = "serif";
         }
     else {
-        sFontFamily = "Sans Serif,MS Sans Serif"; // "Arial", "Tahoma", "MS Sans Serif"
+        sFontFamily = "sans-serif";
         }
     return sFontFamily;
 }
