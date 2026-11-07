@@ -1768,25 +1768,20 @@ std::string ColorToValue (const std::string & Color){
 /******************************************************************************/
 std::string FontToFontFamily (const std::string & s){
     std::string sFontFamily;
-    if      ( (!(s.find("Sans") == std::string::npos)) ||
-              (!(s.find("Arial") == std::string::npos)) ||
-              (!(s.find("MS Shell Dlg") == std::string::npos)) )  {
-        sFontFamily = "Liberation Sans,Sans Serif,MS Sans Serif"; // "Arial", "Tahoma", "MS Sans Serif"
-        }
-    else if ( (!(s.find("Mono") == std::string::npos)) ||
+    if      ( (!(s.find("Mono") == std::string::npos)) ||
               (!(s.find("Fixed") == std::string::npos)) ||
               (!(s.find("Courier") == std::string::npos)))  {
-        sFontFamily = "Liberation Mono,Monospace,Courier New"; // "Courier", "Courier New", "Fixedsys", "Console", "Terminal"
+        sFontFamily = "'Liberation Mono', monospace"; // "Courier", "Courier New", "Fixedsys", "Console", "Terminal"
         }
     else if ( (!(s.find("Serif") == std::string::npos)) ||
               (!(s.find("Times") == std::string::npos)))  {
-        sFontFamily = "Liberation Serif,Serif,MS Serif"; // "Times", "Times New Roman", "MS Serif"
+        sFontFamily = "Liberation Serif, serif"; // "Times", "Times New Roman", "MS Serif"
         }
     else if ( (!(s.find("osifont") == std::string::npos)) )  {
-        sFontFamily = "osifont,Sans Serif"; // sog. "Normschrift" oder ohne Serifen
+        sFontFamily = "osifont, sans-serif"; // sog. "Normschrift" oder ohne Serifen
         }
     else {
-        sFontFamily = "Liberation Sans,Sans Serif,MS Sans Serif"; // "Arial", "Tahoma", "MS Sans Serif"
+        sFontFamily = "'Liberation Sans', sans-serif"; // "Arial", "Tahoma", "MS Sans Serif"
         }
     return sFontFamily;
 }
