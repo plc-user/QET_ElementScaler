@@ -1768,7 +1768,12 @@ std::string ColorToValue (const std::string & Color){
 /******************************************************************************/
 std::string FontToFontFamily (const std::string & s){
     std::string sFontFamily;
-    if      ( (!(s.find("Mono") == std::string::npos)) ||
+    if      ( (!(s.find("Sans") == std::string::npos)) ||
+              (!(s.find("Arial") == std::string::npos)) ||
+              (!(s.find("MS Shell Dlg") == std::string::npos)) )  {
+        sFontFamily = "'Liberation Sans',sans-serif"; // "Arial", "Tahoma", "MS Sans Serif"
+        }
+    else if ( (!(s.find("Mono") == std::string::npos)) ||
               (!(s.find("Fixed") == std::string::npos)) ||
               (!(s.find("Courier") == std::string::npos)))  {
         sFontFamily = "'Liberation Mono', monospace"; // "Courier", "Courier New", "Fixedsys", "Console", "Terminal"
