@@ -662,8 +662,8 @@ std::string ToSVG(pugi::xml_node node) {
     DefinitionLine DefLine;
     DefLine.ReadFromPugiNode(node);
     // Daten für Abmessungen aus Definition-Line:
-    s += "     width=\"" + std::to_string(DefLine.GetWidth());
-    s += "\" height=\"" + std::to_string(DefLine.GetHeight()) + "\">\n";
+    s += "     width=\"" + FormatValue(DefLine.GetWidth(), 3);
+    s += "\" height=\"" + FormatValue(DefLine.GetHeight(), 3) + "\">\n";
     // hier die Definition von "terminal", falls im Element vorhanden:
     if (node.child("description").child("terminal")) {
         s += "  <defs>\n";
