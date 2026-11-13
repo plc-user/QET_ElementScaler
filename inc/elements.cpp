@@ -1446,33 +1446,33 @@ void ElmtTerminal::WriteToPugiNode(pugi::xml_node& node)
     if (node.attribute("uuid")) {
         node.remove_attribute("uuid");
         node.prepend_attribute("uuid").set_value(uuid);
-        } else {
-        node.prepend_attribute("uuid").set_value(("{" + CreateUUID(false) + "}"));
-        }
+    } else {
+        node.prepend_attribute("uuid").set_value("{" + CreateUUID(false) + "}");
+    }
     if (node.attribute("name")) {
         node.remove_attribute("name");
         node.append_attribute("name").set_value(name);
-        } else {
+    } else {
         node.append_attribute("name").set_value("");
-        }
+    }
     WritePosition(node, 0);
     node.remove_attribute("orientation");
     node.append_attribute("orientation").set_value(orientation);
     if (node.attribute("type")) {
         node.remove_attribute("type");
         node.append_attribute("type").set_value(type);
-        } else {
+    } else {
         node.append_attribute("type").set_value("Generic");
-        }
+    }
 }
 // ---
 void ElmtTerminal::Rot90(void){
     RotPoint90(x, y);
     switch (orientation[0]){
-    case 'n': orientation = "e"; break;
-    case 'e': orientation = "s"; break;
-    case 's': orientation = "w"; break;
-    case 'w': orientation = "n"; break;
+        case 'n': orientation = "e"; break;
+        case 'e': orientation = "s"; break;
+        case 's': orientation = "w"; break;
+        case 'w': orientation = "n"; break;
     }
 }
 // ---
@@ -1810,13 +1810,13 @@ std::string FontToFontFamily (const std::string & s){
         }
     else if ( (!(s.find("Serif") == std::string::npos)) ||
               (!(s.find("Times") == std::string::npos)))  {
-        sFontFamily = "'Liberation Serif', serif"; // "Times", "Times New Roman", "MS Serif"
+        sFontFamily = "'Liberation Serif',serif"; // "Times", "Times New Roman", "MS Serif"
         }
     else if ( (!(s.find("osifont") == std::string::npos)) )  {
-        sFontFamily = "osifont, sans-serif"; // sog. "Normschrift" oder ohne Serifen
+        sFontFamily = "osifont,sans-serif"; // sog. "Normschrift" oder ohne Serifen
         }
     else {
-        sFontFamily = "'Liberation Sans', sans-serif"; // "Arial", "Tahoma", "MS Sans Serif"
+        sFontFamily = "'Liberation Sans',sans-serif"; // "Arial", "Tahoma", "MS Sans Serif"
         }
     return sFontFamily;
 }
