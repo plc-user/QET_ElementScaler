@@ -33,6 +33,7 @@
 #include <iostream>     // for IO-Operations
 #include <cstdint>      // int8_t, ...
 #include <cmath>        // round, ...
+#include <algorithm>    // all_of, ...
 
 // für die Terminal-Größe:
 #if defined(_WIN32)
@@ -103,6 +104,22 @@ std::string ReadPieceOfFile(const std::string file, size_t pos, const size_t len
 // --- "trim" remove leading and trailing whitespace from a std::string --------
 //
 std::string trim(const std::string& source);
+
+
+//
+// --- check if font is a "QET"-font – if not, replace by Liberation-font ------
+//
+bool IsQetFont(std::string &font);
+
+
+
+//
+// check if a string contains only digits
+//
+inline bool IsDigits(const std::string& str)
+{
+    return all_of(str.begin(), str.end(), ::isdigit);
+}
 
 
 

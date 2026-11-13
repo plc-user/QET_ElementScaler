@@ -30,7 +30,6 @@
 #include "helpers.h"
 
 #include <random>       // for random values of uuid
-#include <cmath>        // for sqrt, atan2, isnan(), ...
 #include <iomanip>      // for IO-Operations
 #include <fstream>      // for file-reading
 #include <sstream>      // for String-Streams
@@ -191,6 +190,37 @@ void replaceAll(      std::string& str,   // in-place - replacement!
 //
 
 
+
+/******************************************************************************/
+// QET ships some fonts and users are encouraged to use them so that the
+// elements look the same on all supported systems.
+// Return-value: false, if font is changed
+bool IsQetFont(std::string &font) {
+    std::string f = font;
+    std::cerr << "font \"" << f << "\" ";
+    for (auto &c : f) c = std::tolower(static_cast<unsigned char>(c));
+    auto has = [&f](const char *s) { return f.find(s) != std::string::npos; };
+    if ((font == "osifont") || has("liberation")) {
+        std::cerr << "(unchanged)\n";
+        return true;
+    }
+    if (has("mono") || has("courier") || has("console") || has("consolas")
+        || has("fixed") || has("cousine") || has("terminal")) {
+        font = "Liberation Mono";
+        std::cerr << "replace by \"" << font << "\"\n";
+        return false;
+    }
+    if ((has("serif") && !has("sans")) || has("times") || has("tinos")
+        || has("georgia") || has("cambria") || has("garamond")) {
+        font = "Liberation Serif";
+        std::cerr << "replace by \"" << font << "\"\n";
+        return false;
+    }
+    font = "Liberation Sans";
+    std::cerr << "replace by \"" << font << "\"\n";
+    return false;
+}
+/******************************************************************************/
 
 
 

@@ -401,6 +401,7 @@ class ElmtDynText : public BaseElement,
                        CreateFontString();
                        }
       std::string AsSVGstring(const size_t&);
+      bool CheckFont(void);
 };
 //
 //--- END - definition of class "ElmtDynText" ----------------------------------
@@ -493,6 +494,7 @@ class ElmtText : public BaseElement,
                        CreateFontString();
                        }
       std::string AsSVGstring(const size_t&);
+      bool CheckFont(void);
 };
 //
 //--- END - definition of class "ElmtText" -------------------------------------

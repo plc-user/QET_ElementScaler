@@ -48,7 +48,7 @@
 // global variables
 // =============================================================================
 
-const std::string sVersion = "v0.5.6.2";
+const std::string sVersion = "v0.5.7beta1";
 
 // the element-file to process:
 static std::string ElementFile       ;
@@ -75,6 +75,8 @@ static bool xFlipHor            = false;
 static bool xFlipVert           = false;
 static bool xRotate90           = false;
 static bool xOnlyCleanMeta      = false;
+static bool xFixFonts           = false;
+static bool xOnlyFixFonts       = false;
 
 // to find out, if we need to renew UUIDs for "dynamic_text" or "terminal":
 static std::list <std::string> lsUUIDsDynTexts;
@@ -91,6 +93,8 @@ static double scaleY = 1.0;
 
 static double moveX = 0.0;
 static double moveY = 0.0;
+
+static size_t uiFontsReplaced = 0;    // number of fonts that were replaced to QET-internal
 
 //
 // --- function-prototypes -----------------------------------------------------
@@ -123,6 +127,8 @@ static struct option long_options[]={
     {"toSVG",no_argument,nullptr,1004},  // "long-opt" only!!!
     {"Rot90",no_argument,nullptr,1005},  // "long-opt" only!!!
     {"OnlyCleanMeta",no_argument,nullptr,1006},  // "long-opt" only!!!
+    {"FixFonts",no_argument,nullptr,1007},  // "long-opt" only!!!
+    {"OnlyFixFonts",no_argument,nullptr,1008},  // "long-opt" only!!!
     {0,0,0,0}
   };
 
@@ -194,6 +200,20 @@ int parseCommandline(int argc, char *argv[]) {
                     xOnlyCleanMeta = true;
                     xCreateSVG     = false; // SVG hat diese Daten nicht!
                     xCreateELMT    = true;
+                }
+                break;
+            case 1007:
+                if (std::string(long_options[option_index].name) == "FixFonts"){
+                    if (_DEBUG_)
+                        std::cerr << "replace fonts not delivered by QET by included fonts\n";
+                    xFixFonts = true;
+                }
+                break;
+            case 1008:
+                if (std::string(long_options[option_index].name) == "OnlyFixFonts"){
+                    if (_DEBUG_)
+                        std::cerr << "ONLY replace fonts not delivered by QET by included fonts\n";
+                    xOnlyFixFonts = true;
                 }
                 break;
             case 'd':
@@ -347,10 +367,10 @@ void PrintHelp(const std::string &s, const std::string &v){
     std::string sExeName = ss.str();
     std::cout << std::endl
     << sExeName << " version " << v << " needs arguments!" << std::endl
-    << std::endl
+    << "\n"
     << "usage:" << std::endl
-    << sExeName << "  [options]  FILENAME" << std::endl
-    << std::endl
+    << sExeName << "  [options]  FILENAME\n"
+    << "\n"
     << "   -i | --stdin     input-data is read from stdin, a given filename is  \n"
     << "                    ignored and scaled element will be written to stdout\n"
     << "   -o | --stdout    output will be written to stdout                    \n"
@@ -369,9 +389,9 @@ void PrintHelp(const std::string &s, const std::string &v){
     << "   -d VALUE         or                                                  \n"
     << "   --decimals VALUE number of decimals for float-values in output       \n"
     << "   -h | --help      show this help                                      \n"
-    << std::endl
+    << "\n"
     << "  there are also some \"long-opt\"-only options:                        \n"
-    << std::endl
+    << "\n"
     << "  \"--toSVG\"              creates data for a Scalable-Vector-Graphic   \n"
     << "                         instead of a QElectroTech-element              \n"
     << "  \"--RemoveAllTerminals\" removes all terminals from the element       \n"
@@ -382,11 +402,18 @@ void PrintHelp(const std::string &s, const std::string &v){
     << "                         (useful during creation of elements)           \n"
     << "  \"--Rot90\"              rotate element clockwise by 90 degree        \n"
     << "                         (useful during creation of elements)           \n"
+    << "  \"--FixFonts\"           replace every font that is not delivered     \n"
+    << "                         by QElectroTech by one of Liberation Sans,     \n"
+    << "                         Liberation Serif or Liberation Mono            \n"
+    << "  \"--OnlyFixFonts\"       NO scaling or moving - only replace fonts    \n"
+    << "                         that are not delivered by QElectroTech by one  \n"
+    << "                         of Liberation Sans, -Serif or -Mono. Use with  \n"
+    << "                         \"--OverwriteOriginal\" to not create a new file. \n"
     << "  \"--OnlyCleanMeta\"      NO scaling or moving - sort names and        \n"
     << "                         delete empty elementInformation                \n"
     << "  \"--OverwriteOriginal\"  the original file is replaced by scaled one  \n"
     << "                         (CAUTION: Be careful with this option!)        \n"
-    << std::endl
+    << "\n"
     << "As always with free software: Use it at your own risk!                \n\n";
 }
 /******************************************************************************/
@@ -422,6 +449,35 @@ void ProcessDirFile(pugi::xml_node doc) {
     Namen.ReadFromPugiNode(doc.child("qet-directory").child("names"));
     Namen.WriteToPugiNode(doc.child("qet-directory").child("names"));
     //
+}
+/******************************************************************************/
+
+
+
+/******************************************************************************/
+void ProcessOnlyFontsOfElement(pugi::xml_node doc) {
+    // alle Nodes durchgehen, aber nur Text-Nodes bearbeiten – wir starten also bei Node "description":
+    pugi::xml_node node = doc.child("definition").child("description").first_child();
+    for (; node; node = node.next_sibling()) {
+        if ((std::string(node.name())) == "text") {
+            ElmtText text;
+            text.ReadFromPugiNode(node);
+            if (text.CheckFont() == false) {
+                uiFontsReplaced++;
+                text.WriteToPugiNode(node, decimals);
+            }
+        }
+        if ((std::string(node.name())) == "dynamic_text") {
+            ElmtDynText dyntext;
+            dyntext.ReadFromPugiNode(node);
+            if (dyntext.CheckFont() == false) {
+                uiFontsReplaced++;
+                dyntext.WriteToPugiNode(node, decimals);
+            }
+        }
+    }
+    if (uiFontsReplaced > 0) // die UUID des Elements muss erneuert werden:
+        doc.child("definition").child("uuid").attribute("uuid").set_value(("{" + CreateUUID(false) + "}"));
 }
 /******************************************************************************/
 
@@ -526,6 +582,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (xRotate90) text.Rot90();
             text.Scale(scaleX, scaleY);
             if (xMoveElement) text.Move(moveX, moveY);
+            if ((xFixFonts) && (text.CheckFont() == false)) { uiFontsReplaced++; }
             text.WriteToPugiNode(node, decimals);
             if (!((text.GetText().empty()) || (text.GetText() == "_"))) {
                 ElmtMinMax.addx(text.GetX()-text.GetSize());
@@ -566,6 +623,7 @@ void ProcessElement(pugi::xml_node doc) {
             if (node.attribute("uuid")) {
                 lsUUIDsDynTexts.push_back(node.attribute("uuid").as_string());
             }
+            if ((xFixFonts) && (dyntext.CheckFont() == false)) { uiFontsReplaced++; }
             dyntext.WriteToPugiNode(node, decimals);
             if (!((dyntext.GetText().empty()) || (dyntext.GetText() == "_"))) {
                 ElmtMinMax.addx(dyntext.GetX()-dyntext.GetSize());

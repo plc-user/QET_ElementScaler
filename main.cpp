@@ -142,7 +142,15 @@ int main(int argc, char **argv)
 
     // Process the Element-file: scale, flip, etc...
     if (xIsElmtFile) {
-        ProcessElement(doc);
+        if (xOnlyFixFonts) {
+            // einige Steuerbits müssen passend gesetzt werden:
+            xCreateELMT = true;
+            xCreateSVG = false;
+            // die Schriftarten ansehen und bei Bedarf ersetzen:
+            ProcessOnlyFontsOfElement(doc);
+        } else {
+            ProcessElement(doc);
+        }
     }
 
     if (xCreateSVG == true) {
@@ -180,6 +188,11 @@ int main(int argc, char **argv)
             std::cout << sXML;
             if (_DEBUG_) std::cerr << "XML auf stdout ------------------------------------------------------" << std::endl;
         } else {
+            // If only the fonts were supposed to be replaced, but none were, we can stop here!
+            if ((xOnlyFixFonts) && (uiFontsReplaced == 0)) {
+                std::cerr << "No fonts replaced –> no need to save anything.\n";
+                return 10;
+            }
             // save string to file:
             std::ofstream outFile(ElementFileScaled);
             outFile << sXML;

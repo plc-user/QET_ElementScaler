@@ -645,6 +645,21 @@ void ElmtDynText::CreateFontString(void)
         font += "," + vsFont[i];
     }
 }
+// ---
+bool ElmtDynText::CheckFont(void)
+{
+    bool xCorrectFont = IsQetFont(vsFont[0]);
+    if (xCorrectFont == false)
+    {
+        // wir bauen den font-string ohne den Text am Ende neu auf
+        font = vsFont[0];
+        for (size_t i=1; i<vsFont.size()-1; i++)
+            font += "," + vsFont[i];
+    }
+    if  (IsDigits(vsFont[vsFont.size()-1]))
+        font += "," + vsFont[vsFont.size()-1];
+    return xCorrectFont;
+}
 //
 //--- END - implementation of class "ElmtDynText" ------------------------------
 //
@@ -767,6 +782,21 @@ void ElmtText::CreateFontString(void)
     for (size_t i=2; i<vsFont.size(); i++) {
         font += "," + vsFont[i];
     }
+}
+// ---
+bool ElmtText::CheckFont(void)
+{
+    bool xCorrectFont = IsQetFont(vsFont[0]);
+    if (xCorrectFont == false)
+    {
+        // wir bauen den font-string ohne den Text am Ende neu auf
+        font = vsFont[0];
+        for (size_t i=1; i<vsFont.size()-1; i++)
+            font += "," + vsFont[i];
+    }
+    if  (IsDigits(vsFont[vsFont.size()-1]))
+        font += "," + vsFont[vsFont.size()-1];
+    return xCorrectFont;
 }
 //
 //--- implementation of class "ElmtText" ---------------------------------------

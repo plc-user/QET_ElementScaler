@@ -60,6 +60,13 @@ QET_ElementScaler [options] &lt;file&gt; <br>
                          (useful during creation of elements) 
   "--Rot90"              rotate element clockwise by 90 degree
                          (useful during creation of elements)
+  "--FixFonts"           replace every font that is not delivered
+                         by QElectroTech by one of Liberation Sans,
+                         Liberation Serif or Liberation Mono
+  "--OnlyFixFonts"       NO scaling or moving - only replace fonts
+                         that are not delivered by QElectroTech by one
+                         of Liberation Sans, -Serif or -Mono. Use with
+                         "--OverwriteOriginal" to not create a new file.
   "--OnlyCleanMeta"      NO scaling or moving - sort names and
                          delete empty elementInformation
   "--OverwriteOriginal"  the original file is replaced by scaled one
